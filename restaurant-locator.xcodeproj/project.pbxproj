@@ -14,6 +14,8 @@
 		65ADFEEC1F35AEC800CB0A45 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 65ADFEEB1F35AEC800CB0A45 /* Assets.xcassets */; };
 		65ADFEEF1F35AEC800CB0A45 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 65ADFEED1F35AEC800CB0A45 /* LaunchScreen.storyboard */; };
 		65ADFEFA1F35AEC800CB0A45 /* restaurant_locatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ADFEF91F35AEC800CB0A45 /* restaurant_locatorTests.swift */; };
+		65ADFF061F35B04A00CB0A45 /* AddCategoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ADFF051F35B04A00CB0A45 /* AddCategoryViewController.swift */; };
+		65ADFF081F35B55000CB0A45 /* CategoryIconsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ADFF071F35B55000CB0A45 /* CategoryIconsCollectionViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +40,8 @@
 		65ADFEF51F35AEC800CB0A45 /* restaurant-locatorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "restaurant-locatorTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		65ADFEF91F35AEC800CB0A45 /* restaurant_locatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = restaurant_locatorTests.swift; sourceTree = "<group>"; };
 		65ADFEFB1F35AEC800CB0A45 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		65ADFF051F35B04A00CB0A45 /* AddCategoryViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AddCategoryViewController.swift; path = ViewControllers/AddCategoryViewController.swift; sourceTree = "<group>"; };
+		65ADFF071F35B55000CB0A45 /* CategoryIconsCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CategoryIconsCollectionViewCell.swift; path = ViewControllers/CategoryIconsCollectionViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,6 +83,7 @@
 		65ADFEE11F35AEC800CB0A45 /* restaurant-locator */ = {
 			isa = PBXGroup;
 			children = (
+				65ADFF041F35B02600CB0A45 /* ViewControllers */,
 				65ADFEE21F35AEC800CB0A45 /* AppDelegate.swift */,
 				65ADFEE41F35AEC800CB0A45 /* MasterViewController.swift */,
 				65ADFEE61F35AEC800CB0A45 /* DetailViewController.swift */,
@@ -97,6 +102,15 @@
 				65ADFEFB1F35AEC800CB0A45 /* Info.plist */,
 			);
 			path = "restaurant-locatorTests";
+			sourceTree = "<group>";
+		};
+		65ADFF041F35B02600CB0A45 /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				65ADFF051F35B04A00CB0A45 /* AddCategoryViewController.swift */,
+				65ADFF071F35B55000CB0A45 /* CategoryIconsCollectionViewCell.swift */,
+			);
+			name = ViewControllers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -204,9 +218,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65ADFF061F35B04A00CB0A45 /* AddCategoryViewController.swift in Sources */,
 				65ADFEE71F35AEC800CB0A45 /* DetailViewController.swift in Sources */,
 				65ADFEE51F35AEC800CB0A45 /* MasterViewController.swift in Sources */,
 				65ADFEE31F35AEC800CB0A45 /* AppDelegate.swift in Sources */,
+				65ADFF081F35B55000CB0A45 /* CategoryIconsCollectionViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
