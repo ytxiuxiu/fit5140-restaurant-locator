@@ -16,6 +16,11 @@
 		65ADFEFA1F35AEC800CB0A45 /* restaurant_locatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ADFEF91F35AEC800CB0A45 /* restaurant_locatorTests.swift */; };
 		65ADFF061F35B04A00CB0A45 /* AddCategoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ADFF051F35B04A00CB0A45 /* AddCategoryViewController.swift */; };
 		65ADFF081F35B55000CB0A45 /* CategoryIconsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ADFF071F35B55000CB0A45 /* CategoryIconsCollectionViewCell.swift */; };
+		65ADFF0A1F35CDE300CB0A45 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ADFF091F35CDE300CB0A45 /* Constants.swift */; };
+		65ADFF0E1F35F20900CB0A45 /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ADFF0D1F35F20900CB0A45 /* Category.swift */; };
+		65ADFF101F36A7DF00CB0A45 /* CategoryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ADFF0F1F36A7DF00CB0A45 /* CategoryTableViewCell.swift */; };
+		65ADFF151F36BC0D00CB0A45 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65ADFF141F36BC0C00CB0A45 /* MapKit.framework */; };
+		65ADFF171F36DEFE00CB0A45 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65ADFF161F36DEFE00CB0A45 /* CoreLocation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,6 +47,11 @@
 		65ADFEFB1F35AEC800CB0A45 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		65ADFF051F35B04A00CB0A45 /* AddCategoryViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AddCategoryViewController.swift; path = ViewControllers/AddCategoryViewController.swift; sourceTree = "<group>"; };
 		65ADFF071F35B55000CB0A45 /* CategoryIconsCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CategoryIconsCollectionViewCell.swift; path = ViewControllers/CategoryIconsCollectionViewCell.swift; sourceTree = "<group>"; };
+		65ADFF091F35CDE300CB0A45 /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		65ADFF0D1F35F20900CB0A45 /* Category.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
+		65ADFF0F1F36A7DF00CB0A45 /* CategoryTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CategoryTableViewCell.swift; path = ViewControllers/CategoryTableViewCell.swift; sourceTree = "<group>"; };
+		65ADFF141F36BC0C00CB0A45 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		65ADFF161F36DEFE00CB0A45 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,6 +59,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65ADFF171F36DEFE00CB0A45 /* CoreLocation.framework in Frameworks */,
+				65ADFF151F36BC0D00CB0A45 /* MapKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -68,6 +80,7 @@
 				65ADFEE11F35AEC800CB0A45 /* restaurant-locator */,
 				65ADFEF81F35AEC800CB0A45 /* restaurant-locatorTests */,
 				65ADFEE01F35AEC800CB0A45 /* Products */,
+				65ADFF111F36BC0B00CB0A45 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -88,9 +101,11 @@
 				65ADFEE41F35AEC800CB0A45 /* MasterViewController.swift */,
 				65ADFEE61F35AEC800CB0A45 /* DetailViewController.swift */,
 				65ADFEE81F35AEC800CB0A45 /* Main.storyboard */,
+				65ADFF0D1F35F20900CB0A45 /* Category.swift */,
 				65ADFEEB1F35AEC800CB0A45 /* Assets.xcassets */,
 				65ADFEED1F35AEC800CB0A45 /* LaunchScreen.storyboard */,
 				65ADFEF01F35AEC800CB0A45 /* Info.plist */,
+				65ADFF091F35CDE300CB0A45 /* Constants.swift */,
 			);
 			path = "restaurant-locator";
 			sourceTree = "<group>";
@@ -109,8 +124,18 @@
 			children = (
 				65ADFF051F35B04A00CB0A45 /* AddCategoryViewController.swift */,
 				65ADFF071F35B55000CB0A45 /* CategoryIconsCollectionViewCell.swift */,
+				65ADFF0F1F36A7DF00CB0A45 /* CategoryTableViewCell.swift */,
 			);
 			name = ViewControllers;
+			sourceTree = "<group>";
+		};
+		65ADFF111F36BC0B00CB0A45 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				65ADFF161F36DEFE00CB0A45 /* CoreLocation.framework */,
+				65ADFF141F36BC0C00CB0A45 /* MapKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -165,6 +190,11 @@
 						CreatedOnToolsVersion = 8.3.3;
 						DevelopmentTeam = DPWDASQ472;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.Maps.iOS = {
+								enabled = 1;
+							};
+						};
 					};
 					65ADFEF41F35AEC800CB0A45 = {
 						CreatedOnToolsVersion = 8.3.3;
@@ -223,6 +253,9 @@
 				65ADFEE51F35AEC800CB0A45 /* MasterViewController.swift in Sources */,
 				65ADFEE31F35AEC800CB0A45 /* AppDelegate.swift in Sources */,
 				65ADFF081F35B55000CB0A45 /* CategoryIconsCollectionViewCell.swift in Sources */,
+				65ADFF0A1F35CDE300CB0A45 /* Constants.swift in Sources */,
+				65ADFF0E1F35F20900CB0A45 /* Category.swift in Sources */,
+				65ADFF101F36A7DF00CB0A45 /* CategoryTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -434,6 +467,7 @@
 				65ADFF001F35AEC800CB0A45 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		65ADFF011F35AEC800CB0A45 /* Build configuration list for PBXNativeTarget "restaurant-locatorTests" */ = {
 			isa = XCConfigurationList;
@@ -442,6 +476,7 @@
 				65ADFF031F35AEC800CB0A45 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
