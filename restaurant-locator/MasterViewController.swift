@@ -50,17 +50,19 @@ class MasterViewController: UITableViewController {
 
     // MARK: - Segues
 
-    /*override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "showDetail" {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "showRestaurantsInCategorySegue" {
             if let indexPath = tableView.indexPathForSelectedRow {
-                let object = objects[indexPath.row] as! NSDate
-                let controller = (segue.destination as! UINavigationController).topViewController as! DetailViewController
-                controller.detailItem = object
-                controller.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
+                let category = categories[indexPath.row]
+                let controller = segue.destination as! RestaurantTableViewController
+                
+                controller.category = category
+                controller.title = category.sName
+                //controller.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
                 controller.navigationItem.leftItemsSupplementBackButton = true
             }
         }
-    }*/
+    }
 
     // MARK: - Table View
 

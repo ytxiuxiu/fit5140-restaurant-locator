@@ -41,6 +41,14 @@ class DetailViewController: UIViewController, CLLocationManagerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // menu icon
+        // draw the menu button in portrait mode
+        if let splitView = self.navigationController?.splitViewController, !splitView.isCollapsed {
+            self.navigationItem.leftBarButtonItem = splitView.displayModeButtonItem
+        }
+        // ⚠️ TODO: change open master button icon to menu - not working
+        self.navigationItem.backBarButtonItem = UIBarButtonItem(image: UIImage(named: "menu"), style: .plain, target: nil, action: nil)
+        
         // start loction
         self.locationManager.delegate = self
         self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
