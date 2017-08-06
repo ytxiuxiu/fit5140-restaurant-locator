@@ -66,6 +66,12 @@ class DetailViewController: UIViewController, CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         let location = locations[0] // most recent location
         
+        // get zomato geocode
+        Zomato.sharedInstance.getGeoCode(lat: location.coordinate.latitude, lng: location.coordinate.longitude, closure: {(cityId: Int, cityName: String) in
+            print(cityId)
+            print(cityName)
+        })
+        
         // prepare region
         let coordinateLocation: CLLocationCoordinate2D = CLLocationCoordinate2DMake(location.coordinate.latitude, location.coordinate.longitude)
         let coordinateSpan: MKCoordinateSpan = MKCoordinateSpanMake(0.01, 0.01)

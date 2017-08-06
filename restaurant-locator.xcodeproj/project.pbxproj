@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		65423D531F3744700038CCE4 /* Restaurant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65423D521F3744700038CCE4 /* Restaurant.swift */; };
 		65ADFEE31F35AEC800CB0A45 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ADFEE21F35AEC800CB0A45 /* AppDelegate.swift */; };
 		65ADFEE51F35AEC800CB0A45 /* MasterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ADFEE41F35AEC800CB0A45 /* MasterViewController.swift */; };
 		65ADFEE71F35AEC800CB0A45 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ADFEE61F35AEC800CB0A45 /* DetailViewController.swift */; };
@@ -23,6 +24,8 @@
 		65ADFF171F36DEFE00CB0A45 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65ADFF161F36DEFE00CB0A45 /* CoreLocation.framework */; };
 		65D039071F36E7FE0019A327 /* RestaurantTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D039061F36E7FE0019A327 /* RestaurantTableViewController.swift */; };
 		65D039091F36F8CC0019A327 /* AddRestaurantViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D039081F36F8CC0019A327 /* AddRestaurantViewController.swift */; };
+		65D0390B1F3731AF0019A327 /* Zomato.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D0390A1F3731AF0019A327 /* Zomato.swift */; };
+		C79CE0312BC905BBEF520CDB /* Pods_restaurant_locator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F2A3C0827F360385DC8D5778 /* Pods_restaurant_locator.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,6 +39,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4BE5EAC9D6C761BFE873BA2D /* Pods-restaurant-locator.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-restaurant-locator.debug.xcconfig"; path = "Pods/Target Support Files/Pods-restaurant-locator/Pods-restaurant-locator.debug.xcconfig"; sourceTree = "<group>"; };
+		65423D521F3744700038CCE4 /* Restaurant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Restaurant.swift; sourceTree = "<group>"; };
 		65ADFEDF1F35AEC800CB0A45 /* restaurant-locator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "restaurant-locator.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		65ADFEE21F35AEC800CB0A45 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		65ADFEE41F35AEC800CB0A45 /* MasterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterViewController.swift; sourceTree = "<group>"; };
@@ -56,6 +61,9 @@
 		65ADFF161F36DEFE00CB0A45 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		65D039061F36E7FE0019A327 /* RestaurantTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RestaurantTableViewController.swift; path = ViewControllers/RestaurantTableViewController.swift; sourceTree = "<group>"; };
 		65D039081F36F8CC0019A327 /* AddRestaurantViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AddRestaurantViewController.swift; path = ViewControllers/AddRestaurantViewController.swift; sourceTree = "<group>"; };
+		65D0390A1F3731AF0019A327 /* Zomato.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Zomato.swift; sourceTree = "<group>"; };
+		DB3DAB1A65DE1C8F40F38FE1 /* Pods-restaurant-locator.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-restaurant-locator.release.xcconfig"; path = "Pods/Target Support Files/Pods-restaurant-locator/Pods-restaurant-locator.release.xcconfig"; sourceTree = "<group>"; };
+		F2A3C0827F360385DC8D5778 /* Pods_restaurant_locator.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_restaurant_locator.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,6 +73,7 @@
 			files = (
 				65ADFF171F36DEFE00CB0A45 /* CoreLocation.framework in Frameworks */,
 				65ADFF151F36BC0D00CB0A45 /* MapKit.framework in Frameworks */,
+				C79CE0312BC905BBEF520CDB /* Pods_restaurant_locator.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -85,6 +94,7 @@
 				65ADFEF81F35AEC800CB0A45 /* restaurant-locatorTests */,
 				65ADFEE01F35AEC800CB0A45 /* Products */,
 				65ADFF111F36BC0B00CB0A45 /* Frameworks */,
+				A9FE8C9F1C5C08849479F6DD /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -110,6 +120,8 @@
 				65ADFEED1F35AEC800CB0A45 /* LaunchScreen.storyboard */,
 				65ADFEF01F35AEC800CB0A45 /* Info.plist */,
 				65ADFF091F35CDE300CB0A45 /* Constants.swift */,
+				65D0390A1F3731AF0019A327 /* Zomato.swift */,
+				65423D521F3744700038CCE4 /* Restaurant.swift */,
 			);
 			path = "restaurant-locator";
 			sourceTree = "<group>";
@@ -140,8 +152,18 @@
 			children = (
 				65ADFF161F36DEFE00CB0A45 /* CoreLocation.framework */,
 				65ADFF141F36BC0C00CB0A45 /* MapKit.framework */,
+				F2A3C0827F360385DC8D5778 /* Pods_restaurant_locator.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A9FE8C9F1C5C08849479F6DD /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				4BE5EAC9D6C761BFE873BA2D /* Pods-restaurant-locator.debug.xcconfig */,
+				DB3DAB1A65DE1C8F40F38FE1 /* Pods-restaurant-locator.release.xcconfig */,
+			);
+			name = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -151,9 +173,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 65ADFEFE1F35AEC800CB0A45 /* Build configuration list for PBXNativeTarget "restaurant-locator" */;
 			buildPhases = (
+				6AA8AF8C5441827A3BF09BBC /* [CP] Check Pods Manifest.lock */,
 				65ADFEDB1F35AEC800CB0A45 /* Sources */,
 				65ADFEDC1F35AEC800CB0A45 /* Frameworks */,
 				65ADFEDD1F35AEC800CB0A45 /* Resources */,
+				75877FAF6AD7FBD9FA68B3EA /* [CP] Embed Pods Frameworks */,
+				2B5309B2D0A9B68C7692A764 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -249,6 +274,64 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		2B5309B2D0A9B68C7692A764 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-restaurant-locator/Pods-restaurant-locator-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		6AA8AF8C5441827A3BF09BBC /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-restaurant-locator-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		75877FAF6AD7FBD9FA68B3EA /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-restaurant-locator/Pods-restaurant-locator-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
+				"${BUILT_PRODUCTS_DIR}/SearchTextField/SearchTextField.framework",
+				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SearchTextField.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyJSON.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-restaurant-locator/Pods-restaurant-locator-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		65ADFEDB1F35AEC800CB0A45 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -262,6 +345,8 @@
 				65ADFF081F35B55000CB0A45 /* CategoryIconsCollectionViewCell.swift in Sources */,
 				65ADFF0A1F35CDE300CB0A45 /* Constants.swift in Sources */,
 				65D039091F36F8CC0019A327 /* AddRestaurantViewController.swift in Sources */,
+				65423D531F3744700038CCE4 /* Restaurant.swift in Sources */,
+				65D0390B1F3731AF0019A327 /* Zomato.swift in Sources */,
 				65ADFF0E1F35F20900CB0A45 /* Category.swift in Sources */,
 				65ADFF101F36A7DF00CB0A45 /* CategoryTableViewCell.swift in Sources */,
 			);
@@ -402,6 +487,7 @@
 		};
 		65ADFEFF1F35AEC800CB0A45 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4BE5EAC9D6C761BFE873BA2D /* Pods-restaurant-locator.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = DPWDASQ472;
@@ -415,6 +501,7 @@
 		};
 		65ADFF001F35AEC800CB0A45 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = DB3DAB1A65DE1C8F40F38FE1 /* Pods-restaurant-locator.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = DPWDASQ472;
