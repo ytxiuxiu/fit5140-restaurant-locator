@@ -23,6 +23,9 @@
 //      5. Scroll View
 //          Website: UIScrollView Tutorial: Getting Started
 //              https://www.raywenderlich.com/159481/uiscrollview-tutorial-getting-started
+//      6. Picker View
+//          Website: iOS9 UIPickerView Example and Tutorial in Swift and Objective-C
+//              http://codewithchris.com/uipickerview-example/
 
 
 import UIKit
@@ -32,7 +35,7 @@ import CoreLocation
 import Cosmos
 import Alamofire
 
-class AddRestaurantViewController: UIViewController, CLLocationManagerDelegate {
+class AddRestaurantViewController: UIViewController, CLLocationManagerDelegate, UIPickerViewDelegate, UIPickerViewDataSource {
     
     @IBOutlet weak var restaurantNameSearchTextField: SearchTextField!
     
@@ -49,6 +52,8 @@ class AddRestaurantViewController: UIViewController, CLLocationManagerDelegate {
     var userLocationLoaded = false
     
     var restaurantSearchResult = [Restaurant]()
+    
+    var notificationPickerData = [String]()
     
     var restaurantAnnotation: MKPointAnnotation?
     
@@ -136,12 +141,20 @@ class AddRestaurantViewController: UIViewController, CLLocationManagerDelegate {
                 }
             }
         }
+        
+        // notification picker
+        self.notificationPickerData = ["Within 50m", "Within 250m", "Within 500m", "Within 1km", "Never"]
+        self.notificationPickerView.delegate = self
+        self.notificationPickerView.dataSource = self
+        
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
+    // MARK: - Location
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         let location = locations[0] // most recent location
@@ -159,6 +172,21 @@ class AddRestaurantViewController: UIViewController, CLLocationManagerDelegate {
         let coordinateLocation: CLLocationCoordinate2D = CLLocationCoordinate2DMake(latitude, longitude)
         let coordinateSpan: MKCoordinateSpan = MKCoordinateSpanMake(0.01, 0.01)
         return MKCoordinateRegionMake(coordinateLocation, coordinateSpan)
+    }
+    
+    
+    // MARK: - Notification Picker
+    
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1    // 1 column
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return self.notificationPickerData.count
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        return notificationPickerData[row]
     }
 
     /*
