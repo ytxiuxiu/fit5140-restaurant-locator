@@ -9,6 +9,11 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>Cosmos.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>Pods-restaurant-locator.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -27,7 +32,17 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>12D975156F0A607EE63347A796C73D01</key>
+		<key>4E70568B452B970DA87F3729BF523175</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>4FDC533A4360A68ABDCE852F04B30927</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>726C10D91143D26C200C38465B5602E9</key>
 		<dict>
 			<key>primary</key>
 			<true/>
@@ -37,12 +52,7 @@
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>D6448C56583AEB37DB8DE1EE9699E144</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>DF97DE135B3879A206A88CD650514FC7</key>
+		<key>F5EBA2254683503A745CD50C47F1C9D0</key>
 		<dict>
 			<key>primary</key>
 			<true/>

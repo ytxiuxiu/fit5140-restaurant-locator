@@ -4,6 +4,7 @@ use_frameworks!
 
 target 'restaurant-locator' do
     pod 'Alamofire', '~> 4.4'
-		pod 'SearchTextField'
-		pod 'SwiftyJSON'
+    pod 'SearchTextField'
+    pod 'SwiftyJSON'
+    pod 'Cosmos', '~> 11.0'
 end

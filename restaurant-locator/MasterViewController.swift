@@ -5,10 +5,16 @@
 //  Created by YINGCHEN LIU on 5/8/17.
 //  Copyright © 2017 YINGCHEN LIU. All rights reserved.
 //
+//  ✴️ Attributes:
+//      1. Show Navigation Bar and Close Button on Popover on Compact Screen
+//          Website: A Beginner’s Guide to Presentation Controllers in iOS 8
+//              http://www.appcoda.com/presentation-controllers-tutorial/
+//          Create NavBar programmatically with Button and Title Swift
+//              https://stackoverflow.com/questions/33717698/create-navbar-programmatically-with-button-and-title-swift
 
 import UIKit
 
-class MasterViewController: UITableViewController {
+class MasterViewController: UITableViewController, UIPopoverPresentationControllerDelegate {
 
     var detailViewController: DetailViewController? = nil
     
@@ -41,12 +47,6 @@ class MasterViewController: UITableViewController {
         // Dispose of any resources that can be recreated.
     }
 
-    /*
-    func insertNewObject(_ sender: Any) {
-        objects.insert(NSDate(), at: 0)
-        let indexPath = IndexPath(row: 0, section: 0)
-        tableView.insertRows(at: [indexPath], with: .automatic)
-    }*/
 
     // MARK: - Segues
 
@@ -61,9 +61,14 @@ class MasterViewController: UITableViewController {
                 //controller.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
                 controller.navigationItem.leftItemsSupplementBackButton = true
             }
+        } else if segue.identifier == "showAddCategorySegue" {
+            let controller = segue.destination.popoverPresentationController!
+            controller.delegate = self
+            controller.barButtonItem = sender as? UIBarButtonItem
         }
     }
 
+    
     // MARK: - Table View
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -99,6 +104,31 @@ class MasterViewController: UITableViewController {
         }
     }
 
-
+    
+    // MARK: - Presentation Controller - only will be executed on compact screen
+    
+    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
+        return UIModalPresentationStyle.fullScreen
+    }
+    
+    func presentationController(_ controller: UIPresentationController, viewControllerForAdaptivePresentationStyle style: UIModalPresentationStyle) -> UIViewController? {
+        // add navigation bar
+        let navigationBar = UINavigationBar(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIApplication.shared.statusBarFrame.size.height + 44))
+        let navigationItem = UINavigationItem(title: "Add Category")
+        let cancelBarButton = UIBarButtonItem(title: "Cancel", style: .done, target: self, action: #selector(cancelBarButtonItemTapped(sender:)))
+        navigationItem.leftBarButtonItem = cancelBarButton
+        navigationBar.setItems([navigationItem], animated: false)
+        controller.presentedViewController.view.addSubview(navigationBar)
+        
+        // add extra top space
+        let addCategoryViewController = controller.presentedViewController as! AddCategoryViewController
+        addCategoryViewController.addExtraTopSpaceForCompatScreen()
+        
+        return controller.presentedViewController
+    }
+    
+    func cancelBarButtonItemTapped(sender: UIBarButtonItem) {
+        dismiss(animated: true, completion: nil)
+    }
 }
 

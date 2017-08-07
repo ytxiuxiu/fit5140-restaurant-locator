@@ -32,6 +32,8 @@ class Zomato: NSObject {
     
     let zomatoURL = "https://developers.zomato.com/api/v2.1/"
     
+    let headers: HTTPHeaders
+    
     static let sharedInstance = Zomato()
     
     var lastGetGeoCodeTime: CFAbsoluteTime?
@@ -39,6 +41,13 @@ class Zomato: NSObject {
     var cityName: String?
     
     var cityId: Int?
+    
+    override init() {
+        self.headers = [
+            "user-key": self.zomatoAPIKey,
+            "Accept": "application/json"
+        ]
+    }
     
     func getGeoCode(lat: CLLocationDegrees, lng: CLLocationDegrees, closure: @escaping (_ cityId: Int, _ cityName: String) -> Void) {
         // only get it after 5 min from last time
@@ -48,12 +57,8 @@ class Zomato: NSObject {
             }
         }
         
-        let headers: HTTPHeaders = [
-            "user-key": self.zomatoAPIKey,
-            "Accept": "application/json"
-        ]
         
-        Alamofire.request("\(self.zomatoURL)geocode?lat=\(lat)&lon=\(lng)", headers: headers).responseJSON { response in
+        Alamofire.request("\(self.zomatoURL)geocode?lat=\(lat)&lon=\(lng)", headers: self.headers).responseJSON { response in
             // ⚠️ TODO: error handling
             if let json = response.data {
                 let data = JSON(data: json)
@@ -65,6 +70,51 @@ class Zomato: NSObject {
         }
         
         lastGetGeoCodeTime = CFAbsoluteTimeGetCurrent()
+    }
+    
+    func searchRestaurants(keyword: String, closure: @escaping (_ restaurants: [Restaurant]) -> Void) throws {
+        // ⚠️ TODO: error handling - for no city id
+        if let cityId = self.cityId {
+            let url = URL(string: "\(self.zomatoURL)search")!
+            let urlRequest = URLRequest(url: url)
+            
+            let parameters: Parameters = ["entity_type": "city", "entity_id": cityId, "q": keyword]
+            var encodedURLRequest = try URLEncoding.queryString.encode(urlRequest, with: parameters)
+            encodedURLRequest.setValue(zomatoAPIKey, forHTTPHeaderField: "user-key")
+            encodedURLRequest.setValue("application/json", forHTTPHeaderField: "Accept")
+            
+            Alamofire.request(encodedURLRequest).responseJSON { response in
+                var restaurants = [Restaurant]()
+            
+                if let json = response.data {
+                    let data = JSON(data: json)
+                
+                    let restaurantsData = data["restaurants"].array
+                
+                    if restaurantsData == nil {
+                        return closure(restaurants)
+                    }
+                
+                    for restaurantData in restaurantsData! {
+                        // ⚠️ TODO: error handling - no data
+                        let name = restaurantData["restaurant"]["name"].string
+                        let url = restaurantData["restaurant"]["url"].string
+                        let thumbURL = restaurantData["restaurant"]["thumb"].string
+                        let imageURL = restaurantData["restaurant"]["featured_image"].string
+                        let rating = Double(restaurantData["restaurant"]["user_rating"]["aggregate_rating"].string!)
+                        let address = restaurantData["restaurant"]["location"]["address"].string
+                        let latitude = Double(restaurantData["restaurant"]["location"]["latitude"].string!)
+                        let longitude = Double(restaurantData["restaurant"]["location"]["longitude"].string!)
+                        let coordinate = CLLocationCoordinate2DMake(latitude!, longitude!)
+                    
+                        let restaurant = Restaurant(name: name!, url: url!, thumbURL: thumbURL!, imageURL: imageURL!, rating: rating!, address: address!, coordinate: coordinate)
+                        restaurants.append(restaurant)
+                    }
+                }
+            
+                closure(restaurants)
+            }
+        }
     }
 
 }

@@ -6,21 +6,22 @@
 //  Copyright © 2017 YINGCHEN LIU. All rights reserved.
 //
 //  ✴️ Attributes:
-//  1. Collection View:
-//      Youtube Video: UICollectionView Tutorial: How to Style an iOS Collection View
-//          https://www.youtube.com/watch?v=sPTUJZ88HGA
-//      Youtube Video: UICollectionView Tutorial: How to Style an iOS Collection View II
-//          https://www.youtube.com/watch?v=btIq1JoybBk
-//      StackOverflow: uicollectionview remove top padding
-//          https://stackoverflow.com/questions/43023384/uicollectionview-remove-top-padding
-//      StackOverflow: How can I highlight selected UICollectionView cells? (Swift)
-//          https://stackoverflow.com/questions/30598664/how-can-i-highlight-selected-uicollectionview-cells-swift
-//  2. Category Icons:
-//      Designed by Madebyoliver from Flaticon
-//          https://www.flaticon.com/packs/gastronomy-set
-//  3. View Border:
-//      StackOverflow: UIView with rounded corners and drop shadow?
-//          https://stackoverflow.com/questions/4754392/uiview-with-rounded-corners-and-drop-shadow
+//      1. Collection View:
+//          Youtube Video: UICollectionView Tutorial: How to Style an iOS Collection View
+//              https://www.youtube.com/watch?v=sPTUJZ88HGA
+//          Youtube Video: UICollectionView Tutorial: How to Style an iOS Collection View II
+//              https://www.youtube.com/watch?v=btIq1JoybBk
+//          StackOverflow: uicollectionview remove top padding
+//              https://stackoverflow.com/questions/43023384/uicollectionview-remove-top-padding
+//          StackOverflow: How can I highlight selected UICollectionView cells? (Swift)
+//              https://stackoverflow.com/questions/30598664/how-can-i-highlight-selected-uicollectionview-cells-swift
+//      2. Category Icons:
+//          Designed by Madebyoliver from Flaticon
+//              https://www.flaticon.com/packs/gastronomy-set
+//      3. View Border:
+//          StackOverflow: UIView with rounded corners and drop shadow?
+//              https://stackoverflow.com/questions/4754392/uiview-with-rounded-corners-and-drop-shadow
+
 
 import UIKit
 
@@ -40,17 +41,14 @@ class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UIC
     
     @IBOutlet weak var categoryColor: UISegmentedControl!
     
+    @IBOutlet weak var topSpaceConstraint: NSLayoutConstraint!
+    
     var categoryIcon: Int?
     
     var selectedCategoryIcon: CategoryIconsCollectionViewCell?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // category name view
-        self.categoryView.layer.borderColor = Constants().colors["grey"]?.cgColor
-        self.categoryView.layer.borderWidth = 1
-        self.categoryView.layer.cornerRadius = 5
         
         // category icons collection
         self.categoryIconsCollectionView.delegate = self
@@ -104,6 +102,18 @@ class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UIC
 //        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "categoryIconCell", for: indexPath) as! CategoryIconsCollectionViewCell
     }
     
+    // MARK: Navigation Bar
+    
+    // Add extra top space for compat screen as a navigation bar will be added to this popover
+    // ✴️ Attributes:
+    // StackOverflow: How to change constraints programmatically that is added from storyboard?
+    //      https://stackoverflow.com/questions/40583602/how-to-change-constraints-programmatically-that-is-added-from-storyboard
+    // StackOverflow: How to add Navigation bar to a view without Navigation controller
+    //      https://stackoverflow.com/questions/23859785/how-to-add-navigation-bar-to-a-view-without-navigation-controller
+    func addExtraTopSpaceForCompatScreen() {
+        topSpaceConstraint.constant = UIApplication.shared.statusBarFrame.height + 44   // status bar + navigation bar + original top
+    }
+    
     /*
     // MARK: - Navigation
 
@@ -117,6 +127,7 @@ class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UIC
     @IBAction func onAddCategoryButtonClicked(_ sender: Any) {
         
     }
+    
     
 
 }

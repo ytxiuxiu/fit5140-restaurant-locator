@@ -21,7 +21,7 @@ class Restaurant: NSObject {
     
     var sImageURL: String?
     
-    var fRating: Float?
+    var fRating: Double?
     
     var sAddress: String?
     
@@ -29,7 +29,7 @@ class Restaurant: NSObject {
     
     var dAddedAt: Date?
     
-    init(name: String, category: Category?, url: String?, thumbURL: String?, imageURL: String?, rating: Float?, address: String?, coordinate: CLLocationCoordinate2D?, addedAt: Date?) {
+    init(name: String, category: Category?, url: String?, thumbURL: String?, imageURL: String?, rating: Double?, address: String?, coordinate: CLLocationCoordinate2D?, addedAt: Date?) {
         self.sName = name
         self.oCategory = category
         self.sURL = url
@@ -41,7 +41,7 @@ class Restaurant: NSObject {
         self.dAddedAt = addedAt
     }
     
-    convenience init(name: String, url: String, thumbURL: String, imageURL: String, rating: Float, address: String, coordinate: CLLocationCoordinate2D) {
+    convenience init(name: String, url: String, thumbURL: String, imageURL: String, rating: Double, address: String, coordinate: CLLocationCoordinate2D) {
         
         // ✴️ Attribute:
         // Website: nil is not compatible with expected argument type Selector??
