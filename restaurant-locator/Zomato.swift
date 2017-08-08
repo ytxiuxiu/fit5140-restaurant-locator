@@ -65,7 +65,11 @@ class Zomato: NSObject {
                 self.cityName = data["location"]["city_name"].string
                 self.cityId = data["location"]["city_id"].int
                 
-                closure(self.cityId!, self.cityName!)
+                if let cityId = self.cityId, let cityName = self.cityName {
+                    closure(cityId, cityName)
+                } else {
+                    // ⚠️ TODO: error handling
+                }
             }
         }
         

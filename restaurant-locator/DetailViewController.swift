@@ -14,9 +14,8 @@
 
 import UIKit
 import MapKit
-import CoreLocation
 
-class DetailViewController: UIViewController, CLLocationManagerDelegate {
+class DetailViewController: UIViewController {
 
     @IBOutlet weak var detailDescriptionLabel: UILabel!
 
@@ -37,6 +36,7 @@ class DetailViewController: UIViewController, CLLocationManagerDelegate {
             }
         }
     }
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,12 +50,21 @@ class DetailViewController: UIViewController, CLLocationManagerDelegate {
         self.navigationItem.backBarButtonItem = UIBarButtonItem(image: UIImage(named: "menu"), style: .plain, target: nil, action: nil)
         
         // start loction
-        self.locationManager.delegate = self
-        self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        self.locationManager.requestWhenInUseAuthorization()
-        self.locationManager.startUpdatingLocation()
+        Location.sharedInstance.addCallback(key: "mainMap", callback: {(latitude, longitude, cityId, cityName) in
+            // prepare region
+            let coordinateLocation: CLLocationCoordinate2D = CLLocationCoordinate2DMake(latitude, longitude)
+            let coordinateSpan: MKCoordinateSpan = MKCoordinateSpanMake(0.01, 0.01)
+            let coordinateRegion: MKCoordinateRegion = MKCoordinateRegionMake(coordinateLocation, coordinateSpan)
+            
+            self.mapView.setRegion(coordinateRegion, animated: true)
+        })
         
         configureView()
+    }
+    
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        // self.navigationItem.leftBarButtonItem?.image = UIImage(named: "menu")
     }
 
     override func didReceiveMemoryWarning() {
@@ -63,33 +72,17 @@ class DetailViewController: UIViewController, CLLocationManagerDelegate {
         // Dispose of any resources that can be recreated.
     }
     
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        let location = locations[0] // most recent location
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
         
-        // get zomato geocode
-        Zomato.sharedInstance.getGeoCode(lat: location.coordinate.latitude, lng: location.coordinate.longitude, closure: {(cityId: Int, cityName: String) in
-            print(cityId)
-            print(cityName)
-        })
-        
-        // prepare region
-        let coordinateLocation: CLLocationCoordinate2D = CLLocationCoordinate2DMake(location.coordinate.latitude, location.coordinate.longitude)
-        let coordinateSpan: MKCoordinateSpan = MKCoordinateSpanMake(0.01, 0.01)
-        let coordinateRegion: MKCoordinateRegion = MKCoordinateRegionMake(coordinateLocation, coordinateSpan)
-        
-        // show on the map
-        self.mapView.setRegion(coordinateRegion, animated: true)
-        self.mapView.showsUserLocation = true
-        
+        Location.sharedInstance.removeCallback(key: "mainMap")
     }
-
+    
     var detailItem: NSDate? {
         didSet {
             // Update the view.
             configureView()
         }
     }
-
-
 }
 

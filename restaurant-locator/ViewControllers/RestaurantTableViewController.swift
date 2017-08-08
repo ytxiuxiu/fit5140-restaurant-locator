@@ -15,6 +15,7 @@
 //              https://stackoverflow.com/questions/27243158/hiding-the-master-view-controller-with-uisplitviewcontroller-in-ios8
 
 import UIKit
+import CoreLocation
 
 extension UISplitViewController {
     func toggleMasterView() {
@@ -26,6 +27,8 @@ extension UISplitViewController {
 class RestaurantTableViewController: UITableViewController {
     
     var category: Category?
+    
+    var restaurants = [Restaurant]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,6 +38,9 @@ class RestaurantTableViewController: UITableViewController {
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
+        
+        let restaurant = Restaurant(name: "Amarillo", url: "", thumbURL: "", imageURL: "", rating: 3.5, address: "149 Brunswick Street", coordinate: CLLocationCoordinate2D(latitude: -37.8770587, longitude: 145.0464984))
+        restaurants.append(restaurant)
     }
     
     override func didReceiveMemoryWarning() {
@@ -46,23 +52,25 @@ class RestaurantTableViewController: UITableViewController {
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 0
+        return 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 0
+        return self.restaurants.count
     }
 
-    /*
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
-
-        // Configure the cell...
+        let cell = tableView.dequeueReusableCell(withIdentifier: "restaurantCell", for: indexPath) as! RestaurantTableViewCell
+        let restaurant = restaurants[indexPath.row]
+        
+        cell.restaurantNameLabel.text = restaurant.sName
+        cell.restaurantRatingView.settings.fillMode = .precise
+        cell.restaurantRatingView.rating = restaurant.fRating!
+        cell.restaurantAddressLabel.text = restaurant.sAddress
 
         return cell
     }
-    */
 
     /*
     // Override to support conditional editing of the table view.

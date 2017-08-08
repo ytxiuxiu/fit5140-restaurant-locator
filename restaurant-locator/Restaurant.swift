@@ -41,7 +41,7 @@ class Restaurant: NSObject {
         self.dAddedAt = addedAt
     }
     
-    convenience init(name: String, url: String, thumbURL: String, imageURL: String, rating: Double, address: String, coordinate: CLLocationCoordinate2D) {
+    convenience init(name: String, url: String?, thumbURL: String?, imageURL: String?, rating: Double, address: String, coordinate: CLLocationCoordinate2D?) {
         
         // ✴️ Attribute:
         // Website: nil is not compatible with expected argument type Selector??

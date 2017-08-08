@@ -35,7 +35,7 @@ import CoreLocation
 import Cosmos
 import Alamofire
 
-class AddRestaurantViewController: UIViewController, CLLocationManagerDelegate, UIPickerViewDelegate, UIPickerViewDataSource {
+class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     @IBOutlet weak var restaurantNameSearchTextField: SearchTextField!
     
@@ -69,10 +69,13 @@ class AddRestaurantViewController: UIViewController, CLLocationManagerDelegate, 
         self.restaurantRatingView.settings.fillMode = .precise
         
         // start loction
-        self.locationManager.delegate = self
-        self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        self.locationManager.requestWhenInUseAuthorization()
-        self.locationManager.startUpdatingLocation()
+        Location.sharedInstance.addCallback(key: "addRestaurantMap", callback: {(latitude, longitude, cityId, cityName) in
+            if !self.userLocationLoaded {    // only move to the user location at the first time
+                let region = Location().makeRegion(latitude: latitude, longitude: longitude)
+                self.restaurantMapView.setRegion(region, animated: true)
+                self.userLocationLoaded = true
+            }
+        })
         
         // restaurant suggestion
         self.restaurantNameSearchTextField.theme.bgColor = UIColor.white
@@ -107,7 +110,7 @@ class AddRestaurantViewController: UIViewController, CLLocationManagerDelegate, 
             self.restaurantAnnotation?.title = restaurant.sName
             self.restaurantMapView.addAnnotation(self.restaurantAnnotation!)
             
-            let region = self.makeRegion(latitude: (restaurant.oCoordinate?.latitude)!, longitude: (restaurant.oCoordinate?.longitude)!)
+            let region = Location().makeRegion(latitude: (restaurant.oCoordinate?.latitude)!, longitude: (restaurant.oCoordinate?.longitude)!)
             self.restaurantMapView.setRegion(region, animated: true)
         }
         
@@ -142,6 +145,16 @@ class AddRestaurantViewController: UIViewController, CLLocationManagerDelegate, 
             }
         }
         
+        // photo
+        // ✴️ Attribute:
+        // StackOverflow: UIImageView as button
+        //      https://stackoverflow.com/questions/11330544/uiimageview-as-button
+        
+        self.restaurantPhotoImageView.isUserInteractionEnabled = true
+        let singleTap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(restaurantPhotoImageViewTapped(_:)))
+        singleTap.numberOfTapsRequired = 1;
+        self.restaurantPhotoImageView.addGestureRecognizer(singleTap)
+        
         // notification picker
         self.notificationPickerData = ["Within 50m", "Within 250m", "Within 500m", "Within 1km", "Never"]
         self.notificationPickerView.delegate = self
@@ -154,26 +167,12 @@ class AddRestaurantViewController: UIViewController, CLLocationManagerDelegate, 
         // Dispose of any resources that can be recreated.
     }
     
-    // MARK: - Location
-    
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        let location = locations[0] // most recent location
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
         
-        // show on the map
-        if !userLocationLoaded {    // only move to the user location at the first time
-            let region = makeRegion(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
-            self.restaurantMapView.setRegion(region, animated: true)
-            userLocationLoaded = true
-        }
-        self.restaurantMapView.showsUserLocation = true
+        Location.sharedInstance.removeCallback(key: "addRestaurantMap")
     }
-    
-    func makeRegion(latitude: CLLocationDegrees, longitude: CLLocationDegrees) -> MKCoordinateRegion {
-        let coordinateLocation: CLLocationCoordinate2D = CLLocationCoordinate2DMake(latitude, longitude)
-        let coordinateSpan: MKCoordinateSpan = MKCoordinateSpanMake(0.01, 0.01)
-        return MKCoordinateRegionMake(coordinateLocation, coordinateSpan)
-    }
-    
+
     
     // MARK: - Notification Picker
     
@@ -188,6 +187,69 @@ class AddRestaurantViewController: UIViewController, CLLocationManagerDelegate, 
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         return notificationPickerData[row]
     }
+    
+    
+    // MARK: - Photo
+    
+    // ✴️ Attribute:
+    // Website: Choosing Images with UIImagePickerController in Swift
+    //      http://www.codingexplorer.com/choosing-images-with-uiimagepickercontroller-in-swift/
+    // Website: Action Sheet Tutorial in iOS8 with Swift
+    //      https://www.ioscreator.com/tutorials/action-sheet-tutorial-ios8-swift
+    // Website: How to Access Photo Camera and Library in Swift
+    //      https://turbofuture.com/cell-phones/Access-Photo-Camera-and-Library-in-Swift
+    
+    func restaurantPhotoImageViewTapped(_ sender: UIImageView) {
+        let optionMenu = UIAlertController(title: nil, message: "Choose a photo for the restaurant", preferredStyle: .actionSheet)
+        
+        let cameraAction = UIAlertAction(title: "Camera", style: .default, handler: {
+            (alert: UIAlertAction!) -> Void in
+            // not working on a simulator, please use real device to test
+            if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.camera) {
+                let imagePicker = UIImagePickerController()
+                imagePicker.delegate = self
+                imagePicker.sourceType = UIImagePickerControllerSourceType.camera;
+                imagePicker.allowsEditing = false
+                self.present(imagePicker, animated: true, completion: nil)
+            } else {
+                // ⚠️ TODO: error handling
+            }
+        })
+        let photoLibraryAction = UIAlertAction(title: "Photo Library", style: .default, handler: {
+            (alert: UIAlertAction!) -> Void in
+            if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.photoLibrary) {
+                let imagePicker = UIImagePickerController()
+                imagePicker.delegate = self
+                imagePicker.sourceType = UIImagePickerControllerSourceType.photoLibrary;
+                imagePicker.allowsEditing = true
+                self.present(imagePicker, animated: true, completion: nil)
+            } else {
+                // ⚠️ TODO: error handling
+            }
+        })
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: {
+            (alert: UIAlertAction!) -> Void in
+            
+        })
+        
+        optionMenu.addAction(cameraAction)
+        optionMenu.addAction(photoLibraryAction)
+        optionMenu.addAction(cancelAction)
+        
+        self.present(optionMenu, animated: true, completion: nil)
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        if let pickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
+            self.restaurantPhotoImageView.image = pickedImage
+        } else {
+            // ⚠️ TODO: error handling
+        }
+        
+        dismiss(animated: true, completion: nil)
+    }
+    
 
     /*
     // MARK: - Navigation
