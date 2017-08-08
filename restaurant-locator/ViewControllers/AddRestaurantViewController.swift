@@ -49,6 +49,8 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     
     @IBOutlet weak var notificationPickerView: UIPickerView!
     
+    @IBOutlet weak var topSpaceConstraint: NSLayoutConstraint!
+    
     var userLocationLoaded = false
     
     var restaurantSearchResult = [Restaurant]()
@@ -248,6 +250,19 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
         }
         
         dismiss(animated: true, completion: nil)
+    }
+    
+    
+    // MARK: Navigation Bar
+    
+    // Add extra top space for compat screen as a navigation bar will be added to this popover
+    // ✴️ Attributes:
+    // StackOverflow: How to change constraints programmatically that is added from storyboard?
+    //      https://stackoverflow.com/questions/40583602/how-to-change-constraints-programmatically-that-is-added-from-storyboard
+    // StackOverflow: How to add Navigation bar to a view without Navigation controller
+    //      https://stackoverflow.com/questions/23859785/how-to-add-navigation-bar-to-a-view-without-navigation-controller
+    func addExtraTopSpaceForCompatScreen() {
+        topSpaceConstraint.constant = UIApplication.shared.statusBarFrame.height + 44   // status bar + navigation bar + original top
     }
     
 

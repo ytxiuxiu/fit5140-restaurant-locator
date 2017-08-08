@@ -4,7 +4,6 @@
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
@@ -99,7 +98,7 @@
                                 <rect key="frame" x="0.0" y="22" width="375" height="80"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="e0v-FY-ilD" id="CnA-O8-aFs">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="79.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="80"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="GHM-5w-njr">
@@ -173,7 +172,7 @@
                                 <rect key="frame" x="0.0" y="28" width="375" height="113"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="2Au-XQ-wTj" id="cOw-v7-vrA">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="112.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="113"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="amarillo" translatesAutoresizingMaskIntoConstraints="NO" id="eNt-dg-wcv">
@@ -240,7 +239,7 @@
                     <navigationItem key="navigationItem" title="Category Name" id="Ly2-oI-6ri">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="m7I-Z6-k6Z">
                             <connections>
-                                <segue destination="J97-RQ-rC9" kind="popoverPresentation" popoverAnchorBarButtonItem="m7I-Z6-k6Z" id="qPf-0k-DcB">
+                                <segue destination="J97-RQ-rC9" kind="popoverPresentation" identifier="showAddRestaurantSegue" popoverAnchorBarButtonItem="m7I-Z6-k6Z" id="qPf-0k-DcB">
                                     <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
                                 </segue>
                             </connections>
@@ -296,7 +295,7 @@
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <view contentMode="scaleToFill" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="t2F-mK-8aI" customClass="CosmosView" customModule="Cosmos">
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="t2F-mK-8aI" customClass="CosmosView" customModule="Cosmos">
                                         <rect key="frame" x="16" y="311" width="343" height="20"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     </view>
@@ -420,6 +419,7 @@
                         <outlet property="restaurantNameSearchTextField" destination="C0Q-ik-cKB" id="5Hn-ga-W0p"/>
                         <outlet property="restaurantPhotoImageView" destination="3gO-ja-Avx" id="Vyn-zh-FM6"/>
                         <outlet property="restaurantRatingView" destination="t2F-mK-8aI" id="Slz-cc-0a4"/>
+                        <outlet property="topSpaceConstraint" destination="wuz-MG-yOd" id="iP2-Mc-IPL"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="pj3-CW-XfM" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -430,7 +430,7 @@
         <scene sceneID="r7l-gg-dq7">
             <objects>
                 <navigationController id="vC3-pB-5Vb" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" misplaced="YES" id="DjV-YW-jjY">
+                    <navigationBar key="navigationBar" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="DjV-YW-jjY">
                         <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>

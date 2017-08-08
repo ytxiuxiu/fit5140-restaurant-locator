@@ -17,14 +17,8 @@
 import UIKit
 import CoreLocation
 
-extension UISplitViewController {
-    func toggleMasterView() {
-        let barButtonItem = self.displayModeButtonItem
-        UIApplication.shared.sendAction(barButtonItem.action!, to: barButtonItem.target, from: nil, for: nil)
-    }
-}
 
-class RestaurantTableViewController: UITableViewController {
+class RestaurantTableViewController: UITableViewController, UIPopoverPresentationControllerDelegate {
     
     var category: Category?
     
@@ -112,9 +106,36 @@ class RestaurantTableViewController: UITableViewController {
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showAddRestaurantSegue" {
-            self.splitViewController?.toggleMasterView()
+            let controller = segue.destination.popoverPresentationController!
+            controller.delegate = self
+            controller.barButtonItem = sender as? UIBarButtonItem
         }
     }
 
     
+    // MARK: - Presentation Controller - only will be executed on compact screen
+    
+    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
+        return UIModalPresentationStyle.fullScreen
+    }
+    
+    func presentationController(_ controller: UIPresentationController, viewControllerForAdaptivePresentationStyle style: UIModalPresentationStyle) -> UIViewController? {
+        // add navigation bar
+        let navigationBar = UINavigationBar(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIApplication.shared.statusBarFrame.size.height + 44))
+        let navigationItem = UINavigationItem(title: "Add Category")
+        let cancelBarButton = UIBarButtonItem(title: "Cancel", style: .done, target: self, action: #selector(cancelBarButtonItemTapped(sender:)))
+        navigationItem.leftBarButtonItem = cancelBarButton
+        navigationBar.setItems([navigationItem], animated: false)
+        controller.presentedViewController.view.addSubview(navigationBar)
+        
+        // add extra top space
+        let addRestaurantViewController = controller.presentedViewController as! AddRestaurantViewController
+        addRestaurantViewController.addExtraTopSpaceForCompatScreen()
+        
+        return controller.presentedViewController
+    }
+    
+    func cancelBarButtonItemTapped(sender: UIBarButtonItem) {
+        dismiss(animated: true, completion: nil)
+    }
 }
