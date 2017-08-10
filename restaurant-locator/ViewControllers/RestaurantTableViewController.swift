@@ -33,13 +33,32 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
         
-        let restaurant = Restaurant(name: "Amarillo", url: "", thumbURL: "", imageURL: "", rating: 3.5, address: "149 Brunswick Street", coordinate: CLLocationCoordinate2D(latitude: -37.8770587, longitude: 145.0464984))
+        let restaurant = Restaurant(name: "Amarillo", url: "", thumbURL: "", imageURL: "", rating: 3.5, address: "149 Brunswick Street", latitude: -37.81283536536353, longitude: 144.96120929718018)
         restaurants.append(restaurant)
+        
+        Location.sharedInstance.addCallback(key: "restaurantsDisntance", callback: {(latitude, longitude, cityId, cityName) in
+            for i in 0..<self.restaurants.count {
+                let restaurant = self.restaurants[i]
+                restaurant.calculateDistance(currentLocation: CLLocation(latitude: latitude, longitude: longitude))
+                
+                // ✴️ Attribute:
+                // StackOverflow: Refresh certain row of UITableView based on Int in Swift
+                // https://stackoverflow.com/questions/28206492/refresh-certain-row-of-uitableview-based-on-int-in-swift
+                
+                let indexPath = IndexPath(item: i, section: 0)
+                self.tableView.reloadRows(at: [indexPath], with: .none)
+            }
+        })
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        Location.sharedInstance.removeCallback(key: "restaurantsDisntance")
     }
 
     // MARK: - Table view data source
@@ -62,6 +81,14 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
         cell.restaurantRatingView.settings.fillMode = .precise
         cell.restaurantRatingView.rating = restaurant.fRating!
         cell.restaurantAddressLabel.text = restaurant.sAddress
+        
+        if let distance = restaurant.fDistance {
+            if (distance < 1000) {
+                cell.restaurantDistanceLabel.text = String(format: "%.0f m", distance)
+            } else {
+                cell.restaurantDistanceLabel.text = String(format: "%.1f km", distance / 1000)
+            }
+        }
 
         return cell
     }

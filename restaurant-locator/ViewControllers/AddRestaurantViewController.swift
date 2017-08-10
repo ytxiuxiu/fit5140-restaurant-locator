@@ -107,13 +107,16 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
             if let lastAnnotation = self.restaurantAnnotation {
                 self.restaurantMapView.removeAnnotation(lastAnnotation)
             }
-            self.restaurantAnnotation = MKPointAnnotation()
-            self.restaurantAnnotation?.coordinate = restaurant.oCoordinate!
-            self.restaurantAnnotation?.title = restaurant.sName
-            self.restaurantMapView.addAnnotation(self.restaurantAnnotation!)
             
-            let region = Location().makeRegion(latitude: (restaurant.oCoordinate?.latitude)!, longitude: (restaurant.oCoordinate?.longitude)!)
-            self.restaurantMapView.setRegion(region, animated: true)
+            if let latitude = restaurant.fLatitude, let longitude = restaurant.fLongitude {
+                self.restaurantAnnotation = MKPointAnnotation()
+                self.restaurantAnnotation?.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+                self.restaurantAnnotation?.title = restaurant.sName
+                self.restaurantMapView.addAnnotation(self.restaurantAnnotation!)
+            
+                let region = Location().makeRegion(latitude: latitude, longitude: longitude)
+                self.restaurantMapView.setRegion(region, animated: true)
+            }
         }
         
         // on user stop typing

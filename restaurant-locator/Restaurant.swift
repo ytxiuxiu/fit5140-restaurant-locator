@@ -25,11 +25,15 @@ class Restaurant: NSObject {
     
     var sAddress: String?
     
-    var oCoordinate: CLLocationCoordinate2D?
+    var fLatitude: CLLocationDegrees?
+    
+    var fLongitude: CLLocationDegrees?
+    
+    var fDistance: Double?
     
     var dAddedAt: Date?
     
-    init(name: String, category: Category?, url: String?, thumbURL: String?, imageURL: String?, rating: Double?, address: String?, coordinate: CLLocationCoordinate2D?, addedAt: Date?) {
+    init(name: String, category: Category?, url: String?, thumbURL: String?, imageURL: String?, rating: Double?, address: String?, latitude: CLLocationDegrees?, longitude: CLLocationDegrees?, addedAt: Date?) {
         self.sName = name
         self.oCategory = category
         self.sURL = url
@@ -37,16 +41,27 @@ class Restaurant: NSObject {
         self.sImageURL = imageURL
         self.fRating = rating
         self.sAddress = address
-        self.oCoordinate = coordinate
+        self.fLatitude = latitude
+        self.fLongitude = longitude
         self.dAddedAt = addedAt
     }
     
-    convenience init(name: String, url: String?, thumbURL: String?, imageURL: String?, rating: Double, address: String, coordinate: CLLocationCoordinate2D?) {
+    convenience init(name: String, url: String?, thumbURL: String?, imageURL: String?, rating: Double, address: String, latitude: CLLocationDegrees?, longitude: CLLocationDegrees?) {
         
         // ✴️ Attribute:
         // Website: nil is not compatible with expected argument type Selector??
         //      https://teamtreehouse.com/community/nil-is-not-compatible-with-expected-argument-type-selector
         
-        self.init(name: name, category: nil, url: url, thumbURL: thumbURL, imageURL: imageURL, rating: rating, address: address, coordinate: coordinate, addedAt: nil)
+        self.init(name: name, category: nil, url: url, thumbURL: thumbURL, imageURL: imageURL, rating: rating, address: address, latitude: latitude, longitude: longitude, addedAt: nil)
     }
+    
+    func calculateDistance(currentLocation: CLLocation) {
+        if let latitude = self.fLatitude, let longitude = self.fLongitude {
+            let location = CLLocation(latitude: latitude, longitude: longitude)
+            
+            self.fDistance = location.distance(from: currentLocation)
+        }
+    }
+    
+    
 }

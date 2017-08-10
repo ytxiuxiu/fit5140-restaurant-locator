@@ -92,21 +92,16 @@ class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UIC
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let cell = collectionView.cellForItem(at: indexPath) as! CategoryIconsCollectionViewCell
-        cell.categoryIconImageView.backgroundColor = UIColor.blue
-//        print(cell.categoryIconImageView.backgroundColor?.cgColor.components)
         
-//        print(cell.categoryIconImageView.backgroundColor?.cgColor.components)
-//        collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .init(rawValue: 0))
+        cell.highlight()
         
-        // TODO: not working
         self.categoryIconImageView.image = UIImage(named: "category-\(indexPath.row + 1)")
-        
-        
-        // TODO: highlight - not working
     }
     
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
-//        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "categoryIconCell", for: indexPath) as! CategoryIconsCollectionViewCell
+        let cell = collectionView.cellForItem(at: indexPath) as! CategoryIconsCollectionViewCell
+        
+        cell.lowlight()
     }
     
     // MARK: Navigation Bar

@@ -53,7 +53,11 @@ class Zomato: NSObject {
         // only get it after 5 min from last time
         if let lastGetGeoCodeTime = self.lastGetGeoCodeTime {
             if CFAbsoluteTimeGetCurrent() - lastGetGeoCodeTime < 5 * 60 {
-                return
+                if let cityId = self.cityId, let cityName = self.cityName {
+                    closure(cityId, cityName)
+                } else {
+                    return
+                }
             }
         }
         
@@ -109,9 +113,8 @@ class Zomato: NSObject {
                         let address = restaurantData["restaurant"]["location"]["address"].string
                         let latitude = Double(restaurantData["restaurant"]["location"]["latitude"].string!)
                         let longitude = Double(restaurantData["restaurant"]["location"]["longitude"].string!)
-                        let coordinate = CLLocationCoordinate2DMake(latitude!, longitude!)
                     
-                        let restaurant = Restaurant(name: name!, url: url!, thumbURL: thumbURL!, imageURL: imageURL!, rating: rating!, address: address!, coordinate: coordinate)
+                        let restaurant = Restaurant(name: name!, url: url!, thumbURL: thumbURL!, imageURL: imageURL!, rating: rating!, address: address!, latitude: latitude, longitude: longitude)
                         restaurants.append(restaurant)
                     }
                 }
