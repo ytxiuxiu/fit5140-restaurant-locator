@@ -89,7 +89,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
             // fill the form
             self.restaurantNameSearchTextField.text = restaurant.sName
             self.restaurantAddressTextField.text = restaurant.sAddress
-            self.restaurantRatingView.rating = restaurant.fRating!
+            self.restaurantRatingView.rating = restaurant.fRating
             
             // download the image
             let destination = DownloadRequest.suggestedDownloadDestination(for: .documentDirectory)
@@ -108,15 +108,13 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
                 self.restaurantMapView.removeAnnotation(lastAnnotation)
             }
             
-            if let latitude = restaurant.fLatitude, let longitude = restaurant.fLongitude {
-                self.restaurantAnnotation = MKPointAnnotation()
-                self.restaurantAnnotation?.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-                self.restaurantAnnotation?.title = restaurant.sName
-                self.restaurantMapView.addAnnotation(self.restaurantAnnotation!)
+            self.restaurantAnnotation = MKPointAnnotation()
+            self.restaurantAnnotation?.coordinate = CLLocationCoordinate2D(latitude: restaurant.fLatitude, longitude: restaurant.fLongitude)
+            self.restaurantAnnotation?.title = restaurant.sName
+            self.restaurantMapView.addAnnotation(self.restaurantAnnotation!)
             
-                let region = Location().makeRegion(latitude: latitude, longitude: longitude)
-                self.restaurantMapView.setRegion(region, animated: true)
-            }
+            let region = Location().makeRegion(latitude: restaurant.fLatitude, longitude: restaurant.fLongitude)
+            self.restaurantMapView.setRegion(region, animated: true)
         }
         
         // on user stop typing
@@ -143,7 +141,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
                             self.restaurantNameSearchTextField.filterItems(items)
                             self.restaurantNameSearchTextField.stopLoadingIndicator()
                         })
-                    } catch is Error {
+                    } catch {
                         // ⚠️ TODO: error handling
                     }
                 }
@@ -161,7 +159,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
         self.restaurantPhotoImageView.addGestureRecognizer(singleTap)
         
         // notification picker
-        self.notificationPickerData = ["Within 50m", "Within 250m", "Within 500m", "Within 1km", "Never"]
+        self.notificationPickerData = ["< 50m", "< 100m", "< 250m", "< 500m", "< 1km", "Never"]
         self.notificationPickerView.delegate = self
         self.notificationPickerView.dataSource = self
         

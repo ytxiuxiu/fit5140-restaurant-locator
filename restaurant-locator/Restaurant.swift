@@ -21,19 +21,19 @@ class Restaurant: NSObject {
     
     var sImageURL: String?
     
-    var fRating: Double?
+    var fRating: Double
     
-    var sAddress: String?
+    var sAddress: String
     
-    var fLatitude: CLLocationDegrees?
+    var fLatitude: CLLocationDegrees
     
-    var fLongitude: CLLocationDegrees?
+    var fLongitude: CLLocationDegrees
     
     var fDistance: Double?
     
     var dAddedAt: Date?
     
-    init(name: String, category: Category?, url: String?, thumbURL: String?, imageURL: String?, rating: Double?, address: String?, latitude: CLLocationDegrees?, longitude: CLLocationDegrees?, addedAt: Date?) {
+    init(name: String, category: Category?, url: String?, thumbURL: String?, imageURL: String?, rating: Double, address: String, latitude: CLLocationDegrees, longitude: CLLocationDegrees, addedAt: Date?) {
         self.sName = name
         self.oCategory = category
         self.sURL = url
@@ -46,7 +46,7 @@ class Restaurant: NSObject {
         self.dAddedAt = addedAt
     }
     
-    convenience init(name: String, url: String?, thumbURL: String?, imageURL: String?, rating: Double, address: String, latitude: CLLocationDegrees?, longitude: CLLocationDegrees?) {
+    convenience init(name: String, url: String?, thumbURL: String?, imageURL: String?, rating: Double, address: String, latitude: CLLocationDegrees, longitude: CLLocationDegrees) {
         
         // ✴️ Attribute:
         // Website: nil is not compatible with expected argument type Selector??
@@ -55,12 +55,10 @@ class Restaurant: NSObject {
         self.init(name: name, category: nil, url: url, thumbURL: thumbURL, imageURL: imageURL, rating: rating, address: address, latitude: latitude, longitude: longitude, addedAt: nil)
     }
     
-    func calculateDistance(currentLocation: CLLocation) {
-        if let latitude = self.fLatitude, let longitude = self.fLongitude {
-            let location = CLLocation(latitude: latitude, longitude: longitude)
-            
-            self.fDistance = location.distance(from: currentLocation)
-        }
+    func calculateDistance(currentLocation: CLLocation) -> Double? {
+        let location = CLLocation(latitude: fLatitude, longitude: fLongitude)
+        self.fDistance = location.distance(from: currentLocation)
+        return self.fDistance
     }
     
     

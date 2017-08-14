@@ -103,6 +103,22 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
         }
     }
+    
+    
+    // Re-arrange Categories
+    // ✴️ Attribute:
+    // Website: Reordering Rows from Table View in iOS8 with Swift
+    //      https://www.ioscreator.com/tutorials/reordering-rows-table-view-ios8-swift
+    
+    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        let category = categories[sourceIndexPath.row]
+        categories.remove(at: sourceIndexPath.row)
+        categories.insert(category, at: destinationIndexPath.row)
+    }
 
     
     // MARK: - Presentation Controller - only will be executed on compact screen

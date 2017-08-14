@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="RestaurantCalloutView" customModule="restaurant_locator" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="304" height="139"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="8Mc-14-HSY">
+                    <rect key="frame" x="5" y="5" width="129" height="129"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="8Mc-14-HSY" secondAttribute="height" multiplier="1:1" id="6tB-d7-AOn"/>
+                        <constraint firstAttribute="width" constant="129" id="YRU-bS-sJj"/>
+                    </constraints>
+                </imageView>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MmZ-Lh-WNt">
+                    <rect key="frame" x="142" y="3" width="157" height="24"/>
+                    <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Address" lineBreakMode="tailTruncation" numberOfLines="4" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Hrs-yD-ExP">
+                    <rect key="frame" x="142" y="29" width="157" height="18"/>
+                    <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
+                    <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ag9-bv-a9R">
+                    <rect key="frame" x="255" y="113" width="41" height="21"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="41" id="9Bl-Ld-Aih"/>
+                        <constraint firstAttribute="height" constant="21" id="A5O-gi-AE5"/>
+                    </constraints>
+                    <state key="normal" title="Detail"/>
+                </button>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="notification-big" translatesAutoresizingMaskIntoConstraints="NO" id="FrL-su-ec6">
+                    <rect key="frame" x="142" y="113" width="21" height="21"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="FrL-su-ec6" secondAttribute="height" multiplier="1:1" id="KyJ-Bk-QgJ"/>
+                        <constraint firstAttribute="width" constant="21" id="OTW-IV-eKn"/>
+                    </constraints>
+                </imageView>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="&lt; 500m" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Fs-rs-bU0">
+                    <rect key="frame" x="168" y="113" width="82" height="21"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="21" id="p2a-Xf-PpX"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
+                    <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                    <nil key="highlightedColor"/>
+                </label>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="Hrs-yD-ExP" firstAttribute="leading" secondItem="8Mc-14-HSY" secondAttribute="trailing" constant="8" id="3DR-zn-T8s"/>
+                <constraint firstItem="7Fs-rs-bU0" firstAttribute="leading" secondItem="FrL-su-ec6" secondAttribute="trailing" constant="5" id="7NR-hW-d47"/>
+                <constraint firstAttribute="trailing" secondItem="MmZ-Lh-WNt" secondAttribute="trailing" constant="5" id="ASB-fK-218"/>
+                <constraint firstAttribute="bottom" secondItem="8Mc-14-HSY" secondAttribute="bottom" constant="5" id="B7X-fG-JsN"/>
+                <constraint firstItem="MmZ-Lh-WNt" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="3" id="CBQ-72-KHG"/>
+                <constraint firstAttribute="trailing" secondItem="Hrs-yD-ExP" secondAttribute="trailing" constant="5" id="IgL-Zo-mvm"/>
+                <constraint firstItem="Ag9-bv-a9R" firstAttribute="bottom" secondItem="FrL-su-ec6" secondAttribute="bottom" id="J2M-UB-IuH"/>
+                <constraint firstItem="8Mc-14-HSY" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="5" id="NW6-If-WJZ"/>
+                <constraint firstItem="FrL-su-ec6" firstAttribute="leading" secondItem="8Mc-14-HSY" secondAttribute="trailing" constant="8" id="Q5H-rP-Bud"/>
+                <constraint firstItem="Ag9-bv-a9R" firstAttribute="leading" secondItem="7Fs-rs-bU0" secondAttribute="trailing" constant="5" id="RVW-SM-VBc"/>
+                <constraint firstAttribute="trailing" secondItem="Ag9-bv-a9R" secondAttribute="trailing" constant="8" id="ToU-82-Fza"/>
+                <constraint firstItem="Hrs-yD-ExP" firstAttribute="top" secondItem="MmZ-Lh-WNt" secondAttribute="bottom" constant="2" id="XOG-Bl-ljB"/>
+                <constraint firstItem="8Mc-14-HSY" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="5" id="ajR-rk-ZYJ"/>
+                <constraint firstItem="7Fs-rs-bU0" firstAttribute="bottom" secondItem="FrL-su-ec6" secondAttribute="bottom" id="eP3-z8-gk5"/>
+                <constraint firstAttribute="bottom" secondItem="Ag9-bv-a9R" secondAttribute="bottom" constant="5" id="nbu-wR-VQa"/>
+                <constraint firstItem="MmZ-Lh-WNt" firstAttribute="leading" secondItem="8Mc-14-HSY" secondAttribute="trailing" constant="8" id="rmB-R9-fKJ"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="restaurantAddressLabel" destination="Hrs-yD-ExP" id="cC4-Xy-8G4"/>
+                <outlet property="restaurantImageView" destination="8Mc-14-HSY" id="of4-v9-WND"/>
+                <outlet property="restaurantNameLabel" destination="MmZ-Lh-WNt" id="hkk-6A-bE9"/>
+                <outlet property="restaurantNotificationLabel" destination="7Fs-rs-bU0" id="svC-Yg-iiU"/>
+            </connections>
+            <point key="canvasLocation" x="34" y="91.5"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="notification-big" width="32" height="32"/>
+    </resources>
+</document>

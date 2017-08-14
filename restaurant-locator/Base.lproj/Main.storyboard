@@ -45,8 +45,8 @@
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" misplaced="YES" mapType="standard" showsUserLocation="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fCa-gZ-QB9">
-                                <rect key="frame" x="1" y="64" width="375" height="603"/>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" showsUserLocation="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fCa-gZ-QB9">
+                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                             </mapView>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -61,10 +61,17 @@
                         </constraints>
                     </view>
                     <toolbarItems/>
-                    <navigationItem key="navigationItem" title="Restaurants" id="mOI-FS-AaM"/>
+                    <navigationItem key="navigationItem" title="Restaurants" id="mOI-FS-AaM">
+                        <barButtonItem key="rightBarButtonItem" title="&lt; 500m" id="sp6-Am-ZDB">
+                            <connections>
+                                <action selector="onRadiusClicked:" destination="JEX-9P-axG" id="WMC-ff-DcK"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="detailDescriptionLabel" destination="0XM-y9-sOw" id="deQ-Na-JPF"/>
                         <outlet property="mapView" destination="fCa-gZ-QB9" id="bpY-N8-hfY"/>
+                        <outlet property="radiusBarButton" destination="sp6-Am-ZDB" id="a9I-Ly-h8Q"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="FJe-Yq-33r" sceneMemberID="firstResponder"/>
@@ -98,7 +105,7 @@
                                 <rect key="frame" x="0.0" y="22" width="375" height="80"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="e0v-FY-ilD" id="CnA-O8-aFs">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="79.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="80"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="GHM-5w-njr">
@@ -172,7 +179,7 @@
                                 <rect key="frame" x="0.0" y="28" width="375" height="113"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="2Au-XQ-wTj" id="cOw-v7-vrA">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="112.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="113"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="amarillo" translatesAutoresizingMaskIntoConstraints="NO" id="eNt-dg-wcv">
@@ -311,12 +318,6 @@
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
-                                    <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="bHb-c3-POh">
-                                        <rect key="frame" x="16" y="406" width="343" height="193"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" secondItem="bHb-c3-POh" secondAttribute="height" multiplier="16:9" id="6f2-hq-PY0"/>
-                                        </constraints>
-                                    </mapView>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Notification" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fEy-e0-Gmq">
                                         <rect key="frame" x="16" y="607" width="343" height="21"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
@@ -346,6 +347,12 @@
                                         <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                         <nil key="highlightedColor"/>
                                     </label>
+                                    <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="bHb-c3-POh">
+                                        <rect key="frame" x="16" y="406" width="343" height="193"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="bHb-c3-POh" secondAttribute="height" multiplier="16:9" id="6f2-hq-PY0"/>
+                                        </constraints>
+                                    </mapView>
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="3gO-ja-Avx" firstAttribute="top" secondItem="dId-tm-nYX" secondAttribute="bottom" constant="8" id="0oY-s4-Yph"/>
