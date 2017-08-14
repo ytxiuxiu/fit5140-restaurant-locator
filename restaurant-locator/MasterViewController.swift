@@ -25,9 +25,6 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         navigationItem.leftBarButtonItem = editButtonItem
-        
-        categories.append(Category(name: "Japanese", color: "green", icon: 15))
-        categories.append(Category(name: "Bakery", color: "yellow", icon: 1))
 
         //let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(insertNewObject(_:)))
         //navigationItem.rightBarButtonItem = addButton
@@ -35,6 +32,8 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
             let controllers = split.viewControllers
             detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
         }
+        
+        categories = Category.fetchAll()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -57,7 +56,7 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
                 let controller = segue.destination as! RestaurantTableViewController
                 
                 controller.category = category
-                controller.title = category.sName
+                controller.title = category.name
                 //controller.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
                 controller.navigationItem.leftItemsSupplementBackButton = true
             }
@@ -84,8 +83,8 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
 
         let category = categories[indexPath.row]
         
-        cell.categoryImageView.image = UIImage(named: "category-\(category.nIcon)")
-        cell.categoryNameLabel.text = category.sName
+        cell.categoryImageView.image = UIImage(named: "category-\(category.icon)")
+        cell.categoryNameLabel.text = category.name
         
         return cell
     }

@@ -53,7 +53,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     
     var userLocationLoaded = false
     
-    var restaurantSearchResult = [Restaurant]()
+    var restaurantSearchResult = [ZomatoRestaurant]()
     
     var notificationPickerData = [String]()
     
@@ -87,21 +87,23 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
             let restaurant = self.restaurantSearchResult[itemPosition]
             
             // fill the form
-            self.restaurantNameSearchTextField.text = restaurant.sName
-            self.restaurantAddressTextField.text = restaurant.sAddress
-            self.restaurantRatingView.rating = restaurant.fRating
+            self.restaurantNameSearchTextField.text = restaurant.name
+            self.restaurantAddressTextField.text = restaurant.address
+            self.restaurantRatingView.rating = restaurant.rating
             
             // download the image
+            if let imageURL = restaurant.imageURL {
             let destination = DownloadRequest.suggestedDownloadDestination(for: .documentDirectory)
-            Alamofire.download(restaurant.sImageURL!, to: destination)
-                .downloadProgress { progress in
-                    print("Download Progress: \(progress.fractionCompleted)")
-                }
-                .responseData { response in
-                    if response.error == nil || response.error.debugDescription.contains("already exists"), let imagePath = response.destinationURL?.path {
-                        self.restaurantPhotoImageView.image = UIImage(contentsOfFile: imagePath)
+                Alamofire.download(imageURL, to: destination)
+                    .downloadProgress { progress in
+                        print("Download Progress: \(progress.fractionCompleted)")
                     }
-                }
+                    .responseData { response in
+                        if response.error == nil || response.error.debugDescription.contains("already exists"), let imagePath = response.destinationURL?.path {
+                            self.restaurantPhotoImageView.image = UIImage(contentsOfFile: imagePath)
+                        }
+                    }
+            }
             
             // add an annotation
             if let lastAnnotation = self.restaurantAnnotation {
@@ -109,11 +111,11 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
             }
             
             self.restaurantAnnotation = MKPointAnnotation()
-            self.restaurantAnnotation?.coordinate = CLLocationCoordinate2D(latitude: restaurant.fLatitude, longitude: restaurant.fLongitude)
-            self.restaurantAnnotation?.title = restaurant.sName
+            self.restaurantAnnotation?.coordinate = CLLocationCoordinate2D(latitude: restaurant.latitude, longitude: restaurant.longitude)
+            self.restaurantAnnotation?.title = restaurant.name
             self.restaurantMapView.addAnnotation(self.restaurantAnnotation!)
             
-            let region = Location().makeRegion(latitude: restaurant.fLatitude, longitude: restaurant.fLongitude)
+            let region = Location().makeRegion(latitude: restaurant.latitude, longitude: restaurant.longitude)
             self.restaurantMapView.setRegion(region, animated: true)
         }
         
@@ -127,14 +129,14 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
                     // search restaurants from zomato
                     
                     do {
-                        try Zomato.sharedInstance.searchRestaurants(keyword: keyword, closure: {(restaurants: [Restaurant]) in
+                        try Zomato.sharedInstance.searchRestaurants(keyword: keyword, closure: {(restaurants: [ZomatoRestaurant]) in
                             var items = [SearchTextFieldItem]()
                             self.restaurantSearchResult.removeAll()
                         
                             for restaurant in restaurants {
                                 self.restaurantSearchResult.append(restaurant)
 
-                                let item = SearchTextFieldItem(title: restaurant.sName, subtitle: restaurant.sAddress/*, image: UIImage(named: "")*/)
+                                let item = SearchTextFieldItem(title: restaurant.name, subtitle: restaurant.address/*, image: UIImage(named: "")*/)
                                 items.append(item)
                             }
                         

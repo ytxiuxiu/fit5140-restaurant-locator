@@ -116,11 +116,7 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
         }
         // ⚠️ TODO: change open master button icon to menu - not working
         self.navigationItem.backBarButtonItem = UIBarButtonItem(image: UIImage(named: "menu"), style: .plain, target: nil, action: nil)
-        
-        
-        let restaurant = Restaurant(name: "Restore Cafe Bar", url: "", thumbURL: "", imageURL: "", rating: 3.1, address: "18 Derby Road, Caulfield East, Caulfield, Melbourne", latitude: -37.876051, longitude: 145.042027)
-        restaurants.append(restaurant)
-        
+
         
         mapView.delegate = self
         
@@ -208,8 +204,8 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
         self.mapView.removeAnnotations(self.restaurantAnnotations)
         
         for restaurant in restaurants {
-            let restaurantAnnotation = RestaurantAnnotation(image: UIImage(named: "amarillo")!, name: restaurant.sName, address: restaurant.sAddress, isNotification: true, notificationDistance: 250)
-            restaurantAnnotation.coordinate = CLLocationCoordinate2D(latitude: restaurant.fLatitude, longitude: restaurant.fLongitude)
+            let restaurantAnnotation = RestaurantAnnotation(image: UIImage(named: "amarillo")!, name: restaurant.name, address: restaurant.address, isNotification: true, notificationDistance: 250)
+            restaurantAnnotation.coordinate = CLLocationCoordinate2D(latitude: restaurant.latitude, longitude: restaurant.longitude)
                 
             let restaurantAnnotationView = MKPinAnnotationView(annotation: restaurantAnnotation, reuseIdentifier: "restaurantPin")
                 

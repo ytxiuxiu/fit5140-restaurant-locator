@@ -81,7 +81,7 @@ class Zomato: NSObject {
         lastGetGeoCodeTime = CFAbsoluteTimeGetCurrent()
     }
     
-    func searchRestaurants(keyword: String, closure: @escaping (_ restaurants: [Restaurant]) -> Void) throws {
+    func searchRestaurants(keyword: String, closure: @escaping (_ restaurants: [ZomatoRestaurant]) -> Void) throws {
         // ⚠️ TODO: error handling - for no city id
         if let cityId = self.cityId {
             let url = URL(string: "\(self.zomatoURL)search")!
@@ -93,7 +93,7 @@ class Zomato: NSObject {
             encodedURLRequest.setValue("application/json", forHTTPHeaderField: "Accept")
             
             Alamofire.request(encodedURLRequest).responseJSON { response in
-                var restaurants = [Restaurant]()
+                var restaurants = [ZomatoRestaurant]()
             
                 if let json = response.data {
                     let data = JSON(data: json)
@@ -107,15 +107,13 @@ class Zomato: NSObject {
                     for restaurantData in restaurantsData! {
                         // ⚠️ TODO: error handling - no data
                         let name = restaurantData["restaurant"]["name"].string
-                        let url = restaurantData["restaurant"]["url"].string
-                        let thumbURL = restaurantData["restaurant"]["thumb"].string
                         let imageURL = restaurantData["restaurant"]["featured_image"].string
                         let rating = Double(restaurantData["restaurant"]["user_rating"]["aggregate_rating"].string!)
                         let address = restaurantData["restaurant"]["location"]["address"].string
                         let latitude = Double(restaurantData["restaurant"]["location"]["latitude"].string!)
                         let longitude = Double(restaurantData["restaurant"]["location"]["longitude"].string!)
                     
-                        let restaurant = Restaurant(name: name!, url: url!, thumbURL: thumbURL!, imageURL: imageURL!, rating: rating!, address: address!, latitude: latitude!, longitude: longitude!)
+                        let restaurant = ZomatoRestaurant(name: name!, imageURL: imageURL!, rating: rating!, address: address!, latitude: latitude!, longitude: longitude!)
                         restaurants.append(restaurant)
                     }
                 }
