@@ -96,8 +96,6 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
 
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            categories[indexPath.row]
-            
             categories.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
         } else if editingStyle == .insert {

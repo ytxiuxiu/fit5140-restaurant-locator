@@ -210,7 +210,7 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
         self.mapView.removeAnnotations(self.restaurantAnnotations)
         
         for restaurant in restaurants {
-            let restaurantAnnotation = RestaurantAnnotation(objectId: restaurant.getId(), image: restaurant.getImage(), name: restaurant.name, address: restaurant.address, isNotification: true, notificationDistance: 250)
+            let restaurantAnnotation = RestaurantAnnotation(imageFilename: restaurant.image ?? "noImage", image: restaurant.getImage(), name: restaurant.name, address: restaurant.address, isNotification: true, notificationDistance: 250)
             restaurantAnnotation.coordinate = CLLocationCoordinate2D(latitude: restaurant.latitude, longitude: restaurant.longitude)
                 
             let restaurantAnnotationView = MKPinAnnotationView(annotation: restaurantAnnotation, reuseIdentifier: "restaurantPin")
@@ -241,7 +241,7 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
     // https://stackoverflow.com/questions/29062225/saving-an-image-on-top-of-another-image-in-swift
     
     func generatePinImage(for restaurantAnnotation: RestaurantAnnotation) -> UIImage {
-        if let restaurantPinImage = restaurantPinImages[restaurantAnnotation.objectId] {
+        if let restaurantPinImage = restaurantPinImages[restaurantAnnotation.imageFilename!] {
             return restaurantPinImage
         } else {
             let pinSize = CGSize(width: 53, height: 59)
@@ -260,11 +260,11 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
             restaurantAnnotation.pinImage = UIGraphicsGetImageFromCurrentImageContext()
             
             // cache
-            restaurantPinImages.updateValue(restaurantAnnotation.pinImage!, forKey: restaurantAnnotation.objectId)
+            restaurantPinImages.updateValue(restaurantAnnotation.pinImage!, forKey: restaurantAnnotation.imageFilename!)
             
             UIGraphicsEndImageContext()
             
-            return restaurantPinImages[restaurantAnnotation.objectId]!
+            return restaurantPinImages[restaurantAnnotation.imageFilename!]!
         }
         
         

@@ -67,16 +67,16 @@ public class Restaurant: NSManagedObject {
     }
     
     // ✴️ Attribute:
-    // Get all characters after the last '/' (slash) from url string
-    //      https://stackoverflow.com/questions/36175805/get-all-characters-after-the-last-slash-from-url-string
+    // Generate a UUID on iOS from Swift
+    //      https://stackoverflow.com/questions/24428250/generate-a-uuid-on-ios-from-swift
     
     func getImageURL() -> URL {
-        let url = getDirecotryURL().appendingPathComponent("\(getId()).png")
-        return url
-    }
-    
-    func getId() -> String {
-        return self.objectID.uriRepresentation().absoluteString.components(separatedBy: "/").last!
+        if let filename = self.image {
+            return getDirecotryURL().appendingPathComponent("\(filename).png")
+        } else {
+            self.image = UUID().uuidString
+            return getDirecotryURL().appendingPathComponent("\(self.image).png")
+        }
     }
     
     func saveImage(image: UIImage) {

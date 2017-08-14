@@ -29,10 +29,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         //      https://stackoverflow.com/questions/27208103/detect-first-launch-of-ios-app
         
         if !UserDefaults.standard.bool(forKey: "launchedBefore") {
-            print("first launch")
             self.insertDefaultData()
-        } else {
-            print("launched before")
+            UserDefaults.standard.set(true, forKey: "launchedBefore")
         }
         
         
@@ -83,6 +81,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         let restaurantCorner = Restaurant.insertNewObject(name: "The Corner Kitchen", rating: 3.2, address: "98 Waverley Road, Malvern East, Melbourne", latitude: -37.876054, longitude: 145.047481)
         restaurantCorner.saveImage(image: UIImage(named: "demo-corner-kitchen")!)
         categoryBrunch.addToRestaurants(restaurantCorner)
+
+        saveContext()
     }
     
     func getDirecotryURL() -> URL {
