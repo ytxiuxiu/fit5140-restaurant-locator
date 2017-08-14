@@ -14,10 +14,13 @@ class Data: NSObject {
     static let shared = Data()
     
     let managedObjectContext: NSManagedObjectContext
+    
+    let directoryURL: URL
 
     override init() {
         let appDelegate = UIApplication.shared.delegate as? AppDelegate
         self.managedObjectContext = (appDelegate?.persistentContainer.viewContext)!
+        self.directoryURL = (appDelegate?.getDirecotryURL())!
     }
     
 }

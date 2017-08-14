@@ -10,6 +10,8 @@ import UIKit
 import MapKit
 
 class RestaurantAnnotation: MKPointAnnotation {
+    
+    var objectId: String
 
     var image: UIImage
     
@@ -23,7 +25,8 @@ class RestaurantAnnotation: MKPointAnnotation {
     
     var notificationDistance: Double?
     
-    init(image: UIImage, name: String, address: String, isNotification: Bool, notificationDistance: Double?) {
+    init(objectId: String, image: UIImage, name: String, address: String, isNotification: Bool, notificationDistance: Double?) {
+        self.objectId = objectId
         self.image = image
         self.name = name
         self.address = address

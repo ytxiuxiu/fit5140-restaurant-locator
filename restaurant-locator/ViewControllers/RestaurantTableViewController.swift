@@ -33,6 +33,12 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
         
+        
+        // get data
+        if let categoryName = category?.name {
+            restaurants = Restaurant.fetchByCategory(categoryName: categoryName)
+        }
+        
         Location.sharedInstance.addCallback(key: "restaurantsDisntance", callback: {(latitude, longitude, cityId, cityName) in
             for i in 0..<self.restaurants.count {
                 let restaurant = self.restaurants[i]
@@ -75,6 +81,7 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
         let restaurant = restaurants[indexPath.row]
         
         cell.restaurantNameLabel.text = restaurant.name
+        cell.restaurantPhotoImageView.image = restaurant.getImage()
         cell.restaurantRatingView.settings.fillMode = .precise
         cell.restaurantRatingView.rating = restaurant.rating
         cell.restaurantRatingView.settings.updateOnTouch = false    // disable editing

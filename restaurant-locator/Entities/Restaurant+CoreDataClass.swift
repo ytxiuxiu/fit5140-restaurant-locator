@@ -23,6 +23,7 @@ public class Restaurant: NSManagedObject {
         restaurant.rating = rating
         restaurant.address = address
         restaurant.latitude = latitude
+        restaurant.longitude = longitude
         restaurant.addedAt = NSDate()
         
         return restaurant
@@ -38,6 +39,93 @@ public class Restaurant: NSManagedObject {
         }
     }
     
+    static func fetchByCategory(categoryName: String) -> [Restaurant] {
+        let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Restaurant")
+        
+        fetch.predicate = NSPredicate(format: "category.name = %@", categoryName)
+        
+        do {
+            return try Data.shared.managedObjectContext.fetch(fetch) as! [Restaurant]
+        } catch {
+            fatalError("Failed to fetch restaurants: \(error)")
+        }
+    }
+    
+    
+    // save restaurant photo
+    // ✴️ Attribute:
+    // Website: How to save a UIImage to a file using UIImagePNGRepresentation
+    //      https://www.hackingwithswift.com/example-code/media/how-to-save-a-uiimage-to-a-file-using-uiimagepngrepresentation
+    // Website: Save and Get Image from Document Directory in Swift ?
+    //      https://iosdevcenters.blogspot.com/2016/04/save-and-get-image-from-document.html
+    // GitHub: Dougly/PersistingImages
+    //      https://github.com/Dougly/PersistingImages
+    
+    func getDirecotryURL() -> URL {
+        let url = Data.shared.directoryURL.appendingPathComponent("restaurants")
+        return url
+    }
+    
+    // ✴️ Attribute:
+    // Get all characters after the last '/' (slash) from url string
+    //      https://stackoverflow.com/questions/36175805/get-all-characters-after-the-last-slash-from-url-string
+    
+    func getImageURL() -> URL {
+        let url = getDirecotryURL().appendingPathComponent("\(getId()).png")
+        return url
+    }
+    
+    func getId() -> String {
+        return self.objectID.uriRepresentation().absoluteString.components(separatedBy: "/").last!
+    }
+    
+    func saveImage(image: UIImage) {
+        let fileManager = FileManager.default
+        
+        let directoryPath = getDirecotryURL().path
+        let imagePath = getImageURL().path
+        
+        do {
+            if !fileManager.fileExists(atPath: directoryPath) {
+                try fileManager.createDirectory(atPath: directoryPath, withIntermediateDirectories: true, attributes: nil)
+            }
+        } catch {
+            fatalError("Could not add image to document directory: \(error)")
+        }
+        
+        do {
+            let files = try fileManager.contentsOfDirectory(atPath: getDirecotryURL().path)
+        
+            for file in files {
+                // if we find existing image filePath delete it to make way for new imageData
+                if "\(directoryPath)/\(file)" == imagePath {
+                    try fileManager.removeItem(atPath: imagePath)
+                }
+            }
+        } catch {
+            fatalError("Could not add image to document directory: \(error)")
+        }
+        
+        do {
+            if let data = UIImagePNGRepresentation(image) {
+                try data.write(to: getImageURL(), options: .atomic)
+            }
+        } catch {
+            fatalError("Could not write image: \(error)")
+        }
+    }
+    
+    func getImage() -> UIImage {
+        let fileManager = FileManager.default
+        
+        let imagePath = getImageURL().path
+
+        if fileManager.fileExists(atPath: imagePath) {
+            return UIImage(contentsOfFile: imagePath)!
+        } else {
+            return UIImage(named: "photo")!
+        }
+    }
     
     func calculateDistance(currentLocation: CLLocation) -> Double? {
         let location = CLLocation(latitude: self.latitude, longitude: self.longitude)

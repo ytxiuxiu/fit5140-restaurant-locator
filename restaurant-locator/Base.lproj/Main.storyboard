@@ -4,6 +4,7 @@
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
@@ -105,7 +106,7 @@
                                 <rect key="frame" x="0.0" y="22" width="375" height="80"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="e0v-FY-ilD" id="CnA-O8-aFs">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="80"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="79.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="GHM-5w-njr">
@@ -179,10 +180,10 @@
                                 <rect key="frame" x="0.0" y="28" width="375" height="113"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="2Au-XQ-wTj" id="cOw-v7-vrA">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="113"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="112.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="amarillo" translatesAutoresizingMaskIntoConstraints="NO" id="eNt-dg-wcv">
+                                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="eNt-dg-wcv">
                                             <rect key="frame" x="8" y="8" width="96" height="96"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="96" id="M0e-cV-sAx"/>
@@ -625,7 +626,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="amarillo" width="1200" height="464"/>
         <image name="category-11" width="512" height="512"/>
         <image name="photo" width="1000" height="1000"/>
         <image name="zomato" width="225" height="225"/>

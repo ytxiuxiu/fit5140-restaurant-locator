@@ -95,6 +95,8 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
     
     var restaurantAnnotations = [RestaurantAnnotation]()
     
+    var restaurantPinImages = [String: UIImage]()
+    
     
     func configureView() {
         // Update the user interface for the detail item.
@@ -117,6 +119,10 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
         // ⚠️ TODO: change open master button icon to menu - not working
         self.navigationItem.backBarButtonItem = UIBarButtonItem(image: UIImage(named: "menu"), style: .plain, target: nil, action: nil)
 
+        
+        // get data
+        self.restaurants = Restaurant.fetchAll()
+        
         
         mapView.delegate = self
         
@@ -204,7 +210,7 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
         self.mapView.removeAnnotations(self.restaurantAnnotations)
         
         for restaurant in restaurants {
-            let restaurantAnnotation = RestaurantAnnotation(image: UIImage(named: "amarillo")!, name: restaurant.name, address: restaurant.address, isNotification: true, notificationDistance: 250)
+            let restaurantAnnotation = RestaurantAnnotation(objectId: restaurant.getId(), image: restaurant.getImage(), name: restaurant.name, address: restaurant.address, isNotification: true, notificationDistance: 250)
             restaurantAnnotation.coordinate = CLLocationCoordinate2D(latitude: restaurant.latitude, longitude: restaurant.longitude)
                 
             let restaurantAnnotationView = MKPinAnnotationView(annotation: restaurantAnnotation, reuseIdentifier: "restaurantPin")
@@ -235,7 +241,9 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
     // https://stackoverflow.com/questions/29062225/saving-an-image-on-top-of-another-image-in-swift
     
     func generatePinImage(for restaurantAnnotation: RestaurantAnnotation) -> UIImage {
-        if restaurantAnnotation.pinImage == nil {
+        if let restaurantPinImage = restaurantPinImages[restaurantAnnotation.objectId] {
+            return restaurantPinImage
+        } else {
             let pinSize = CGSize(width: 53, height: 59)
             let backgroundSize = CGSize(width: 50, height: 56)
             let imageSize = CGSize(width: 40, height: 40)
@@ -250,10 +258,16 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
             notificationImage?.draw(in: CGRect(origin: CGPoint.zero, size: CGSize(width: 16, height: 16)))
             
             restaurantAnnotation.pinImage = UIGraphicsGetImageFromCurrentImageContext()
+            
+            // cache
+            restaurantPinImages.updateValue(restaurantAnnotation.pinImage!, forKey: restaurantAnnotation.objectId)
+            
             UIGraphicsEndImageContext()
+            
+            return restaurantPinImages[restaurantAnnotation.objectId]!
         }
         
-        return restaurantAnnotation.pinImage!
+        
     }
     
     // customized annotation

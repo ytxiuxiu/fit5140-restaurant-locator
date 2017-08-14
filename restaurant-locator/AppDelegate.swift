@@ -29,7 +29,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         //      https://stackoverflow.com/questions/27208103/detect-first-launch-of-ios-app
         
         if !UserDefaults.standard.bool(forKey: "launchedBefore") {
+            print("first launch")
             self.insertDefaultData()
+        } else {
+            print("launched before")
         }
         
         
@@ -65,11 +68,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         let categoryBakery = Category.insertNewObject(name: "Bakery", color: "yellow", icon: 1, sort: 2)
         let categoryBrunch = Category.insertNewObject(name: "Brunch", color: "blue", icon: 2, sort: 2)
         
-        categoryJapanese.addToRestaurants(Restaurant.insertNewObject(name: "Restore Cafe Bar", rating: 3.1, address: "18 Derby Road, Caulfield East, Caulfield, Melbourne", latitude: -37.876051, longitude: 145.042027))
-        categoryJapanese.addToRestaurants(Restaurant.insertNewObject(name: "Sakura Kaiten Sushi", rating: 4.3, address: "61, Little Collins Street, CBD, Melbourne, VIC", latitude: -37.8129954, longitude: 144.9716862))
-        categoryJapanese.addToRestaurants(Restaurant.insertNewObject(name: "Hakata Gensuke Ramen Professionals", rating: 4.2, address: "168, Russell Street, CBD, Melbourne, VIC", latitude: -37.8122201, longitude: 144.9682514))
+        let restaurantRestore = Restaurant.insertNewObject(name: "Restore Cafe Bar", rating: 3.1, address: "18 Derby Road, Caulfield East, Caulfield, Melbourne", latitude: -37.876051, longitude: 145.042027)
+        restaurantRestore.saveImage(image: UIImage(named: "demo-restore-cafe")!)
+        categoryJapanese.addToRestaurants(restaurantRestore)
         
-        categoryBakery.addToRestaurants(Restaurant.insertNewObject(name: "The Corner Kitchen", rating: 3.2, address: "98 Waverley Road, Malvern East, Melbourne", latitude: -37.876054, longitude: 145.047481))
+        let restaurantSakuraSushi = Restaurant.insertNewObject(name: "Sakura Kaiten Sushi", rating: 4.3, address: "61, Little Collins Street, CBD, Melbourne, VIC", latitude: -37.8129954, longitude: 144.9716862)
+        restaurantSakuraSushi.saveImage(image: UIImage(named: "demo-sakura-sushi")!)
+        categoryJapanese.addToRestaurants(restaurantSakuraSushi)
+        
+        let restaurantHakata = Restaurant.insertNewObject(name: "Hakata Gensuke Ramen Professionals", rating: 4.2, address: "168, Russell Street, CBD, Melbourne, VIC", latitude: -37.8122201, longitude: 144.9682514)
+        restaurantHakata.saveImage(image: UIImage(named: "demo-hakata-gensuke")!)
+        categoryJapanese.addToRestaurants(restaurantHakata)
+        
+        let restaurantCorner = Restaurant.insertNewObject(name: "The Corner Kitchen", rating: 3.2, address: "98 Waverley Road, Malvern East, Melbourne", latitude: -37.876054, longitude: 145.047481)
+        restaurantCorner.saveImage(image: UIImage(named: "demo-corner-kitchen")!)
+        categoryBrunch.addToRestaurants(restaurantCorner)
+    }
+    
+    func getDirecotryURL() -> URL {
+        let fileManager = FileManager.default
+        
+        return fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
     }
 
     // MARK: - Split view
