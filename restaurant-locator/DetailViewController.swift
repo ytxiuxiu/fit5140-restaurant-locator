@@ -274,6 +274,7 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
     // ✴️ Attribute:
     // Website: How To Completely Customise Your Map Annotations Callout Views
     //      http://sweettutos.com/2016/03/16/how-to-completely-customise-your-map-annotations-callout-views/
+    
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         if !(view.annotation is RestaurantAnnotation) {
             return

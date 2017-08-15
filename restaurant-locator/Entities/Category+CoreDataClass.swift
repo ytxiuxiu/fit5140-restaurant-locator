@@ -12,11 +12,13 @@ import CoreData
 
 @objc(Category)
 public class Category: NSManagedObject {
+    
+    var numberOfRestaurants: Int?
 
-    static func insertNewObject(name: String, color: String, icon: Int, sort: Int) -> Category {
+    static func insertNewObject(name: String, color: Int, icon: Int, sort: Int) -> Category {
         let category = NSEntityDescription.insertNewObject(forEntityName: "Category", into: Data.shared.managedObjectContext) as! Category
         category.name = name
-        category.color = color
+        category.color = Int64(color)
         category.icon = Int64(icon)
         category.sort = Int64(sort)
         
@@ -34,6 +36,5 @@ public class Category: NSManagedObject {
             fatalError("Failed to fetch categories: \(error)")
         }
     }
-    
     
 }

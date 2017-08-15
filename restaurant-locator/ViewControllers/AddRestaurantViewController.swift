@@ -34,22 +34,32 @@ import MapKit
 import CoreLocation
 import Cosmos
 import Alamofire
+import SwiftValidator
 
-class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+
+class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource, UIImagePickerControllerDelegate, UINavigationControllerDelegate, ValidationDelegate, MKLocalSearchCompleterDelegate, MKMapViewDelegate {
     
     @IBOutlet weak var restaurantNameSearchTextField: SearchTextField!
+    
+    @IBOutlet weak var restaurantNameErrorLabel: UILabel!
     
     @IBOutlet weak var restaurantPhotoImageView: UIImageView!
     
     @IBOutlet weak var restaurantRatingView: CosmosView!
     
-    @IBOutlet weak var restaurantAddressTextField: UITextField!
+    @IBOutlet weak var restaurantAddressTextField: SearchTextField!
+    
+    @IBOutlet weak var restaurantAddressErrorLabel: UITextField!
     
     @IBOutlet weak var restaurantMapView: MKMapView!
     
     @IBOutlet weak var notificationPickerView: UIPickerView!
     
     @IBOutlet weak var topSpaceConstraint: NSLayoutConstraint!
+    
+    var category: Category?
+    
+    var delegate: RestaurantDelegate?
     
     var userLocationLoaded = false
     
@@ -60,6 +70,15 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     var restaurantAnnotation: MKPointAnnotation?
     
     let locationManager = CLLocationManager()
+    
+    let validator = Validator()
+    
+    var restaurantLatitude: CLLocationDegrees?
+    
+    var restaurantLongitude: CLLocationDegrees?
+    
+    var currentPin: MKPointAnnotation?
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -72,53 +91,23 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
         
         // start loction
         Location.sharedInstance.addCallback(key: "addRestaurantMap", callback: {(latitude, longitude, cityId, cityName) in
-            if !self.userLocationLoaded {    // only move to the user location at the first time
-                let region = Location().makeRegion(latitude: latitude, longitude: longitude)
-                self.restaurantMapView.setRegion(region, animated: true)
-                self.userLocationLoaded = true
-            }
+            
+            // fill current address
+            Location.getAddress(latitude: latitude, longitude: longitude, callback: { (address) in
+                if address != nil {
+                    self.restaurantAddressTextField.text = address
+                }
+            })
+            
+            self.movePin(latitude: latitude, longitude: longitude)
+            
+            // unsubscribe, just need location once
+            Location.sharedInstance.removeCallback(key: "addRestaurantMap")
         })
         
         // restaurant suggestion
         self.restaurantNameSearchTextField.theme.bgColor = UIColor.white
-        
-        // on item selected
-        self.restaurantNameSearchTextField.itemSelectionHandler = { filteredResults, itemPosition in
-            let restaurant = self.restaurantSearchResult[itemPosition]
-            
-            // fill the form
-            self.restaurantNameSearchTextField.text = restaurant.name
-            self.restaurantAddressTextField.text = restaurant.address
-            self.restaurantRatingView.rating = restaurant.rating
-            
-            // download the image
-            if let imageURL = restaurant.imageURL {
-            let destination = DownloadRequest.suggestedDownloadDestination(for: .documentDirectory)
-                Alamofire.download(imageURL, to: destination)
-                    .downloadProgress { progress in
-                        print("Download Progress: \(progress.fractionCompleted)")
-                    }
-                    .responseData { response in
-                        if response.error == nil || response.error.debugDescription.contains("already exists"), let imagePath = response.destinationURL?.path {
-                            self.restaurantPhotoImageView.image = UIImage(contentsOfFile: imagePath)
-                        }
-                    }
-            }
-            
-            // add an annotation
-            if let lastAnnotation = self.restaurantAnnotation {
-                self.restaurantMapView.removeAnnotation(lastAnnotation)
-            }
-            
-            self.restaurantAnnotation = MKPointAnnotation()
-            self.restaurantAnnotation?.coordinate = CLLocationCoordinate2D(latitude: restaurant.latitude, longitude: restaurant.longitude)
-            self.restaurantAnnotation?.title = restaurant.name
-            self.restaurantMapView.addAnnotation(self.restaurantAnnotation!)
-            
-            let region = Location().makeRegion(latitude: restaurant.latitude, longitude: restaurant.longitude)
-            self.restaurantMapView.setRegion(region, animated: true)
-        }
-        
+
         // on user stop typing
         self.restaurantNameSearchTextField.userStoppedTypingHandler = {
             if let keyword = self.restaurantNameSearchTextField.text {
@@ -150,6 +139,43 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
             }
         }
         
+        // on item selected
+        self.restaurantNameSearchTextField.itemSelectionHandler = { filteredResults, itemPosition in
+            let restaurant = self.restaurantSearchResult[itemPosition]
+            
+            // fill the form
+            self.restaurantNameSearchTextField.text = restaurant.name
+            self.restaurantAddressTextField.text = restaurant.address
+            self.restaurantRatingView.rating = restaurant.rating
+            
+            // download the image
+            if let imageURL = restaurant.imageURL {
+                let destination = DownloadRequest.suggestedDownloadDestination(for: .documentDirectory)
+                Alamofire.download(imageURL, to: destination)
+                    .downloadProgress { progress in
+                        print("Download Progress: \(progress.fractionCompleted)")
+                    }
+                    .responseData { response in
+                        if response.error == nil || response.error.debugDescription.contains("already exists"), let imagePath = response.destinationURL?.path {
+                            self.restaurantPhotoImageView.image = UIImage(contentsOfFile: imagePath)
+                        }
+                }
+            }
+            
+            // add an annotation
+            if let lastAnnotation = self.restaurantAnnotation {
+                self.restaurantMapView.removeAnnotation(lastAnnotation)
+            }
+            
+            self.restaurantAnnotation = MKPointAnnotation()
+            self.restaurantAnnotation?.coordinate = CLLocationCoordinate2D(latitude: restaurant.latitude, longitude: restaurant.longitude)
+            self.restaurantAnnotation?.title = restaurant.name
+            self.restaurantMapView.addAnnotation(self.restaurantAnnotation!)
+            
+            let region = Location().makeRegion(latitude: restaurant.latitude, longitude: restaurant.longitude)
+            self.restaurantMapView.setRegion(region, animated: true)
+        }
+        
         // photo
         // ✴️ Attribute:
         // StackOverflow: UIImageView as button
@@ -165,6 +191,59 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
         self.notificationPickerView.delegate = self
         self.notificationPickerView.dataSource = self
         
+        
+        // address
+        self.restaurantAddressTextField.theme.bgColor = UIColor.white
+        
+        self.restaurantAddressTextField.userStoppedTypingHandler = {
+            if let keyword = self.restaurantAddressTextField.text {
+                if keyword.characters.count > 1 {
+                    // show the loading indicator
+                    self.restaurantAddressTextField.showLoadingIndicator()
+                    
+                    let completer = MKLocalSearchCompleter()
+                    completer.delegate = self
+                    completer.queryFragment = keyword
+                }
+            }
+        }
+        
+        // ✴️ Attribute:
+        // Website: [Swift MapKit Tutorial Series] How to search a place, address or POI on the map
+        //      http://sweettutos.com/2015/04/24/swift-mapkit-tutorial-series-how-to-search-a-place-address-or-poi-in-the-map/
+        
+        self.restaurantAddressTextField.itemSelectionHandler = { filteredResults, itemPosition in
+            let item = filteredResults[itemPosition]
+            let address = "\(item.title), \(item.subtitle ?? "")"
+            
+            self.restaurantAddressTextField.text = address
+            
+            let localSearchRequest = MKLocalSearchRequest()
+            localSearchRequest.naturalLanguageQuery = address
+            
+            let localSearch = MKLocalSearch(request: localSearchRequest)
+            localSearch.start { (localSearchResponse, error) -> Void in
+                if localSearchResponse == nil {
+                    fatalError("Could not found location of this address")
+                } else {
+                    let latitude = localSearchResponse?.boundingRegion.center.latitude
+                    let longitude = localSearchResponse?.boundingRegion.center.longitude
+                    
+                    if let pinLatitude = latitude, let pinLongitude = longitude {
+                        self.movePin(latitude: pinLatitude, longitude: pinLongitude)
+                    } else {
+                        fatalError("Could not found location of this address")
+                    }
+                }
+            }
+        }
+        
+        // validation
+        
+        self.validator.registerField(restaurantNameSearchTextField, errorLabel: restaurantNameErrorLabel, rules: [RequiredRule(message: "Give it a name!")])
+        
+        self.validator.registerField(restaurantAddressTextField, rules: [RequiredRule(message: "Where is this restaurant?")])
+        
     }
 
     override func didReceiveMemoryWarning() {
@@ -175,7 +254,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
-        Location.sharedInstance.removeCallback(key: "addRestaurantMap")
+        
     }
 
     
@@ -256,6 +335,52 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     }
     
     
+    // MARK: Address
+    
+    // Auto complete address
+    // ✴️ Attributes:
+    // StackOverflow: How to implement auto-complete for address using Apple Map Kit
+    //      https://stackoverflow.com/questions/33380711/how-to-implement-auto-complete-for-address-using-apple-map-kit
+    
+    func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
+        var items = [SearchTextFieldItem]()
+        
+        for result in completer.results {
+            let item = SearchTextFieldItem(title: result.title, subtitle: result.subtitle)
+            items.append(item)
+        }
+        
+        self.restaurantAddressTextField.filterItems(items)
+        self.restaurantAddressTextField.stopLoadingIndicator()
+    }
+    
+    func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
+        self.restaurantAddressTextField.stopLoadingIndicator()
+    }
+    
+    func movePin(latitude: CLLocationDegrees, longitude: CLLocationDegrees) {
+        if self.currentPin == nil {
+            self.currentPin = MKPointAnnotation()
+            
+            let currentPinAnnotationView = MKPinAnnotationView(annotation: currentPin, reuseIdentifier: "currentPin")
+            
+            self.restaurantMapView.addAnnotation(currentPinAnnotationView.annotation!)
+        }
+        
+        self.currentPin?.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        
+        let region = Location().makeRegion(latitude: latitude, longitude: longitude)
+        self.restaurantMapView.setRegion(region, animated: true)
+    }
+    
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        let annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: "currentPin") ?? MKAnnotationView()
+        
+        annotationView.isDraggable = true
+        
+        return annotationView
+    }
+    
     // MARK: Navigation Bar
     
     // Add extra top space for compat screen as a navigation bar will be added to this popover
@@ -264,6 +389,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     //      https://stackoverflow.com/questions/40583602/how-to-change-constraints-programmatically-that-is-added-from-storyboard
     // StackOverflow: How to add Navigation bar to a view without Navigation controller
     //      https://stackoverflow.com/questions/23859785/how-to-add-navigation-bar-to-a-view-without-navigation-controller
+    
     func addExtraTopSpaceForCompatScreen() {
         topSpaceConstraint.constant = UIApplication.shared.statusBarFrame.height + 44   // status bar + navigation bar + original top
     }
@@ -279,8 +405,49 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     }
     */
     
+    // MARK: - Save
+    
     @IBAction func onCancelButtonClicked(_ sender: Any) {
-        self.navigationController?.popViewController(animated: true)
+        // self.navigationController?.popViewController(animated: true)
+    }
+    
+    @IBAction func onAddButtonClicked(_ sender: Any) {
+        validator.validate(self)
+    }
+    
+    
+    
+    func validationSuccessful() {
+        
+//        let restaurant = Restaurant.insertNewObject(name: restaurantNameSearchTextField.text, rating: restaurantRatingView.rating, address: restaurantAddressTextField.text, latitude: , longitude: <#T##Double#>)
+//        
+//        if let sort = self.sort, let categoryIcon = self.categoryIcon {
+//            let category = Category.insertNewObject(name: self.categoryNameTextField.text!, color: categoryColor.selectedSegmentIndex, icon: categoryIcon, sort: sort)
+//            
+//            do {
+//                try Data.shared.managedObjectContext.save()
+//            } catch {
+//                fatalError("Could not save category: \(error)")
+//            }
+//            
+//            delegate?.addCategory(category: category)
+//            
+//            dismiss(animated: true, completion: nil)
+//        } else {
+//            // ⚠️ TODO: error handling
+//        }
+    }
+    
+    func validationFailed(_ errors:[(Validatable ,ValidationError)]) {
+        // show validation error
+        for (field, error) in errors {
+            if let field = field as? UITextField {
+                field.layer.borderColor = Colors.red.cgColor
+                field.layer.borderWidth = 1.0
+            }
+            error.errorLabel?.text = error.errorMessage
+            error.errorLabel?.isHidden = false
+        }
     }
     
 

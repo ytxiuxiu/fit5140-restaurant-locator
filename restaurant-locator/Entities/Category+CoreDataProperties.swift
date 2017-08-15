@@ -16,7 +16,7 @@ extension Category {
         return NSFetchRequest<Category>(entityName: "Category")
     }
 
-    @NSManaged public var color: String
+    @NSManaged public var color: Int64
     @NSManaged public var icon: Int64
     @NSManaged public var name: String
     @NSManaged public var sort: Int64

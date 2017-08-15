@@ -14,7 +14,12 @@
 
 import UIKit
 
-class MasterViewController: UITableViewController, UIPopoverPresentationControllerDelegate {
+
+protocol CategoryDelegate {
+    func addCategory(category: Category)
+}
+
+class MasterViewController: UITableViewController, UIPopoverPresentationControllerDelegate, CategoryDelegate {
 
     var detailViewController: DetailViewController? = nil
     
@@ -34,6 +39,9 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
         }
         
         categories = Category.fetchAll()
+        for category in categories {
+            category.numberOfRestaurants = Restaurant.countByCategory(categoryName: category.name)
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -61,9 +69,13 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
                 controller.navigationItem.leftItemsSupplementBackButton = true
             }
         } else if segue.identifier == "showAddCategorySegue" {
-            let controller = segue.destination.popoverPresentationController!
+            let controller = segue.destination as! AddCategoryViewController
             controller.delegate = self
-            controller.barButtonItem = sender as? UIBarButtonItem
+            controller.sort = categories.count  // new sort
+            
+            let popoverPresentationController = segue.destination.popoverPresentationController!
+            popoverPresentationController.delegate = self
+            popoverPresentationController.barButtonItem = sender as? UIBarButtonItem
         }
     }
 
@@ -85,6 +97,10 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
         
         cell.categoryImageView.image = UIImage(named: "category-\(category.icon)")
         cell.categoryNameLabel.text = category.name
+        if let numberOfRestaurants = category.numberOfRestaurants {
+            cell.numberOfRestaurantsLabel.text = "\(numberOfRestaurants) restaurants"
+        }
+        cell.backgroundColor = Colors.categoryColors[Int(category.color)]
         
         return cell
     }
@@ -96,10 +112,33 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
 
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            categories.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
+            let category = categories[indexPath.row]
+            
+            let alert = UIAlertController(title: "Delete?", message: "Are you sure to delete the category \"\(category.name)\"? It will also delete all restaurants in this category.", preferredStyle: .alert);
+            alert.isModalInPopover = true;
+            
+            // add an action button
+            let deleteAction: UIAlertAction = UIAlertAction(title: "Delete", style: .destructive) { action -> Void in
+                Data.shared.managedObjectContext.delete(category)
+                
+                do {
+                    try Data.shared.managedObjectContext.save()
+                } catch {
+                    fatalError("Could not delete the category: \(error)")
+                }
+                
+                self.categories.remove(at: indexPath.row)
+                tableView.deleteRows(at: [indexPath], with: .fade)
+                
+                self.dismiss(animated: true, completion: nil)
+            }
+            let dismissAction: UIAlertAction = UIAlertAction(title: "Cancel", style: .cancel) { action -> Void in
+                self.dismiss(animated: true, completion: nil)
+            }
+            alert.addAction(deleteAction)
+            alert.addAction(dismissAction)
+            
+            present(alert, animated: true, completion: nil)
         }
     }
     
@@ -144,6 +183,11 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
     
     func cancelBarButtonItemTapped(sender: UIBarButtonItem) {
         dismiss(animated: true, completion: nil)
+    }
+    
+    func addCategory(category: Category) {
+        categories.append(category)
+        tableView.reloadData()
     }
 }
 

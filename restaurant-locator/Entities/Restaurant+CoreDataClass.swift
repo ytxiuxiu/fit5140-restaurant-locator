@@ -51,6 +51,23 @@ public class Restaurant: NSManagedObject {
         }
     }
     
+    // count restaurants in a category
+    // ✴️ Attribute:
+    // StackOverflow: countForFetchRequest in Swift 2.0
+    //      https://stackoverflow.com/questions/34652618/countforfetchrequest-in-swift-2-0
+    
+    static func countByCategory(categoryName: String) -> Int {
+        let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Restaurant")
+        
+        fetch.predicate = NSPredicate(format: "category.name = %@", categoryName)
+        
+        do {
+            return try Data.shared.managedObjectContext.count(for: fetch)
+        } catch {
+            fatalError("Failed to count restaurants: \(error)")
+        }
+    }
+    
     
     // save restaurant photo
     // ✴️ Attribute:

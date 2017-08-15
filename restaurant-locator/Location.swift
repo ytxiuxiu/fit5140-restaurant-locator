@@ -9,8 +9,15 @@
 import UIKit
 import CoreLocation
 import MapKit
+import Alamofire
+import SwiftyJSON
+
 
 class Location: NSObject, CLLocationManagerDelegate {
+    
+    static let googleAPIKey = "AIzaSyAxLjdTklyKbWxOL75N3sZcqyvGl-rxCrA"
+    
+    static let googleGeocoderURL = "https://maps.googleapis.com/maps/api/geocode/json"
 
     static let sharedInstance = Location()
     
@@ -50,6 +57,44 @@ class Location: NSObject, CLLocationManagerDelegate {
                 callback(self.lastLatitude!, self.lastLongitude!, cityId, cityName)
             }
         })
+    }
+    
+    // ✴️ Attribute:
+    // StackOverflow: Swift - Generate an Address Format from Reverse Geocoding
+    //      https://stackoverflow.com/questions/41358423/swift-generate-an-address-format-from-reverse-geocoding
+    
+    static func getAddress(latitude: CLLocationDegrees, longitude: CLLocationDegrees, callback: @escaping (_ address: String?) -> Void) {
+
+        CLGeocoder().reverseGeocodeLocation(CLLocation(latitude: latitude, longitude: longitude)) { (placemark, error) in
+            if error != nil || placemark?.count == 0 {
+                callback(nil)
+            } else {
+                let place = placemark?.first
+                
+                var address = ""
+                
+                if place?.subThoroughfare != nil {  // eg. 900
+                    address = "\(address)\(place?.subThoroughfare ?? ""), "
+                }
+                if place?.thoroughfare != nil { // eg. Dandenong Road
+                    address = "\(address)\(place?.thoroughfare ?? ""), "
+                }
+                if place?.locality != nil { // eg. Caulfield
+                    address = "\(address)\(place?.locality ?? ""), "
+                }
+                if place?.administrativeArea != nil {   // eg. VIC
+                    address = "\(address)\(place?.administrativeArea ?? ""), "
+                }
+                if place?.country != nil {   // eg. Australia
+                    address = "\(address)\(place?.country ?? ""), "
+                }
+                
+                let endIndex = address.index(address.endIndex, offsetBy: -2)
+                address = address.substring(to: endIndex)
+                
+                callback(address)
+            }
+        }
     }
     
     func makeRegion(latitude: CLLocationDegrees, longitude: CLLocationDegrees) -> MKCoordinateRegion {

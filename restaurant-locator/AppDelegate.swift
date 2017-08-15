@@ -62,9 +62,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     }
     
     func insertDefaultData() {
-        let categoryJapanese = Category.insertNewObject(name: "Japanese", color: "green", icon: 15, sort: 1)
-        let categoryBakery = Category.insertNewObject(name: "Bakery", color: "yellow", icon: 1, sort: 2)
-        let categoryBrunch = Category.insertNewObject(name: "Brunch", color: "blue", icon: 2, sort: 2)
+        let categoryJapanese = Category.insertNewObject(name: "Japanese", color: 3, icon: 15, sort: 1)
+        let categoryBakery = Category.insertNewObject(name: "Bakery", color: 2, icon: 1, sort: 2)
+        let categoryBrunch = Category.insertNewObject(name: "Brunch", color: 4, icon: 2, sort: 2)
         
         let restaurantRestore = Restaurant.insertNewObject(name: "Restore Cafe Bar", rating: 3.1, address: "18 Derby Road, Caulfield East, Caulfield, Melbourne", latitude: -37.876051, longitude: 145.042027)
         restaurantRestore.saveImage(image: UIImage(named: "demo-restore-cafe")!)
@@ -149,4 +149,3 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         }
     }
 }
-

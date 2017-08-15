@@ -18,7 +18,11 @@ import UIKit
 import CoreLocation
 
 
-class RestaurantTableViewController: UITableViewController, UIPopoverPresentationControllerDelegate {
+protocol RestaurantDelegate {
+    func addRestaurant(restaurant: Restaurant)
+}
+
+class RestaurantTableViewController: UITableViewController, UIPopoverPresentationControllerDelegate, RestaurantDelegate {
     
     var category: Category?
     
@@ -30,8 +34,7 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
+//        navigationItem.leftBarButtonItem = editButtonItem
         
         
         // get data
@@ -98,7 +101,6 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
         return cell
     }
 
-    
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
         return true
@@ -107,36 +109,25 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             // Delete the row from the data source
+            restaurants.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
         }    
     }
-    
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
 
 
     // MARK: - Navigation
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showAddRestaurantSegue" {
-            let controller = segue.destination.popoverPresentationController!
+            let controller = segue.destination as! AddRestaurantViewController
+            controller.category = self.category
             controller.delegate = self
-            controller.barButtonItem = sender as? UIBarButtonItem
+            
+            let popoverPresentationController = segue.destination.popoverPresentationController!
+            popoverPresentationController.delegate = self
+            popoverPresentationController.barButtonItem = sender as? UIBarButtonItem
         }
     }
 
@@ -150,7 +141,7 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
     func presentationController(_ controller: UIPresentationController, viewControllerForAdaptivePresentationStyle style: UIModalPresentationStyle) -> UIViewController? {
         // add navigation bar
         let navigationBar = UINavigationBar(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIApplication.shared.statusBarFrame.size.height + 44))
-        let navigationItem = UINavigationItem(title: "Add Category")
+        let navigationItem = UINavigationItem(title: "Add Restaurant")
         let cancelBarButton = UIBarButtonItem(title: "Cancel", style: .done, target: self, action: #selector(cancelBarButtonItemTapped(sender:)))
         navigationItem.leftBarButtonItem = cancelBarButton
         navigationBar.setItems([navigationItem], animated: false)
@@ -165,5 +156,13 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
     
     func cancelBarButtonItemTapped(sender: UIBarButtonItem) {
         dismiss(animated: true, completion: nil)
+    }
+    
+    
+    // MARK: - Data
+    
+    func addRestaurant(restaurant: Restaurant) {
+        self.restaurants.append(restaurant)
+        tableView.reloadData()
     }
 }
