@@ -17,6 +17,8 @@ import UIKit
 
 protocol CategoryDelegate {
     func addCategory(category: Category)
+    func reduceNumberOfRestaurants(category: Category)
+    func increaseNumberOfRestaurants(category: Category)
 }
 
 class MasterViewController: UITableViewController, UIPopoverPresentationControllerDelegate, CategoryDelegate {
@@ -67,6 +69,7 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
                 controller.title = category.name
                 //controller.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
                 controller.navigationItem.leftItemsSupplementBackButton = true
+                controller.delegate = self
             }
         } else if segue.identifier == "showAddCategorySegue" {
             let controller = segue.destination as! AddCategoryViewController
@@ -97,9 +100,7 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
         
         cell.categoryImageView.image = UIImage(named: "category-\(category.icon)")
         cell.categoryNameLabel.text = category.name
-        if let numberOfRestaurants = category.numberOfRestaurants {
-            cell.numberOfRestaurantsLabel.text = "\(numberOfRestaurants) restaurants"
-        }
+        cell.numberOfRestaurantsLabel.text = "\(category.numberOfRestaurants) restaurants"
         cell.backgroundColor = Colors.categoryColors[Int(category.color)]
         
         return cell
@@ -156,6 +157,17 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
         let category = categories[sourceIndexPath.row]
         categories.remove(at: sourceIndexPath.row)
         categories.insert(category, at: destinationIndexPath.row)
+        
+        for i in 0..<categories.count {
+            categories[i].sort = Int64(i)
+        }
+        
+        // ⚠️ TODO: save it later, after finish editing
+        do {
+            try Data.shared.managedObjectContext.save()
+        } catch {
+            fatalError("Could not re-arrange categoris: \(error)")
+        }
     }
 
     
@@ -188,6 +200,26 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
     func addCategory(category: Category) {
         categories.append(category)
         tableView.reloadData()
+    }
+    
+    func reduceNumberOfRestaurants(category: Category) {
+        for categoryInTheTable in categories {
+            if categoryInTheTable.name == category.name {
+                categoryInTheTable.numberOfRestaurants = categoryInTheTable.numberOfRestaurants - 1
+                self.tableView.reloadData()
+                return
+            }
+        }
+    }
+    
+    func increaseNumberOfRestaurants(category: Category) {
+        for categoryInTheTable in categories {
+            if categoryInTheTable.name == category.name {
+                categoryInTheTable.numberOfRestaurants = categoryInTheTable.numberOfRestaurants + 1
+                self.tableView.reloadData()
+                return
+            }
+        }
     }
 }
 

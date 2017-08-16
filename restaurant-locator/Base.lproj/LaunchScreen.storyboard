@@ -6,6 +6,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -28,13 +29,25 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="restaurant" translatesAutoresizingMaskIntoConstraints="NO" id="ekQ-bz-DrZ">
+                                <rect key="frame" x="87.5" y="108" width="200" height="200"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="ekQ-bz-DrZ" secondAttribute="height" multiplier="1:1" id="8jC-Ew-YHL"/>
+                                    <constraint firstAttribute="height" constant="200" id="qIU-zN-OJZ"/>
+                                </constraints>
+                            </imageView>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="7Sk-YS-BOI" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="MMt-St-jcN"/>
                             <constraint firstItem="7Sk-YS-BOI" firstAttribute="trailing" secondItem="Ze5-6b-2t3" secondAttribute="trailingMargin" id="NFA-Ce-th6"/>
+                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="ekQ-bz-DrZ" secondAttribute="trailing" constant="8" id="Qow-uk-Xta"/>
                             <constraint firstItem="7Sk-YS-BOI" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leadingMargin" id="Uml-Xg-Y2d"/>
+                            <constraint firstItem="7Sk-YS-BOI" firstAttribute="top" secondItem="ekQ-bz-DrZ" secondAttribute="bottom" constant="8" id="Uxi-F3-LhB"/>
+                            <constraint firstItem="ekQ-bz-DrZ" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="VbC-aN-2UW"/>
+                            <constraint firstItem="ekQ-bz-DrZ" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Ze5-6b-2t3" secondAttribute="leading" constant="8" id="kbg-uk-4EI"/>
                             <constraint firstItem="7Sk-YS-BOI" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="wEL-sN-oXM"/>
+                            <constraint firstItem="ekQ-bz-DrZ" firstAttribute="top" relation="greaterThanOrEqual" secondItem="Ze5-6b-2t3" secondAttribute="top" constant="8" id="ygB-cK-lsi"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -43,4 +56,7 @@
             <point key="canvasLocation" x="52" y="374.66266866566718"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="restaurant" width="512" height="512"/>
+    </resources>
 </document>

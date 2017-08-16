@@ -17,13 +17,14 @@ public class Restaurant: NSManagedObject {
     var distance: Double?
     
     
-    static func insertNewObject(name: String, rating: Double, address: String, latitude: Double, longitude: Double) -> Restaurant {
+    static func insertNewObject(name: String, rating: Double, address: String, latitude: Double, longitude: Double, notificationRadius: Int) -> Restaurant {
         let restaurant = NSEntityDescription.insertNewObject(forEntityName: "Restaurant", into: Data.shared.managedObjectContext) as! Restaurant
         restaurant.name = name
         restaurant.rating = rating
         restaurant.address = address
         restaurant.latitude = latitude
         restaurant.longitude = longitude
+        restaurant.notificationRadius = Int64(notificationRadius)
         restaurant.addedAt = NSDate()
         
         return restaurant

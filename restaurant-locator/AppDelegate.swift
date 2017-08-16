@@ -66,19 +66,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         let categoryBakery = Category.insertNewObject(name: "Bakery", color: 2, icon: 1, sort: 2)
         let categoryBrunch = Category.insertNewObject(name: "Brunch", color: 4, icon: 2, sort: 2)
         
-        let restaurantRestore = Restaurant.insertNewObject(name: "Restore Cafe Bar", rating: 3.1, address: "18 Derby Road, Caulfield East, Caulfield, Melbourne", latitude: -37.876051, longitude: 145.042027)
+        let restaurantRestore = Restaurant.insertNewObject(name: "Restore Cafe Bar", rating: 3.1, address: "18 Derby Road, Caulfield East, Caulfield, Melbourne", latitude: -37.876051, longitude: 145.042027, notificationRadius: 4)
         restaurantRestore.saveImage(image: UIImage(named: "demo-restore-cafe")!)
         categoryJapanese.addToRestaurants(restaurantRestore)
         
-        let restaurantSakuraSushi = Restaurant.insertNewObject(name: "Sakura Kaiten Sushi", rating: 4.3, address: "61, Little Collins Street, CBD, Melbourne, VIC", latitude: -37.8129954, longitude: 144.9716862)
+        let restaurantSakuraSushi = Restaurant.insertNewObject(name: "Sakura Kaiten Sushi", rating: 4.3, address: "61, Little Collins Street, CBD, Melbourne, VIC", latitude: -37.8129954, longitude: 144.9716862, notificationRadius: 4)
         restaurantSakuraSushi.saveImage(image: UIImage(named: "demo-sakura-sushi")!)
         categoryJapanese.addToRestaurants(restaurantSakuraSushi)
         
-        let restaurantHakata = Restaurant.insertNewObject(name: "Hakata Gensuke Ramen Professionals", rating: 4.2, address: "168, Russell Street, CBD, Melbourne, VIC", latitude: -37.8122201, longitude: 144.9682514)
+        let restaurantHakata = Restaurant.insertNewObject(name: "Hakata Gensuke Ramen Professionals", rating: 4.2, address: "168, Russell Street, CBD, Melbourne, VIC", latitude: -37.8122201, longitude: 144.9682514, notificationRadius: 3)
         restaurantHakata.saveImage(image: UIImage(named: "demo-hakata-gensuke")!)
         categoryJapanese.addToRestaurants(restaurantHakata)
         
-        let restaurantCorner = Restaurant.insertNewObject(name: "The Corner Kitchen", rating: 3.2, address: "98 Waverley Road, Malvern East, Melbourne", latitude: -37.876054, longitude: 145.047481)
+        let restaurantCorner = Restaurant.insertNewObject(name: "The Corner Kitchen", rating: 3.2, address: "98 Waverley Road, Malvern East, Melbourne", latitude: -37.876054, longitude: 145.047481, notificationRadius: -1)
         restaurantCorner.saveImage(image: UIImage(named: "demo-corner-kitchen")!)
         categoryBrunch.addToRestaurants(restaurantCorner)
 

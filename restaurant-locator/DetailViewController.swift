@@ -81,10 +81,6 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
     
     let locationManager = CLLocationManager()
     
-    let radiusText = ["< 50m", "< 100m", "< 250m", "< 500m", "< 1km"]
-    
-    let radius = [50.0, 100.0, 250.0, 500.0, 1000.0]
-    
     var currentRadius = 3
     
     var currentLocation: CLLocationCoordinate2D?
@@ -175,7 +171,7 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
             self.mapView.remove(oldCircle)
         }
         if let location = self.currentLocation {
-            self.radiusCircle = MKCircle(center: location, radius: self.radius[self.currentRadius])
+            self.radiusCircle = MKCircle(center: location, radius: Location.radius[self.currentRadius])
             self.mapView.add(self.radiusCircle!)
         }
     }
@@ -188,7 +184,7 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
                 let distanceToCurrentLocation = restaurant.calculateDistance(currentLocation: CLLocation(latitude: location.latitude, longitude: location.longitude))
                 
                 if let distance = distanceToCurrentLocation {
-                    return distance < self.radius[self.currentRadius]
+                    return distance < Location.radius[self.currentRadius]
                 } else {
                     return false;
                 }
@@ -210,7 +206,7 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
         self.mapView.removeAnnotations(self.restaurantAnnotations)
         
         for restaurant in restaurants {
-            let restaurantAnnotation = RestaurantAnnotation(imageFilename: restaurant.image ?? "noImage", image: restaurant.getImage(), name: restaurant.name, address: restaurant.address, isNotification: true, notificationDistance: 250)
+            let restaurantAnnotation = RestaurantAnnotation(imageFilename: restaurant.image ?? "noImage", image: restaurant.getImage(), name: restaurant.name, address: restaurant.address, isNotification: true, notificationRadius: Int(restaurant.notificationRadius))
             restaurantAnnotation.coordinate = CLLocationCoordinate2D(latitude: restaurant.latitude, longitude: restaurant.longitude)
                 
             let restaurantAnnotationView = MKPinAnnotationView(annotation: restaurantAnnotation, reuseIdentifier: "restaurantPin")
@@ -229,6 +225,13 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
         let restaurantAnnotation = annotation as! RestaurantAnnotation
         
         annotationView.annotation = annotation
+        
+        // ✴️ Attribute:
+        // StackOverflow: MKAnnotation image offset with custom pin image
+        //      https://stackoverflow.com/questions/8165262/mkannotation-image-offset-with-custom-pin-image
+        
+        annotationView.centerOffset = CGPoint(x: 3, y: -59 / 2)
+        
         annotationView.canShowCallout = false
         annotationView.image = generatePinImage(for: restaurantAnnotation)
         
@@ -255,7 +258,10 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
             
             cropedRestaurantImage.draw(in: CGRect(origin: CGPoint(x: 8, y: 8), size: imageSize))
             pinBackgroundImage?.draw(in: CGRect(origin: CGPoint(x: 3, y: 3), size: backgroundSize))
-            notificationImage?.draw(in: CGRect(origin: CGPoint.zero, size: CGSize(width: 16, height: 16)))
+            
+            if restaurantAnnotation.notificationRadius != -1 {
+                notificationImage?.draw(in: CGRect(origin: CGPoint.zero, size: CGSize(width: 16, height: 16)))
+            }
             
             restaurantAnnotation.pinImage = UIGraphicsGetImageFromCurrentImageContext()
             
@@ -287,6 +293,12 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
         calloutView.restaurantImageView.image = restaurantAnnotation.image
         calloutView.restaurantNameLabel.text = restaurantAnnotation.name
         calloutView.restaurantAddressLabel.text = restaurantAnnotation.address
+        
+        if restaurantAnnotation.notificationRadius != -1 {
+            calloutView.restaurantNotificationLabel.text = Location.radiusText[restaurantAnnotation.notificationRadius]
+        } else {
+            calloutView.restaurantNotificationLabel.text = "Never"
+        }
         
         calloutView.center = CGPoint(x: view.bounds.size.width / 2, y: -calloutView.bounds.size.height * 0.52)
         calloutView.layer.cornerRadius = 5
@@ -328,11 +340,11 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return radiusText.count
+        return Location.radiusText.count
     }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return radiusText[row]
+        return Location.radiusText[row]
     }
     
     
@@ -358,7 +370,7 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
             // StackOverflow: How to change the text of a BarButtonItem on the NavigationBar?
             //      https://stackoverflow.com/questions/12257522/how-to-change-the-text-of-a-barbuttonitem-on-the-navigationbar
             
-            let radiusText = self.radiusText[self.currentRadius]
+            let radiusText = Location.radiusText[self.currentRadius]
             self.radiusBarButton.title = radiusText
             
             self.showRadiusCircle();

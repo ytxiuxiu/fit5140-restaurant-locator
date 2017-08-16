@@ -27,6 +27,8 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
     var category: Category?
     
     var restaurants = [Restaurant]()
+    
+    var delegate: CategoryDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,7 +37,6 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
         // self.clearsSelectionOnViewWillAppear = false
 
 //        navigationItem.leftBarButtonItem = editButtonItem
-        
         
         // get data
         if let categoryName = category?.name {
@@ -108,12 +109,37 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
  
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            // Delete the row from the data source
-            restaurants.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+            let restaurant = restaurants[indexPath.row]
+            
+            let alert = UIAlertController(title: "Delete?", message: "Are you sure to delete the restaurant \"\(restaurant.name)\"?", preferredStyle: .alert);
+            alert.isModalInPopover = true;
+            
+            // add an action button
+            let deleteAction: UIAlertAction = UIAlertAction(title: "Delete", style: .destructive) { action -> Void in
+                Data.shared.managedObjectContext.delete(restaurant)
+                
+                do {
+                    try Data.shared.managedObjectContext.save()
+                } catch {
+                    fatalError("Could not delete the restaurant: \(error)")
+                }
+                
+                self.restaurants.remove(at: indexPath.row)
+                tableView.deleteRows(at: [indexPath], with: .fade)
+                
+                self.delegate?.reduceNumberOfRestaurants(category: self.category!)
+                
+                self.dismiss(animated: true, completion: nil)
+            }
+            let dismissAction: UIAlertAction = UIAlertAction(title: "Cancel", style: .cancel) { action -> Void in
+                self.dismiss(animated: true, completion: nil)
+            }
+            alert.addAction(deleteAction)
+            alert.addAction(dismissAction)
+            
+            present(alert, animated: true, completion: nil)
+
+        }
     }
 
 
@@ -124,10 +150,13 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
             let controller = segue.destination as! AddRestaurantViewController
             controller.category = self.category
             controller.delegate = self
+            controller.categoryDelegate = self.delegate
             
             let popoverPresentationController = segue.destination.popoverPresentationController!
             popoverPresentationController.delegate = self
             popoverPresentationController.barButtonItem = sender as? UIBarButtonItem
+        } else if segue.identifier == "showRestaurantDetailSegue" {
+            //let controller = segue.destination as! RestaurantDetailViewController
         }
     }
 
@@ -163,6 +192,15 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
     
     func addRestaurant(restaurant: Restaurant) {
         self.restaurants.append(restaurant)
+        
+        // get didtance for this newly added restaurant
+        Location.sharedInstance.addCallback(key: "newRestaurantDisntance", callback: {(latitude, longitude, cityId, cityName) in
+            let _ = restaurant.calculateDistance(currentLocation: CLLocation(latitude: latitude, longitude: longitude))
+            
+            // one time call
+            Location.sharedInstance.removeCallback(key: "newRestaurantDisntance")
+        })
+        
         tableView.reloadData()
     }
 }

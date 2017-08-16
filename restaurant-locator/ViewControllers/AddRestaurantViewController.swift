@@ -47,9 +47,11 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     
     @IBOutlet weak var restaurantRatingView: CosmosView!
     
+    @IBOutlet weak var restaurantRatingLabel: UILabel!
+    
     @IBOutlet weak var restaurantAddressTextField: SearchTextField!
     
-    @IBOutlet weak var restaurantAddressErrorLabel: UITextField!
+    @IBOutlet weak var restaurantAddressErrorLabel: UILabel!
     
     @IBOutlet weak var restaurantMapView: MKMapView!
     
@@ -60,6 +62,8 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     var category: Category?
     
     var delegate: RestaurantDelegate?
+    
+    var categoryDelegate: CategoryDelegate?
     
     var userLocationLoaded = false
     
@@ -79,6 +83,12 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     
     var currentPin: MKPointAnnotation?
     
+    var currentRaidus = 3
+    
+    var radiusCircle: MKCircle?
+    
+    var isPhotoSelected = false
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -88,8 +98,13 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
         
         // rating
         self.restaurantRatingView.settings.fillMode = .precise
+        self.restaurantRatingView.didTouchCosmos = { rating in
+            self.restaurantRatingLabel.text = String(format: "%.1f", rating)
+        }
         
         // start loction
+        self.restaurantMapView.delegate = self
+        
         Location.sharedInstance.addCallback(key: "addRestaurantMap", callback: {(latitude, longitude, cityId, cityName) in
             
             // fill current address
@@ -158,22 +173,13 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
                     .responseData { response in
                         if response.error == nil || response.error.debugDescription.contains("already exists"), let imagePath = response.destinationURL?.path {
                             self.restaurantPhotoImageView.image = UIImage(contentsOfFile: imagePath)
+                            
+                            self.isPhotoSelected = true
                         }
                 }
             }
             
-            // add an annotation
-            if let lastAnnotation = self.restaurantAnnotation {
-                self.restaurantMapView.removeAnnotation(lastAnnotation)
-            }
-            
-            self.restaurantAnnotation = MKPointAnnotation()
-            self.restaurantAnnotation?.coordinate = CLLocationCoordinate2D(latitude: restaurant.latitude, longitude: restaurant.longitude)
-            self.restaurantAnnotation?.title = restaurant.name
-            self.restaurantMapView.addAnnotation(self.restaurantAnnotation!)
-            
-            let region = Location().makeRegion(latitude: restaurant.latitude, longitude: restaurant.longitude)
-            self.restaurantMapView.setRegion(region, animated: true)
+            self.movePin(latitude: restaurant.latitude, longitude: restaurant.longitude)
         }
         
         // photo
@@ -187,7 +193,6 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
         self.restaurantPhotoImageView.addGestureRecognizer(singleTap)
         
         // notification picker
-        self.notificationPickerData = ["< 50m", "< 100m", "< 250m", "< 500m", "< 1km", "Never"]
         self.notificationPickerView.delegate = self
         self.notificationPickerView.dataSource = self
         
@@ -238,6 +243,10 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
             }
         }
         
+        // notification
+        
+        self.notificationPickerView.selectRow(3, inComponent: 0, animated: false)
+        
         // validation
         
         self.validator.registerField(restaurantNameSearchTextField, errorLabel: restaurantNameErrorLabel, rules: [RequiredRule(message: "Give it a name!")])
@@ -257,21 +266,6 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
         
     }
 
-    
-    // MARK: - Notification Picker
-    
-    func numberOfComponents(in pickerView: UIPickerView) -> Int {
-        return 1    // 1 column
-    }
-    
-    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return self.notificationPickerData.count
-    }
-    
-    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return notificationPickerData[row]
-    }
-    
     
     // MARK: - Photo
     
@@ -327,6 +321,8 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         if let pickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
             self.restaurantPhotoImageView.image = pickedImage
+            
+            self.isPhotoSelected = true
         } else {
             // ⚠️ TODO: error handling
         }
@@ -358,30 +354,61 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
         self.restaurantAddressTextField.stopLoadingIndicator()
     }
     
-    func movePin(latitude: CLLocationDegrees, longitude: CLLocationDegrees) {
+    func movePin(latitude: CLLocationDegrees, longitude: CLLocationDegrees, alsoMoveTheMap: Bool = true) {
         if self.currentPin == nil {
             self.currentPin = MKPointAnnotation()
             
-            let currentPinAnnotationView = MKPinAnnotationView(annotation: currentPin, reuseIdentifier: "currentPin")
-            
-            self.restaurantMapView.addAnnotation(currentPinAnnotationView.annotation!)
+            self.restaurantMapView.addAnnotation(self.currentPin!)
         }
         
         self.currentPin?.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
         
-        let region = Location().makeRegion(latitude: latitude, longitude: longitude)
-        self.restaurantMapView.setRegion(region, animated: true)
+        if alsoMoveTheMap {
+            let region = Location().makeRegion(latitude: latitude, longitude: longitude)
+            self.restaurantMapView.setRegion(region, animated: true)
+        }
     }
     
-    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        let annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: "currentPin") ?? MKAnnotationView()
+    func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
+        let latitude = mapView.centerCoordinate.latitude
+        let longitude = mapView.centerCoordinate.longitude
         
-        annotationView.isDraggable = true
+        Location.getAddress(latitude: latitude, longitude: longitude) { (address) in
+            self.restaurantAddressTextField.text = address
+        }
         
-        return annotationView
+        movePin(latitude: latitude, longitude: longitude, alsoMoveTheMap: false)
     }
     
-    // MARK: Navigation Bar
+    
+    // MARK: - Notification Picker
+    
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1    // 1 column
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return Location.radiusText.count + 1
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        if row < Location.radius.count {
+            return Location.radiusText[row]
+        } else {
+            return "Never"
+        }
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        if row < Location.radius.count {
+            self.currentRaidus = row
+        } else {
+            self.currentRaidus = -1 // never notify
+        }
+    }
+    
+    
+    // MARK: - Navigation Bar
     
     // Add extra top space for compat screen as a navigation bar will be added to this popover
     // ✴️ Attributes:
@@ -415,27 +442,30 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
         validator.validate(self)
     }
     
-    
-    
     func validationSuccessful() {
         
-//        let restaurant = Restaurant.insertNewObject(name: restaurantNameSearchTextField.text, rating: restaurantRatingView.rating, address: restaurantAddressTextField.text, latitude: , longitude: <#T##Double#>)
-//        
-//        if let sort = self.sort, let categoryIcon = self.categoryIcon {
-//            let category = Category.insertNewObject(name: self.categoryNameTextField.text!, color: categoryColor.selectedSegmentIndex, icon: categoryIcon, sort: sort)
-//            
-//            do {
-//                try Data.shared.managedObjectContext.save()
-//            } catch {
-//                fatalError("Could not save category: \(error)")
-//            }
-//            
-//            delegate?.addCategory(category: category)
-//            
-//            dismiss(animated: true, completion: nil)
-//        } else {
-//            // ⚠️ TODO: error handling
-//        }
+        if let latitude = self.currentPin?.coordinate.latitude, let longitude = self.currentPin?.coordinate.longitude {
+        let restaurant = Restaurant.insertNewObject(name: self.restaurantNameSearchTextField.text!, rating: self.restaurantRatingView.rating, address: restaurantAddressTextField.text!, latitude: latitude, longitude: longitude, notificationRadius: self.currentRaidus)
+            
+            self.category?.addToRestaurants(restaurant)
+            
+            if isPhotoSelected {
+                restaurant.saveImage(image: self.restaurantPhotoImageView.image!)
+            }
+            
+            do {
+                try Data.shared.managedObjectContext.save()
+            } catch {
+                fatalError("Could not save restaurant: \(error)")
+            }
+            
+            self.delegate?.addRestaurant(restaurant: restaurant)
+            self.categoryDelegate?.increaseNumberOfRestaurants(category: self.category!)
+            
+            dismiss(animated: true, completion: nil)
+        } else {
+            // ⚠️ TODO: error handling
+        }
     }
     
     func validationFailed(_ errors:[(Validatable ,ValidationError)]) {

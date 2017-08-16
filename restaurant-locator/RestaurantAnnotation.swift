@@ -21,16 +21,13 @@ class RestaurantAnnotation: MKPointAnnotation {
     
     var address: String
     
-    var isNotification: Bool
+    var notificationRadius: Int
     
-    var notificationDistance: Double?
-    
-    init(imageFilename: String, image: UIImage, name: String, address: String, isNotification: Bool, notificationDistance: Double?) {
+    init(imageFilename: String, image: UIImage, name: String, address: String, isNotification: Bool, notificationRadius: Int) {
         self.imageFilename = imageFilename
         self.image = image
         self.name = name
         self.address = address
-        self.isNotification = isNotification
-        self.notificationDistance = notificationDistance
+        self.notificationRadius = notificationRadius
     }
 }

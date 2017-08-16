@@ -24,5 +24,6 @@ extension Restaurant {
     @NSManaged public var name: String
     @NSManaged public var rating: Double
     @NSManaged public var category: Category?
+    @NSManaged public var notificationRadius: Int64
 
 }

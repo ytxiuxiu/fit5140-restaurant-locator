@@ -21,6 +21,10 @@ class Location: NSObject, CLLocationManagerDelegate {
 
     static let sharedInstance = Location()
     
+    static let radiusText = ["< 50m", "< 100m", "< 250m", "< 500m", "< 1km"]
+    
+    static let radius = [50.0, 100.0, 250.0, 500.0, 1000.0]
+    
     let locationManager = CLLocationManager()
     
     private var callbacks = [String: (latitude: CLLocationDegrees, longitude: CLLocationDegrees, cityId: Int?, cityName: String?) -> Void]()
@@ -74,7 +78,7 @@ class Location: NSObject, CLLocationManagerDelegate {
                 var address = ""
                 
                 if place?.subThoroughfare != nil {  // eg. 900
-                    address = "\(address)\(place?.subThoroughfare ?? ""), "
+                    address = "\(address)\(place?.subThoroughfare ?? "") "
                 }
                 if place?.thoroughfare != nil { // eg. Dandenong Road
                     address = "\(address)\(place?.thoroughfare ?? ""), "

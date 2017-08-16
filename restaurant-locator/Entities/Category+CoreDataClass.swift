@@ -13,7 +13,7 @@ import CoreData
 @objc(Category)
 public class Category: NSManagedObject {
     
-    var numberOfRestaurants: Int?
+    var numberOfRestaurants: Int = 0
 
     static func insertNewObject(name: String, color: Int, icon: Int, sort: Int) -> Category {
         let category = NSEntityDescription.insertNewObject(forEntityName: "Category", into: Data.shared.managedObjectContext) as! Category
