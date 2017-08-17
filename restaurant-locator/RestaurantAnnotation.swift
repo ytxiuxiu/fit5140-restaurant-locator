@@ -11,23 +11,8 @@ import MapKit
 
 class RestaurantAnnotation: MKPointAnnotation {
     
-    var imageFilename: String?
+    var restaurant: Restaurant?
     
-    var image: UIImage
+    var image: UIImage?
     
-    var pinImage: UIImage?
-    
-    var name: String
-    
-    var address: String
-    
-    var notificationRadius: Int
-    
-    init(imageFilename: String, image: UIImage, name: String, address: String, isNotification: Bool, notificationRadius: Int) {
-        self.imageFilename = imageFilename
-        self.image = image
-        self.name = name
-        self.address = address
-        self.notificationRadius = notificationRadius
-    }
 }

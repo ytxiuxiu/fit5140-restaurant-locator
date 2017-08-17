@@ -716,7 +716,7 @@
         <!--Restaurant Detail View Controller-->
         <scene sceneID="eBE-RF-rpZ">
             <objects>
-                <viewController id="RhQ-Ko-2Kd" customClass="RestaurantDetailViewController" customModule="restaurant_locator" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="restaurantDetail" id="RhQ-Ko-2Kd" customClass="RestaurantDetailViewController" customModule="restaurant_locator" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="8d9-aa-bND"/>
                         <viewControllerLayoutGuide type="bottom" id="mEq-rV-Auk"/>
