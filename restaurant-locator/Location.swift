@@ -27,7 +27,7 @@ class Location: NSObject, CLLocationManagerDelegate {
     
     let locationManager = CLLocationManager()
     
-    private var callbacks = [String: (latitude: CLLocationDegrees, longitude: CLLocationDegrees, cityId: Int?, cityName: String?) -> Void]()
+    private var callbacks = [String: (latitude: CLLocationDegrees, longitude: CLLocationDegrees) -> Void]()
     
     var lastLatitude: CLLocationDegrees?
     
@@ -49,18 +49,13 @@ class Location: NSObject, CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         let location = locations[0] // most recent location
         
-        // get zomato geocode
-        Zomato.sharedInstance.getGeoCode(lat: location.coordinate.latitude, lng: location.coordinate.longitude, closure: {(cityId, cityName) in
+
+        for (_, callback) in self.callbacks {
+            self.lastLatitude = location.coordinate.latitude
+            self.lastLongitude = location.coordinate.longitude
             
-            for (_, callback) in self.callbacks {
-                self.lastLatitude = location.coordinate.latitude
-                self.lastLongitude = location.coordinate.longitude
-                self.lastCityId = cityId
-                self.lastCityName = cityName
-                
-                callback(self.lastLatitude!, self.lastLongitude!, cityId, cityName)
-            }
-        })
+            callback(self.lastLatitude!, self.lastLongitude!)
+        }
     }
     
     // ✴️ Attribute:
@@ -115,11 +110,11 @@ class Location: NSObject, CLLocationManagerDelegate {
         }
     }
     
-    func addCallback(key: String, callback: @escaping (_ latitude: CLLocationDegrees, _ longitude: CLLocationDegrees, _ cityId: Int?, _ cityName: String?) -> Void) {
+    func addCallback(key: String, callback: @escaping (_ latitude: CLLocationDegrees, _ longitude: CLLocationDegrees) -> Void) {
         self.callbacks[key] = callback
         
         if let latitude = self.lastLatitude, let longitude = self.lastLongitude {
-            callback(latitude, longitude, self.lastCityId, self.lastCityName)
+            callback(latitude, longitude)
         }
         
         self.locationManager.startUpdatingLocation()

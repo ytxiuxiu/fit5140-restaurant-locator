@@ -31,7 +31,9 @@ class RestaurantDetailViewController: UIViewController, RestaurantDetailDelegate
     
     @IBOutlet weak var restaurantMapView: MKMapView!
     
-    var delegate: RestaurantDelegate?
+    var restaurantTableDelegate: RestaurantTableDelegate?
+    
+    var restaurantAnnotationDelegate: RestaurantAnnotationDelegate?
     
     var restaurant: Restaurant?
     
@@ -79,8 +81,9 @@ class RestaurantDetailViewController: UIViewController, RestaurantDetailDelegate
         
         controller.isEdit = true
         controller.restaurant = self.restaurant
-        controller.delegate = self.delegate
+        controller.restaurantTableDelegate = self.restaurantTableDelegate
         controller.restaurantDetailDelegate = self
+        controller.restaurantAnnotationDelegate = self.restaurantAnnotationDelegate
         
         self.navigationController?.pushViewController(controller, animated: true)
     }
@@ -115,13 +118,14 @@ class RestaurantDetailViewController: UIViewController, RestaurantDetailDelegate
     */
     
     func editRestaurant(restaurant: Restaurant) {
+        self.title = restaurant.name
         self.restaurantImageView.image = restaurant.getImage()
         self.restaurantRatingView.rating = restaurant.rating
         self.restaurantRatingView.settings.updateOnTouch = false
         
         self.restaurantAddressLabel.text = restaurant.address
         
-        Location.sharedInstance.addCallback(key: "restaurantDetailDisntance", callback: {(latitude, longitude, cityId, cityName) in
+        Location.sharedInstance.addCallback(key: "restaurantDetailDisntance", callback: {(latitude, longitude) in
             let distance = restaurant.calculateDistance(currentLocation: CLLocation(latitude: latitude, longitude: longitude))
             
             self.restaurantDistanceLabel.text = "\(Location.getDistanceString(distance: distance!)) from here"

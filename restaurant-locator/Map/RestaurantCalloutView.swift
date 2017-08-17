@@ -22,16 +22,25 @@ class RestaurantCalloutView: UIView {
     
     @IBOutlet weak var restaurantDetailButton: UIButton!
     
-    var mainMapDelegate: MainMapDelegate?
+    var restaurantAnnotationDelegate: RestaurantAnnotationDelegate?
+    
+    var navigationController: UINavigationController?
     
     var restaurant: Restaurant?
     
     
     @IBAction func onRestaurantDetailTapped(_ sender: Any) {
-        self.mainMapDelegate?.showRestaurantDetail(restaurant: self.restaurant!)
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let controller = storyboard.instantiateViewController(withIdentifier: "restaurantDetail") as! RestaurantDetailViewController
+        
+        controller.restaurant = restaurant
+        controller.restaurantAnnotationDelegate = self.restaurantAnnotationDelegate
+        
+        self.navigationController?.pushViewController(controller, animated: true)
     }
     
     // Detect hits in the custom callout
+    // ✴️ Attribute:
     // Website: Building The Perfect IOS Map (II): Completely Custom Annotation Views
     //      https://digitalleaves.com/blog/2016/12/building-the-perfect-ios-map-ii-completely-custom-annotation-views/
     

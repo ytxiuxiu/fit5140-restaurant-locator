@@ -67,11 +67,7 @@ extension UIImage {
     }
 }
 
-protocol MainMapDelegate {
-    func showRestaurantDetail(restaurant: Restaurant)
-}
-
-class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDataSource, UIPickerViewDelegate, MainMapDelegate {
+class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDataSource, UIPickerViewDelegate {
 
     @IBOutlet weak var detailDescriptionLabel: UILabel!
 
@@ -120,9 +116,6 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
         if let splitView = self.navigationController?.splitViewController, !splitView.isCollapsed {
             self.navigationItem.leftBarButtonItem = splitView.displayModeButtonItem
         }
-        // ⚠️ TODO: change open master button icon to menu - not working
-        self.navigationItem.backBarButtonItem = UIBarButtonItem(image: UIImage(named: "menu"), style: .plain, target: nil, action: nil)
-
         
         // get data
         self.restaurants = Restaurant.fetchAll()
@@ -131,7 +124,7 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
         mapView.showsUserLocation = true
         
         // start loction
-        Location.sharedInstance.addCallback(key: "mainMap", callback: {(latitude, longitude, cityId, cityName) in
+        Location.sharedInstance.addCallback(key: "mainMap", callback: {(latitude, longitude) in
             var updateRestaurants = false;
             if self.lastCLLocation == nil {
                 self.lastCLLocation = CLLocation(latitude: latitude, longitude: longitude)
@@ -273,7 +266,7 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
         
         annotationView?.centerOffset = CGPoint(x: 3, y: -59 / 2)
         annotationView?.image = generatePinImage(for: restaurantAnnotation)
-        annotationView?.mainMapDelegate = self
+        annotationView?.navigationController = self.navigationController
         annotationView?.restaurant = restaurantAnnotation.restaurant
         
         
@@ -414,13 +407,5 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
         present(alert, animated: true, completion: nil)
     }
     
-    func showRestaurantDetail(restaurant: Restaurant) {
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let controller = storyboard.instantiateViewController(withIdentifier: "restaurantDetail") as! RestaurantDetailViewController
-        
-        controller.restaurant = restaurant
-        
-        self.navigationController?.pushViewController(controller, animated: true)
-    }
 }
 

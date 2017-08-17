@@ -12,9 +12,7 @@
 //      2. CocoaPods
 //          Website: CocoaPods.org
 //              https://cocoapods.org/
-//      3. Form auto fill-in
-//          Website: Zomato API - Zomato Developers
-//              https://developers.zomato.com/api
+//      3. Address auto fill-in
 //          GitHub: apasccon/SearchTextField
 //              https://github.com/apasccon/SearchTextField
 //      4. Rating
@@ -67,15 +65,15 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     
     var category: Category?
     
-    var delegate: RestaurantDelegate?
+    var restaurantTableDelegate: RestaurantTableDelegate?
     
     var restaurantDetailDelegate: RestaurantDetailDelegate?
     
-    var categoryDelegate: CategoryDelegate?
+    var restaurantAnnotationDelegate: RestaurantAnnotationDelegate?
+    
+    var categoryTableDelegate: CategoryTableDelegate?
     
     var userLocationLoaded = false
-    
-    var restaurantSearchResult = [ZomatoRestaurant]()
     
     var notificationPickerData = [String]()
     
@@ -101,8 +99,9 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // ⚠️ TODO: image size
-        self.restaurantPhotoImageView.contentMode = .scaleAspectFit
+        // save button
+        let saveBarButtonItem = UIBarButtonItem(title: "Save", style: .done, target: self, action: #selector(onAddButtonClicked(_:)))
+        self.navigationItem.rightBarButtonItem = saveBarButtonItem
         
         // rating
         self.restaurantRatingView.settings.fillMode = .precise
@@ -114,7 +113,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
         self.restaurantMapView.delegate = self
         
         if !isEdit {
-            Location.sharedInstance.addCallback(key: "addRestaurantMap", callback: {(latitude, longitude, cityId, cityName) in
+            Location.sharedInstance.addCallback(key: "addRestaurantMap", callback: {(latitude, longitude) in
                 
                 // fill current address
                 Location.getAddress(latitude: latitude, longitude: longitude, callback: { (address) in
@@ -133,64 +132,6 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
         // restaurant suggestion
         self.restaurantNameSearchTextField.theme.bgColor = UIColor.white
 
-        // on user stop typing
-        self.restaurantNameSearchTextField.userStoppedTypingHandler = {
-            if let keyword = self.restaurantNameSearchTextField.text {
-                if keyword.characters.count > 1 {
-                    // show the loading indicator
-                    self.restaurantNameSearchTextField.showLoadingIndicator()
-                    
-                    // search restaurants from zomato
-                    
-                    do {
-                        try Zomato.sharedInstance.searchRestaurants(keyword: keyword, closure: {(restaurants: [ZomatoRestaurant]) in
-                            var items = [SearchTextFieldItem]()
-                            self.restaurantSearchResult.removeAll()
-                        
-                            for restaurant in restaurants {
-                                self.restaurantSearchResult.append(restaurant)
-
-                                let item = SearchTextFieldItem(title: restaurant.name, subtitle: restaurant.address/*, image: UIImage(named: "")*/)
-                                items.append(item)
-                            }
-                        
-                            self.restaurantNameSearchTextField.filterItems(items)
-                            self.restaurantNameSearchTextField.stopLoadingIndicator()
-                        })
-                    } catch {
-                        // ⚠️ TODO: error handling
-                    }
-                }
-            }
-        }
-        
-        // on item selected
-        self.restaurantNameSearchTextField.itemSelectionHandler = { filteredResults, itemPosition in
-            let restaurant = self.restaurantSearchResult[itemPosition]
-            
-            // fill the form
-            self.restaurantNameSearchTextField.text = restaurant.name
-            self.restaurantAddressTextField.text = restaurant.address
-            self.restaurantRatingView.rating = restaurant.rating
-            
-            // download the image
-            if let imageURL = restaurant.imageURL {
-                let destination = DownloadRequest.suggestedDownloadDestination(for: .documentDirectory)
-                Alamofire.download(imageURL, to: destination)
-                    .downloadProgress { progress in
-                        print("Download Progress: \(progress.fractionCompleted)")
-                    }
-                    .responseData { response in
-                        if response.error == nil || response.error.debugDescription.contains("already exists"), let imagePath = response.destinationURL?.path {
-                            self.restaurantPhotoImageView.image = UIImage(contentsOfFile: imagePath)
-                            
-                            self.isPhotoSelected = true
-                        }
-                }
-            }
-            
-            self.movePin(latitude: restaurant.latitude, longitude: restaurant.longitude)
-        }
         
         // photo
         // ✴️ Attribute:
@@ -293,7 +234,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
             // StackOverflow: How to change button text in Swift Xcode 6?
             //      https://stackoverflow.com/questions/26641571/how-to-change-button-text-in-swift-xcode-6
             
-            self.addButton.setTitle("Edit", for: .normal)
+//            self.addButton.setTitle("Edit", for: .normal)
         }
         
     }
@@ -333,7 +274,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
                 imagePicker.allowsEditing = false
                 self.present(imagePicker, animated: true, completion: nil)
             } else {
-                // ⚠️ TODO: error handling
+                self.showError(message: "Could not access to your camera")
             }
         })
         let photoLibraryAction = UIAlertAction(title: "Photo Library", style: .default, handler: {
@@ -345,13 +286,13 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
                 imagePicker.allowsEditing = true
                 self.present(imagePicker, animated: true, completion: nil)
             } else {
-                // ⚠️ TODO: error handling
+                self.showError(message: "Could not access to your photo library")
             }
         })
         
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: {
             (alert: UIAlertAction!) -> Void in
-            
+            optionMenu.dismiss(animated: true, completion: nil)
         })
         
         optionMenu.addAction(cameraAction)
@@ -367,7 +308,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
             
             self.isPhotoSelected = true
         } else {
-            // ⚠️ TODO: error handling
+            self.showError(message: "Could not access to your selected photo")
         }
         
         dismiss(animated: true, completion: nil)
@@ -506,12 +447,12 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
                     fatalError("Could not save restaurant: \(error)")
                 }
                 
-                self.delegate?.addRestaurant(restaurant: restaurant)
-                self.categoryDelegate?.increaseNumberOfRestaurants(category: self.category!)
+                self.restaurantTableDelegate?.addRestaurant(restaurant: restaurant)
+                self.categoryTableDelegate?.increaseNumberOfRestaurants(category: self.category!)
                 
                 dismiss(animated: true, completion: nil)
             } else {
-                // ⚠️ TODO: error handling
+                self.showError(message: "Please pick the current location of this restaurant. You see this message may be because you have not let this application access to your location.")
             }
         } else {
             if let latitude = self.currentPin?.coordinate.latitude, let longitude = self.currentPin?.coordinate.longitude {
@@ -534,12 +475,13 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
                     fatalError("Could not save restaurant: \(error)")
                 }
                 
-                self.delegate?.editRestaurant(restaurant: restaurant!)
-                self.restaurantDetailDelegate?.editRestaurant(restaurant: restaurant!)
+                self.restaurantTableDelegate?.editRestaurant(restaurant: self.restaurant!)
+                self.restaurantDetailDelegate?.editRestaurant(restaurant: self.restaurant!)
+                self.restaurantAnnotationDelegate?.editRestaurant(restaurant: self.restaurant!)
                 
                 self.navigationController?.popViewController(animated: true)
             } else {
-                // ⚠️ TODO: error handling
+                self.showError(message: "Please pick the current location of this restaurant. You see this message may be because you have not let this application access to your location.")
             }
         }
     }
@@ -548,7 +490,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
         // show validation error
         for (field, error) in errors {
             if let field = field as? UITextField {
-                field.layer.borderColor = Colors.red.cgColor
+                field.layer.borderColor = Colors.red(alpha: 0.7).cgColor
                 field.layer.borderWidth = 1.0
             }
             error.errorLabel?.text = error.errorMessage

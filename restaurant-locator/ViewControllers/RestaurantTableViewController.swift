@@ -18,18 +18,19 @@ import UIKit
 import CoreLocation
 
 
-protocol RestaurantDelegate {
+protocol RestaurantTableDelegate {
     func addRestaurant(restaurant: Restaurant)
     func editRestaurant(restaurant: Restaurant)
+    func editCategory(category: Category)
 }
 
-class RestaurantTableViewController: UITableViewController, UIPopoverPresentationControllerDelegate, RestaurantDelegate {
+class RestaurantTableViewController: UITableViewController, UIPopoverPresentationControllerDelegate, RestaurantTableDelegate {
     
     var category: Category?
     
     var restaurants = [Restaurant]()
     
-    var delegate: CategoryDelegate?
+    var delegate: CategoryTableDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,7 +45,7 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
             restaurants = Restaurant.fetchByCategory(categoryName: categoryName)
         }
         
-        Location.sharedInstance.addCallback(key: "restaurantsDisntance", callback: {(latitude, longitude, cityId, cityName) in
+        Location.sharedInstance.addCallback(key: "restaurantsDisntance", callback: {(latitude, longitude) in
             for i in 0..<self.restaurants.count {
                 let restaurant = self.restaurants[i]
                 let _ = restaurant.calculateDistance(currentLocation: CLLocation(latitude: latitude, longitude: longitude))
@@ -146,19 +147,20 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
         if segue.identifier == "showAddRestaurantSegue" {
             let controller = segue.destination as! AddRestaurantViewController
             controller.category = self.category
-            controller.delegate = self
-            controller.categoryDelegate = self.delegate
+            controller.restaurantTableDelegate = self
+            controller.categoryTableDelegate = self.delegate
             
             let popoverPresentationController = segue.destination.popoverPresentationController!
             popoverPresentationController.delegate = self
             popoverPresentationController.barButtonItem = sender as? UIBarButtonItem
+            
         } else if segue.identifier == "showRestaurantDetailSegue" {
             let controller = segue.destination as! RestaurantDetailViewController
             let restaurant = self.restaurants[(self.tableView.indexPathForSelectedRow?.row)!]
             
             controller.title = restaurant.name
             controller.restaurant = restaurant
-            controller.delegate = self
+            controller.restaurantTableDelegate = self
         }
     }
 
@@ -190,13 +192,28 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
     }
     
     
+    // MARK: - Edit category
+    
+    @IBAction func onEditButtonTapped(_ sender: Any) {
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let controller = storyboard.instantiateViewController(withIdentifier: "editCategoryViewController") as! AddCategoryViewController
+        
+        controller.isEdit = true
+        controller.category = self.category
+        controller.restaurantTableDelegate = self
+        controller.categoryTableDelegate = self.delegate
+        
+        self.navigationController?.pushViewController(controller, animated: true)
+    }
+    
+    
     // MARK: - Data
     
     func addRestaurant(restaurant: Restaurant) {
         self.restaurants.append(restaurant)
         
         // get didtance for this newly added restaurant
-        Location.sharedInstance.addCallback(key: "newRestaurantDisntance", callback: {(latitude, longitude, cityId, cityName) in
+        Location.sharedInstance.addCallback(key: "newRestaurantDisntance", callback: {(latitude, longitude) in
             let _ = restaurant.calculateDistance(currentLocation: CLLocation(latitude: latitude, longitude: longitude))
             
             // one time call
@@ -208,7 +225,7 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
     
     func editRestaurant(restaurant: Restaurant) {
         // get didtance for this edited restaurant
-        Location.sharedInstance.addCallback(key: "editRestaurantDisntance", callback: {(latitude, longitude, cityId, cityName) in
+        Location.sharedInstance.addCallback(key: "editRestaurantDisntance", callback: {(latitude, longitude) in
             let _ = restaurant.calculateDistance(currentLocation: CLLocation(latitude: latitude, longitude: longitude))
             
             // one time call
@@ -216,5 +233,9 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
         })
         
         tableView.reloadData()
+    }
+    
+    func editCategory(category: Category) {
+        self.title = category.name
     }
 }

@@ -49,19 +49,27 @@ class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UIC
     
     @IBOutlet weak var topSpaceConstraint: NSLayoutConstraint!
     
-    var delegate: CategoryDelegate?
+    var isEdit = false
     
-    var categoryIcon: Int?
+    var category: Category?
+    
+    var restaurantTableDelegate: RestaurantTableDelegate?
+    
+    var categoryTableDelegate: CategoryTableDelegate?
     
     var sort: Int?
     
-    var selectedCategoryIcon: CategoryIconsCollectionViewCell?
+    var selectedCategoryIcon = 1
     
     let validator = Validator()
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // save button
+        let saveBarButtonItem = UIBarButtonItem(title: "Save", style: .done, target: self, action: #selector(onAddCategoryButtonClicked(_:)))
+        self.navigationItem.rightBarButtonItem = saveBarButtonItem
         
         // category color
         self.categoryColor.addTarget(self, action: #selector(onColorSegmentedValueChanged(sender:)), for: .valueChanged)
@@ -80,6 +88,20 @@ class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UIC
         
         // validation
         validator.registerField(categoryNameTextField, errorLabel: categoryNameErrorLabel, rules: [RequiredRule(message: "Give it a name")])
+        
+        if isEdit {
+            self.categoryNameTextField.text = category?.name
+            
+            let color = Int((category?.color)!)
+            self.categoryColor.selectedSegmentIndex = color
+            self.categoryColor.tintColor = Colors.categorySegmentColors[color]
+            
+            let icon = Int((category?.icon)!)
+            self.selectedCategoryIcon = icon
+            self.categoryIconImageView.image = UIImage(named: "category-\(icon)")
+            
+            self.title = "Edit Category"
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -98,8 +120,12 @@ class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UIC
         
         cell.categoryIconImageView.image = UIImage(named: "category-\(indexPath.row + 1)")
         cell.categoryIconImageView.backgroundColor = UIColor.clear
-//        print("Cell init: \(cell.categoryIconImageView.backgroundColor?.cgColor.components)")
         cell.categoryIconImageView.isOpaque = false
+        cell.categoryIconImageView.layer.cornerRadius = 5
+        
+        if indexPath.row == self.selectedCategoryIcon - 1 {
+            cell.highlight()
+        }
         
         return cell
     }
@@ -109,24 +135,24 @@ class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UIC
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//        let cell = collectionView.cellForItem(at: indexPath) as! CategoryIconsCollectionViewCell
+        let cell = collectionView.cellForItem(at: indexPath) as! CategoryIconsCollectionViewCell
         
-//        cell.highlight()
+        cell.highlight()
         
         self.categoryIconImageView.image = UIImage(named: "category-\(indexPath.row + 1)")
-        self.categoryIcon = indexPath.row + 1
+        self.selectedCategoryIcon = indexPath.row + 1
     }
     
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
-//        let cell = collectionView.cellForItem(at: indexPath) as! CategoryIconsCollectionViewCell
+        let cell = collectionView.cellForItem(at: indexPath) as! CategoryIconsCollectionViewCell
         
-//        cell.lowlight()
+        cell.lowlight()
     }
     
     // MARK: Color Segment
     
     func onColorSegmentedValueChanged(sender: UISegmentedControl) {
-        sender.tintColor = Colors.categoryColors[sender.selectedSegmentIndex]
+        sender.tintColor = Colors.categorySegmentColors[sender.selectedSegmentIndex]
     }
     
     // MARK: Navigation Bar
@@ -161,21 +187,43 @@ class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UIC
     }
     
     func validationSuccessful() {
-        
-        if let sort = self.sort, let categoryIcon = self.categoryIcon {
-            let category = Category.insertNewObject(name: self.categoryNameTextField.text!, color: categoryColor.selectedSegmentIndex, icon: categoryIcon, sort: sort)
+        if !isEdit {
+            if let sort = self.sort {
+                let category = Category.insertNewObject(name: self.categoryNameTextField.text!, color: categoryColor.selectedSegmentIndex, icon: selectedCategoryIcon, sort: sort)
+                
+                do {
+                    try Data.shared.managedObjectContext.save()
+                    
+                    categoryTableDelegate?.addCategory(category: category)
+                    
+                    dismiss(animated: true, completion: nil)
+                } catch {
+                    if (error.localizedDescription.contains("NSConstraintConflict")) {
+                        self.showError(message: "You already have a category with the same name.")
+                    } else {
+                        self.showError(message: "Could not save category: \(error)")
+                    }
+                }
+                
+                
+            } else {
+                fatalError("No sort provided")
+            }
+        } else {
+            category?.name = self.categoryNameTextField.text!
+            category?.color = Int64(categoryColor.selectedSegmentIndex)
+            category?.icon = Int64(selectedCategoryIcon)
+            
+            restaurantTableDelegate?.editCategory(category: category!)
+            categoryTableDelegate?.editCategory(category: category!)
             
             do {
                 try Data.shared.managedObjectContext.save()
             } catch {
-                fatalError("Could not save category: \(error)")
+                self.showError(message: "Could not save category: \(error)")
             }
             
-            delegate?.addCategory(category: category)
-            
-            dismiss(animated: true, completion: nil)
-        } else {
-            // ⚠️ TODO: error handling
+            self.navigationController?.popViewController(animated: true)
         }
     }
     
@@ -183,7 +231,7 @@ class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UIC
         // show validation error
         for (field, error) in errors {
             if let field = field as? UITextField {
-                field.layer.borderColor = Colors.red.cgColor
+                field.layer.borderColor = Colors.red(alpha: 0.7).cgColor
                 field.layer.borderWidth = 1.0
             }
             error.errorLabel?.text = error.errorMessage // works if you added labels

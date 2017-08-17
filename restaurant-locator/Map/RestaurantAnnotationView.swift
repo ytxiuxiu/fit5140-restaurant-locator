@@ -13,11 +13,15 @@ import UIKit
 import MapKit
 
 
-class RestaurantAnnotationView: MKAnnotationView {
+protocol RestaurantAnnotationDelegate {
+    func editRestaurant(restaurant: Restaurant)
+}
+
+class RestaurantAnnotationView: MKAnnotationView, RestaurantAnnotationDelegate {
     
-    weak var customCalloutView: RestaurantCalloutView?
+    var customCalloutView: RestaurantCalloutView?
     
-    var mainMapDelegate: MainMapDelegate?
+    var navigationController: UINavigationController?
     
     var restaurant: Restaurant?
 
@@ -47,9 +51,17 @@ class RestaurantAnnotationView: MKAnnotationView {
                 newCustomCalloutView.frame.origin.x -= newCustomCalloutView.frame.width / 2.0 - (self.frame.width / 2.0)
                 newCustomCalloutView.frame.origin.y -= newCustomCalloutView.frame.height
                 
+                newCustomCalloutView.navigationController = self.navigationController
+                newCustomCalloutView.restaurantAnnotationDelegate = self
+                newCustomCalloutView.restaurant = self.restaurant
+                
+                newCustomCalloutView.layer.cornerRadius = 5
+                
                 // set custom callout view
                 self.addSubview(newCustomCalloutView)
                 self.customCalloutView = newCustomCalloutView
+                
+                self.editRestaurant(restaurant: self.restaurant!)
                 
                 // animate presentation
                 if animated {
@@ -59,39 +71,12 @@ class RestaurantAnnotationView: MKAnnotationView {
                     })
                 }
             }
-        } else {
-            if customCalloutView != nil {
-                if animated { // fade out animation, then remove it.
-                    UIView.animate(withDuration: 0.3, animations: {
-                        self.customCalloutView!.alpha = 0.0
-                    }, completion: { (success) in
-                        self.customCalloutView!.removeFromSuperview()
-                    })
-                } else { self.customCalloutView!.removeFromSuperview() } // just remove it.
-            }
         }
     }
     
     func loadCustomCalloutView() -> RestaurantCalloutView? {
         if let views = Bundle.main.loadNibNamed("RestaurantCalloutView", owner: self, options: nil) as? [RestaurantCalloutView], views.count > 0 {
-            let restaurantCalloutView = views.first!
-            
-            restaurantCalloutView.mainMapDelegate = self.mainMapDelegate
-            restaurantCalloutView.restaurant = self.restaurant
-            
-            restaurantCalloutView.restaurantImageView.image = restaurant?.getImage()
-            restaurantCalloutView.restaurantNameLabel.text = restaurant?.name
-            restaurantCalloutView.restaurantAddressLabel.text = restaurant?.address
-            
-            if restaurant?.notificationRadius != -1 {
-                restaurantCalloutView.restaurantNotificationLabel.text = Location.radiusText[Int((restaurant?.notificationRadius)!)]
-            } else {
-                restaurantCalloutView.restaurantNotificationLabel.text = "Never"
-            }
-            
-            restaurantCalloutView.layer.cornerRadius = 5
-            
-            return restaurantCalloutView
+            return views.first!
         }
         return nil
     }
@@ -109,7 +94,21 @@ class RestaurantAnnotationView: MKAnnotationView {
         else { // test in our custom callout.
             if customCalloutView != nil {
                 return customCalloutView!.hitTest(convert(point, to: customCalloutView!), with: event)
-            } else { return nil }
+            } else {
+                return nil
+            }
+        }
+    }
+    
+    func editRestaurant(restaurant: Restaurant) {
+        self.customCalloutView?.restaurantImageView.image = restaurant.getImage()
+        self.customCalloutView?.restaurantNameLabel.text = restaurant.name
+        self.customCalloutView?.restaurantAddressLabel.text = restaurant.address
+        
+        if restaurant.notificationRadius != -1 {
+            self.customCalloutView?.restaurantNotificationLabel.text = Location.radiusText[Int(restaurant.notificationRadius)]
+        } else {
+            self.customCalloutView?.restaurantNotificationLabel.text = "Never"
         }
     }
 

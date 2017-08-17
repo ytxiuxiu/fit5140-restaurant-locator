@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		65423D531F3744700038CCE4 /* ZomatoRestaurant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65423D521F3744700038CCE4 /* ZomatoRestaurant.swift */; };
 		65423D571F3955B60038CCE4 /* RestaurantTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65423D561F3955B60038CCE4 /* RestaurantTableViewCell.swift */; };
 		65423D591F39D1330038CCE4 /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65423D581F39D1330038CCE4 /* Location.swift */; };
 		656BE4A11F4080160048769A /* RestaurantAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 656BE4A01F4080160048769A /* RestaurantAnnotation.swift */; };
@@ -15,6 +14,7 @@
 		65AB00811F426E7200DE3DD9 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AB00801F426E7200DE3DD9 /* Colors.swift */; };
 		65AB00831F447F5900DE3DD9 /* RestaurantDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AB00821F447F5900DE3DD9 /* RestaurantDetailViewController.swift */; };
 		65AB00851F45575500DE3DD9 /* RestaurantAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AB00841F45575500DE3DD9 /* RestaurantAnnotationView.swift */; };
+		65AB00871F45774D00DE3DD9 /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AB00861F45774D00DE3DD9 /* SplitViewController.swift */; };
 		65ADFEE31F35AEC800CB0A45 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ADFEE21F35AEC800CB0A45 /* AppDelegate.swift */; };
 		65ADFEE51F35AEC800CB0A45 /* MasterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ADFEE41F35AEC800CB0A45 /* MasterViewController.swift */; };
 		65ADFEE71F35AEC800CB0A45 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ADFEE61F35AEC800CB0A45 /* DetailViewController.swift */; };
@@ -29,7 +29,6 @@
 		65ADFF171F36DEFE00CB0A45 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65ADFF161F36DEFE00CB0A45 /* CoreLocation.framework */; };
 		65D039071F36E7FE0019A327 /* RestaurantTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D039061F36E7FE0019A327 /* RestaurantTableViewController.swift */; };
 		65D039091F36F8CC0019A327 /* AddRestaurantViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D039081F36F8CC0019A327 /* AddRestaurantViewController.swift */; };
-		65D0390B1F3731AF0019A327 /* Zomato.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D0390A1F3731AF0019A327 /* Zomato.swift */; };
 		65D79FCB1F4159DB00E377E9 /* RestaurantCalloutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D79FCA1F4159DB00E377E9 /* RestaurantCalloutView.swift */; };
 		65D79FCD1F4166CB00E377E9 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65D79FCC1F4166CB00E377E9 /* CoreData.framework */; };
 		65D79FD01F4166F200E377E9 /* restaurant.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 65D79FCE1F4166F200E377E9 /* restaurant.xcdatamodeld */; };
@@ -53,7 +52,6 @@
 
 /* Begin PBXFileReference section */
 		4BE5EAC9D6C761BFE873BA2D /* Pods-restaurant-locator.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-restaurant-locator.debug.xcconfig"; path = "Pods/Target Support Files/Pods-restaurant-locator/Pods-restaurant-locator.debug.xcconfig"; sourceTree = "<group>"; };
-		65423D521F3744700038CCE4 /* ZomatoRestaurant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZomatoRestaurant.swift; sourceTree = "<group>"; };
 		65423D561F3955B60038CCE4 /* RestaurantTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RestaurantTableViewCell.swift; path = Cells/RestaurantTableViewCell.swift; sourceTree = "<group>"; };
 		65423D581F39D1330038CCE4 /* Location.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
 		656BE4A01F4080160048769A /* RestaurantAnnotation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RestaurantAnnotation.swift; sourceTree = "<group>"; };
@@ -61,6 +59,7 @@
 		65AB00801F426E7200DE3DD9 /* Colors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		65AB00821F447F5900DE3DD9 /* RestaurantDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RestaurantDetailViewController.swift; path = ViewControllers/RestaurantDetailViewController.swift; sourceTree = "<group>"; };
 		65AB00841F45575500DE3DD9 /* RestaurantAnnotationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RestaurantAnnotationView.swift; path = Map/RestaurantAnnotationView.swift; sourceTree = "<group>"; };
+		65AB00861F45774D00DE3DD9 /* SplitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SplitViewController.swift; path = ViewControllers/SplitViewController.swift; sourceTree = "<group>"; };
 		65ADFEDF1F35AEC800CB0A45 /* restaurant-locator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "restaurant-locator.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		65ADFEE21F35AEC800CB0A45 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		65ADFEE41F35AEC800CB0A45 /* MasterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterViewController.swift; sourceTree = "<group>"; };
@@ -79,7 +78,6 @@
 		65ADFF161F36DEFE00CB0A45 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		65D039061F36E7FE0019A327 /* RestaurantTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RestaurantTableViewController.swift; path = ViewControllers/RestaurantTableViewController.swift; sourceTree = "<group>"; };
 		65D039081F36F8CC0019A327 /* AddRestaurantViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AddRestaurantViewController.swift; path = ViewControllers/AddRestaurantViewController.swift; sourceTree = "<group>"; };
-		65D0390A1F3731AF0019A327 /* Zomato.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Zomato.swift; sourceTree = "<group>"; };
 		65D79FCA1F4159DB00E377E9 /* RestaurantCalloutView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RestaurantCalloutView.swift; path = Map/RestaurantCalloutView.swift; sourceTree = "<group>"; };
 		65D79FCC1F4166CB00E377E9 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		65D79FCF1F4166F200E377E9 /* restaurant.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = restaurant.xcdatamodel; sourceTree = "<group>"; };
@@ -121,7 +119,6 @@
 				65D7A0341F4175DC00E377E9 /* Category+CoreDataProperties.swift */,
 				65D7A0351F4175DC00E377E9 /* Restaurant+CoreDataClass.swift */,
 				65D7A0361F4175DC00E377E9 /* Restaurant+CoreDataProperties.swift */,
-				65423D521F3744700038CCE4 /* ZomatoRestaurant.swift */,
 				65D7A03B1F41881A00E377E9 /* Data.swift */,
 			);
 			name = Entities;
@@ -180,7 +177,6 @@
 				65ADFEEB1F35AEC800CB0A45 /* Assets.xcassets */,
 				65ADFEED1F35AEC800CB0A45 /* LaunchScreen.storyboard */,
 				65ADFEF01F35AEC800CB0A45 /* Info.plist */,
-				65D0390A1F3731AF0019A327 /* Zomato.swift */,
 				65423D581F39D1330038CCE4 /* Location.swift */,
 				65D79FCE1F4166F200E377E9 /* restaurant.xcdatamodeld */,
 				65AB00801F426E7200DE3DD9 /* Colors.swift */,
@@ -206,6 +202,7 @@
 				65D039061F36E7FE0019A327 /* RestaurantTableViewController.swift */,
 				65D039081F36F8CC0019A327 /* AddRestaurantViewController.swift */,
 				65AB00821F447F5900DE3DD9 /* RestaurantDetailViewController.swift */,
+				65AB00861F45774D00DE3DD9 /* SplitViewController.swift */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -420,15 +417,14 @@
 				65423D591F39D1330038CCE4 /* Location.swift in Sources */,
 				65AB00811F426E7200DE3DD9 /* Colors.swift in Sources */,
 				65D039091F36F8CC0019A327 /* AddRestaurantViewController.swift in Sources */,
-				65423D531F3744700038CCE4 /* ZomatoRestaurant.swift in Sources */,
 				656BE4A11F4080160048769A /* RestaurantAnnotation.swift in Sources */,
-				65D0390B1F3731AF0019A327 /* Zomato.swift in Sources */,
 				65D7A0381F4175DC00E377E9 /* Category+CoreDataProperties.swift in Sources */,
 				65D7A03C1F41881A00E377E9 /* Data.swift in Sources */,
 				65423D571F3955B60038CCE4 /* RestaurantTableViewCell.swift in Sources */,
 				65D7A03A1F4175DC00E377E9 /* Restaurant+CoreDataProperties.swift in Sources */,
 				65D79FCB1F4159DB00E377E9 /* RestaurantCalloutView.swift in Sources */,
 				65ADFF101F36A7DF00CB0A45 /* CategoryTableViewCell.swift in Sources */,
+				65AB00871F45774D00DE3DD9 /* SplitViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -11,17 +11,21 @@
 //              http://www.appcoda.com/presentation-controllers-tutorial/
 //          Create NavBar programmatically with Button and Title Swift
 //              https://stackoverflow.com/questions/33717698/create-navbar-programmatically-with-button-and-title-swift
+//      2. Icon Generator
+//          Website: MakeAppIcon
+//              https://makeappicon.com
 
 import UIKit
 
 
-protocol CategoryDelegate {
+protocol CategoryTableDelegate {
     func addCategory(category: Category)
+    func editCategory(category: Category)
     func reduceNumberOfRestaurants(category: Category)
     func increaseNumberOfRestaurants(category: Category)
 }
 
-class MasterViewController: UITableViewController, UIPopoverPresentationControllerDelegate, CategoryDelegate {
+class MasterViewController: UITableViewController, UIPopoverPresentationControllerDelegate, CategoryTableDelegate {
 
     var detailViewController: DetailViewController? = nil
     
@@ -33,8 +37,6 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
         // Do any additional setup after loading the view, typically from a nib.
         navigationItem.leftBarButtonItem = editButtonItem
 
-        //let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(insertNewObject(_:)))
-        //navigationItem.rightBarButtonItem = addButton
         if let split = splitViewController {
             let controllers = split.viewControllers
             detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
@@ -73,7 +75,7 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
             }
         } else if segue.identifier == "showAddCategorySegue" {
             let controller = segue.destination as! AddCategoryViewController
-            controller.delegate = self
+            controller.categoryTableDelegate = self
             controller.sort = categories.count  // new sort
             
             let popoverPresentationController = segue.destination.popoverPresentationController!
@@ -125,7 +127,7 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
                 do {
                     try Data.shared.managedObjectContext.save()
                 } catch {
-                    fatalError("Could not delete the category: \(error)")
+                    self.showError(message: "Could not delete the category: \(error)")
                 }
                 
                 self.categories.remove(at: indexPath.row)
@@ -166,7 +168,7 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
         do {
             try Data.shared.managedObjectContext.save()
         } catch {
-            fatalError("Could not re-arrange categoris: \(error)")
+            self.showError(message: "Could not re-arrange categoris: \(error)")
         }
     }
 
@@ -200,6 +202,10 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
     func addCategory(category: Category) {
         categories.append(category)
         tableView.reloadData()
+    }
+    
+    func editCategory(category: Category) {
+        self.tableView.reloadData()
     }
     
     func reduceNumberOfRestaurants(category: Category) {

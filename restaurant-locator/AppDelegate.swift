@@ -9,6 +9,23 @@
 import UIKit
 import CoreData
 
+
+extension UIViewController {
+    
+    func showError(message: String) {
+        let alertController = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
+        
+        let cancelAction = UIAlertAction(title: "OK", style: .cancel, handler: {
+            (alert: UIAlertAction!) -> Void in
+            alertController.dismiss(animated: true, completion: nil)
+        })
+        
+        alertController.addAction(cancelAction)
+        
+        self.present(alertController, animated: true, completion: nil)
+    }
+}
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDelegate {
 

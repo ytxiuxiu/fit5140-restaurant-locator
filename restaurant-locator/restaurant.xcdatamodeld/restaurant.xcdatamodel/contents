@@ -6,6 +6,16 @@
         <attribute name="name" attributeType="String" indexed="YES" syncable="YES"/>
         <attribute name="sort" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="restaurants" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Restaurant" inverseName="category" inverseEntity="Restaurant" syncable="YES"/>
+        <compoundIndexes>
+            <compoundIndex>
+                <index value="name"/>
+            </compoundIndex>
+        </compoundIndexes>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="name"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
     </entity>
     <entity name="Restaurant" representedClassName="Restaurant" syncable="YES">
         <attribute name="addedAt" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
@@ -19,7 +29,7 @@
         <relationship name="category" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Category" inverseName="restaurants" inverseEntity="Category" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Category" positionX="-54" positionY="36" width="128" height="30"/>
+        <element name="Category" positionX="-54" positionY="36" width="128" height="120"/>
         <element name="Restaurant" positionX="261" positionY="36" width="128" height="30"/>
     </elements>
 </model>
