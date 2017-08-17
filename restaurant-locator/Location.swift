@@ -107,6 +107,14 @@ class Location: NSObject, CLLocationManagerDelegate {
         return MKCoordinateRegionMake(coordinateLocation, coordinateSpan)
     }
     
+    static func getDistanceString(distance: Double) -> String {
+        if (distance < 1000) {
+            return String(format: "%.0f m", distance)
+        } else {
+            return String(format: "%.1f km", distance / 1000)
+        }
+    }
+    
     func addCallback(key: String, callback: @escaping (_ latitude: CLLocationDegrees, _ longitude: CLLocationDegrees, _ cityId: Int?, _ cityName: String?) -> Void) {
         self.callbacks[key] = callback
         

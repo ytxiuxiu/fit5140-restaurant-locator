@@ -56,7 +56,8 @@ class Zomato: NSObject {
                 if let cityId = self.cityId, let cityName = self.cityName {
                     closure(cityId, cityName)
                 } else {
-                    return
+                    // ⚠️ TODO: error handling
+                    closure(nil, nil)
                 }
             }
         }

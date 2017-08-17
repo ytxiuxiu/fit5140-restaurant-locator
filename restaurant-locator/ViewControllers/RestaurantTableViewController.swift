@@ -20,6 +20,7 @@ import CoreLocation
 
 protocol RestaurantDelegate {
     func addRestaurant(restaurant: Restaurant)
+    func editRestaurant(restaurant: Restaurant)
 }
 
 class RestaurantTableViewController: UITableViewController, UIPopoverPresentationControllerDelegate, RestaurantDelegate {
@@ -92,11 +93,7 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
         cell.restaurantAddressLabel.text = restaurant.address
         
         if let distance = restaurant.distance {
-            if (distance < 1000) {
-                cell.restaurantDistanceLabel.text = String(format: "%.0f m", distance)
-            } else {
-                cell.restaurantDistanceLabel.text = String(format: "%.1f km", distance / 1000)
-            }
+            cell.restaurantDistanceLabel.text = Location.getDistanceString(distance: distance)
         }
 
         return cell
@@ -156,7 +153,12 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
             popoverPresentationController.delegate = self
             popoverPresentationController.barButtonItem = sender as? UIBarButtonItem
         } else if segue.identifier == "showRestaurantDetailSegue" {
-            //let controller = segue.destination as! RestaurantDetailViewController
+            let controller = segue.destination as! RestaurantDetailViewController
+            let restaurant = self.restaurants[(self.tableView.indexPathForSelectedRow?.row)!]
+            
+            controller.title = restaurant.name
+            controller.restaurant = restaurant
+            controller.delegate = self
         }
     }
 
@@ -199,6 +201,18 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
             
             // one time call
             Location.sharedInstance.removeCallback(key: "newRestaurantDisntance")
+        })
+        
+        tableView.reloadData()
+    }
+    
+    func editRestaurant(restaurant: Restaurant) {
+        // get didtance for this edited restaurant
+        Location.sharedInstance.addCallback(key: "editRestaurantDisntance", callback: {(latitude, longitude, cityId, cityName) in
+            let _ = restaurant.calculateDistance(currentLocation: CLLocation(latitude: latitude, longitude: longitude))
+            
+            // one time call
+            Location.sharedInstance.removeCallback(key: "editRestaurantDisntance")
         })
         
         tableView.reloadData()

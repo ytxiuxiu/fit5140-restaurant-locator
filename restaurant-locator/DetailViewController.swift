@@ -85,6 +85,8 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
     
     var currentLocation: CLLocationCoordinate2D?
     
+    var lastCLLocation: CLLocation?
+    
     var radiusCircle: MKCircle?
     
     var restaurants = [Restaurant]()
@@ -92,6 +94,8 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
     var restaurantAnnotations = [RestaurantAnnotation]()
     
     var restaurantPinImages = [String: UIImage]()
+    
+    var mapInited = false
     
     
     func configureView() {
@@ -119,25 +123,43 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
         // get data
         self.restaurants = Restaurant.fetchAll()
         
-        
         mapView.delegate = self
+        mapView.showsUserLocation = true
         
         // start loction
         Location.sharedInstance.addCallback(key: "mainMap", callback: {(latitude, longitude, cityId, cityName) in
-            // prepare region
+            var updateRestaurants = false;
+            if self.lastCLLocation == nil {
+                self.lastCLLocation = CLLocation(latitude: latitude, longitude: longitude)
+            }
+            let currentCLLocation = CLLocation(latitude: latitude, longitude: longitude)
+            if !(self.lastCLLocation?.distance(from: currentCLLocation).isLess(than: 20.0))! {
+                self.lastCLLocation = currentCLLocation
+                updateRestaurants = true
+            }
+            
+            
             self.currentLocation = CLLocationCoordinate2DMake(latitude, longitude)
-            let coordinateSpan: MKCoordinateSpan = MKCoordinateSpanMake(0.01, 0.01)
-            let coordinateRegion: MKCoordinateRegion = MKCoordinateRegionMake(self.currentLocation!, coordinateSpan)
             
-            self.mapView.setRegion(coordinateRegion, animated: true)
+            if !self.mapInited {
+                let coordinateSpan: MKCoordinateSpan = MKCoordinateSpanMake(0.01, 0.01)
+                let coordinateRegion: MKCoordinateRegion = MKCoordinateRegionMake(self.currentLocation!, coordinateSpan)
             
+                self.mapView.setRegion(coordinateRegion, animated: true)
+                self.mapInited = true
+                updateRestaurants = true
+            }
+                
             // add radius circle
             // ✴️ Attribute:
             // StackOverflow: Draw a circle of 1000m radius around users location in MKMapView
             //      https://stackoverflow.com/questions/9056451/draw-a-circle-of-1000m-radius-around-users-location-in-mkmapview
             
-            self.showRadiusCircle()
-            self.showRestaurants(restaurants: self.filterRestaurants())
+            // only update when
+            if updateRestaurants {
+                self.showRadiusCircle()
+                self.showRestaurants(restaurants: self.filterRestaurants())
+            }
         })
         
         configureView()
@@ -237,6 +259,7 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
         
         return annotationView
     }
+    
     
     // generate pin image for a restaurant annotation
     // ✴️ Attribute:

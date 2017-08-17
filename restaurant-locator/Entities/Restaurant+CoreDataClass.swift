@@ -88,20 +88,24 @@ public class Restaurant: NSManagedObject {
     // Generate a UUID on iOS from Swift
     //      https://stackoverflow.com/questions/24428250/generate-a-uuid-on-ios-from-swift
     
-    func getImageURL() -> URL {
+    func getImageURL() -> URL? {
         if let filename = self.image {
             return getDirecotryURL().appendingPathComponent("\(filename).png")
         } else {
-            self.image = UUID().uuidString
-            return getDirecotryURL().appendingPathComponent("\(self.image).png")
+            return nil
         }
+    }
+    
+    func generateImageUrl() -> URL {
+        self.image = UUID().uuidString
+        return getDirecotryURL().appendingPathComponent("\(self.image ?? "").png")
     }
     
     func saveImage(image: UIImage) {
         let fileManager = FileManager.default
         
         let directoryPath = getDirecotryURL().path
-        let imagePath = getImageURL().path
+        let imagePath = generateImageUrl().path
         
         do {
             if !fileManager.fileExists(atPath: directoryPath) {
@@ -126,23 +130,23 @@ public class Restaurant: NSManagedObject {
         
         do {
             if let data = UIImagePNGRepresentation(image) {
-                try data.write(to: getImageURL(), options: .atomic)
+                try data.write(to: self.getImageURL()!, options: .atomic)
             }
         } catch {
             fatalError("Could not write image: \(error)")
         }
     }
     
-    func getImage() -> UIImage {
+    func getImage(defaultImage: UIImage = UIImage(named: "photo")!) -> UIImage {
         let fileManager = FileManager.default
         
-        let imagePath = getImageURL().path
-
-        if fileManager.fileExists(atPath: imagePath) {
-            return UIImage(contentsOfFile: imagePath)!
-        } else {
-            return UIImage(named: "photo")!
+        if let imageURL = getImageURL() {
+            if fileManager.fileExists(atPath: imageURL.path) {
+                return UIImage(contentsOfFile: imageURL.path)!
+            }
         }
+        
+        return defaultImage
     }
     
     func calculateDistance(currentLocation: CLLocation) -> Double? {

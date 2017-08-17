@@ -59,9 +59,17 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     
     @IBOutlet weak var topSpaceConstraint: NSLayoutConstraint!
     
+    @IBOutlet weak var addButton: UIButton!
+    
+    var isEdit = false
+    
+    var restaurant: Restaurant?
+    
     var category: Category?
     
     var delegate: RestaurantDelegate?
+    
+    var restaurantDetailDelegate: RestaurantDetailDelegate?
     
     var categoryDelegate: CategoryDelegate?
     
@@ -105,20 +113,22 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
         // start loction
         self.restaurantMapView.delegate = self
         
-        Location.sharedInstance.addCallback(key: "addRestaurantMap", callback: {(latitude, longitude, cityId, cityName) in
-            
-            // fill current address
-            Location.getAddress(latitude: latitude, longitude: longitude, callback: { (address) in
-                if address != nil {
-                    self.restaurantAddressTextField.text = address
-                }
+        if !isEdit {
+            Location.sharedInstance.addCallback(key: "addRestaurantMap", callback: {(latitude, longitude, cityId, cityName) in
+                
+                // fill current address
+                Location.getAddress(latitude: latitude, longitude: longitude, callback: { (address) in
+                    if address != nil {
+                        self.restaurantAddressTextField.text = address
+                    }
+                })
+                
+                self.movePin(latitude: latitude, longitude: longitude)
+                
+                // unsubscribe, just need location once
+                Location.sharedInstance.removeCallback(key: "addRestaurantMap")
             })
-            
-            self.movePin(latitude: latitude, longitude: longitude)
-            
-            // unsubscribe, just need location once
-            Location.sharedInstance.removeCallback(key: "addRestaurantMap")
-        })
+        }
         
         // restaurant suggestion
         self.restaurantNameSearchTextField.theme.bgColor = UIColor.white
@@ -252,6 +262,39 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
         self.validator.registerField(restaurantNameSearchTextField, errorLabel: restaurantNameErrorLabel, rules: [RequiredRule(message: "Give it a name!")])
         
         self.validator.registerField(restaurantAddressTextField, rules: [RequiredRule(message: "Where is this restaurant?")])
+        
+        // edit
+        if isEdit {
+            // fill all the fields with values
+            self.restaurantNameSearchTextField.text = restaurant?.name
+            if restaurant?.image != nil {
+                self.isPhotoSelected = true
+                self.restaurantPhotoImageView.image = restaurant?.getImage()
+            } else {
+                self.restaurantPhotoImageView.image = UIImage(named: "photo-add")
+            }
+            self.restaurantRatingView.rating = (restaurant?.rating)!
+            self.restaurantRatingLabel.text = String(format: "%.1f", (restaurant?.rating)!)
+            self.restaurantAddressTextField.text = restaurant?.address
+            
+            movePin(latitude: (restaurant?.latitude)!, longitude: (restaurant?.longitude)!)
+            
+            self.currentRaidus = Int((restaurant?.notificationRadius)!)
+            if restaurant?.notificationRadius != -1 {
+                self.notificationPickerView.selectRow(Int((restaurant?.notificationRadius)!), inComponent: 0, animated: false)
+            } else {
+                self.notificationPickerView.selectRow(Location.radius.count, inComponent: 0, animated: false)
+            }
+            
+            // change title and button
+            self.title = "Edit Restaurant"
+            
+            // ✴️ Attribute:
+            // StackOverflow: How to change button text in Swift Xcode 6?
+            //      https://stackoverflow.com/questions/26641571/how-to-change-button-text-in-swift-xcode-6
+            
+            self.addButton.setTitle("Edit", for: .normal)
+        }
         
     }
 
@@ -435,7 +478,11 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     // MARK: - Save
     
     @IBAction func onCancelButtonClicked(_ sender: Any) {
-        // self.navigationController?.popViewController(animated: true)
+        if !self.isEdit {
+            dismiss(animated: true, completion: nil)
+        } else {
+            self.navigationController?.popViewController(animated: true)
+        }
     }
     
     @IBAction func onAddButtonClicked(_ sender: Any) {
@@ -443,28 +490,57 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     }
     
     func validationSuccessful() {
-        
-        if let latitude = self.currentPin?.coordinate.latitude, let longitude = self.currentPin?.coordinate.longitude {
-        let restaurant = Restaurant.insertNewObject(name: self.restaurantNameSearchTextField.text!, rating: self.restaurantRatingView.rating, address: restaurantAddressTextField.text!, latitude: latitude, longitude: longitude, notificationRadius: self.currentRaidus)
-            
-            self.category?.addToRestaurants(restaurant)
-            
-            if isPhotoSelected {
-                restaurant.saveImage(image: self.restaurantPhotoImageView.image!)
+        if !isEdit {
+            if let latitude = self.currentPin?.coordinate.latitude, let longitude = self.currentPin?.coordinate.longitude {
+                let restaurant = Restaurant.insertNewObject(name: self.restaurantNameSearchTextField.text!, rating: self.restaurantRatingView.rating, address: restaurantAddressTextField.text!, latitude: latitude, longitude: longitude, notificationRadius: self.currentRaidus)
+                
+                self.category?.addToRestaurants(restaurant)
+                
+                if isPhotoSelected {
+                    restaurant.saveImage(image: self.restaurantPhotoImageView.image!)
+                }
+                
+                do {
+                    try Data.shared.managedObjectContext.save()
+                } catch {
+                    fatalError("Could not save restaurant: \(error)")
+                }
+                
+                self.delegate?.addRestaurant(restaurant: restaurant)
+                self.categoryDelegate?.increaseNumberOfRestaurants(category: self.category!)
+                
+                dismiss(animated: true, completion: nil)
+            } else {
+                // ⚠️ TODO: error handling
             }
-            
-            do {
-                try Data.shared.managedObjectContext.save()
-            } catch {
-                fatalError("Could not save restaurant: \(error)")
-            }
-            
-            self.delegate?.addRestaurant(restaurant: restaurant)
-            self.categoryDelegate?.increaseNumberOfRestaurants(category: self.category!)
-            
-            dismiss(animated: true, completion: nil)
         } else {
-            // ⚠️ TODO: error handling
+            if let latitude = self.currentPin?.coordinate.latitude, let longitude = self.currentPin?.coordinate.longitude {
+                self.restaurant?.name = self.restaurantNameSearchTextField.text!
+                self.restaurant?.rating = self.restaurantRatingView.rating
+                self.restaurant?.address = restaurantAddressTextField.text!
+                self.restaurant?.latitude = latitude
+                self.restaurant?.longitude = longitude
+                self.restaurant?.notificationRadius = Int64(self.currentRaidus)
+                
+                if isPhotoSelected {
+                    restaurant?.saveImage(image: self.restaurantPhotoImageView.image!)
+                } else {
+                    // ⚠️ TODO: delete the image
+                }
+                
+                do {
+                    try Data.shared.managedObjectContext.save()
+                } catch {
+                    fatalError("Could not save restaurant: \(error)")
+                }
+                
+                self.delegate?.editRestaurant(restaurant: restaurant!)
+                self.restaurantDetailDelegate?.editRestaurant(restaurant: restaurant!)
+                
+                self.navigationController?.popViewController(animated: true)
+            } else {
+                // ⚠️ TODO: error handling
+            }
         }
     }
     
