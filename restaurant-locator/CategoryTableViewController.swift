@@ -25,22 +25,17 @@ protocol CategoryTableDelegate {
     func increaseNumberOfRestaurants(category: Category)
 }
 
-class MasterViewController: UITableViewController, UIPopoverPresentationControllerDelegate, CategoryTableDelegate {
+class CategoryTableViewController: UITableViewController, UIPopoverPresentationControllerDelegate, CategoryTableDelegate {
 
-    var detailViewController: DetailViewController? = nil
+    var restaurantMapViewController: RestaurantMapViewController?
     
     var categories = [Category]()
 
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        
         navigationItem.leftBarButtonItem = editButtonItem
-
-        if let split = splitViewController {
-            let controllers = split.viewControllers
-            detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
-        }
         
         categories = Category.fetchAll()
         for category in categories {
@@ -67,21 +62,53 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
                 let category = categories[indexPath.row]
                 let controller = segue.destination as! RestaurantTableViewController
                 
+                controller.restaurantMapViewController = self.restaurantMapViewController
                 controller.category = category
                 controller.title = category.name
                 //controller.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
                 controller.navigationItem.leftItemsSupplementBackButton = true
                 controller.delegate = self
             }
+            
         } else if segue.identifier == "showAddCategorySegue" {
             let controller = segue.destination as! AddCategoryViewController
+            
             controller.categoryTableDelegate = self
             controller.sort = categories.count  // new sort
             
-            let popoverPresentationController = segue.destination.popoverPresentationController!
-            popoverPresentationController.delegate = self
-            popoverPresentationController.barButtonItem = sender as? UIBarButtonItem
         }
+    }
+    
+    func showViewControllerOnDetailViewController(controller: UIViewController) {
+        // if some view opened on the detail view conroller already, pop it
+        if restaurantMapViewController?.navigationController?.viewControllers.last != restaurantMapViewController {
+            restaurantMapViewController?.navigationController?.popViewController(animated: false)
+            restaurantMapViewController?.navigationController?.pushViewController(controller, animated: false)
+        } else {
+            restaurantMapViewController?.navigationController?.pushViewController(controller, animated: true)
+        }
+    }
+    
+    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
+        let device = UIDevice.current.userInterfaceIdiom
+        
+        if device == .pad {
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            
+            if identifier == "showAddCategorySegue" {
+                let controller = storyboard.instantiateViewController(withIdentifier: "editCategoryViewController") as! AddCategoryViewController
+                
+                controller.restaurantMapViewController = self.restaurantMapViewController
+                controller.categoryTableDelegate = self
+                controller.sort = categories.count  // new sort
+                
+                showViewControllerOnDetailViewController(controller: controller)
+                
+                return false    // don't do the default segue
+            }
+        }
+        
+        return true
     }
 
     
@@ -177,26 +204,6 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
     
     func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
         return UIModalPresentationStyle.fullScreen
-    }
-    
-    func presentationController(_ controller: UIPresentationController, viewControllerForAdaptivePresentationStyle style: UIModalPresentationStyle) -> UIViewController? {
-        // add navigation bar
-        let navigationBar = UINavigationBar(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIApplication.shared.statusBarFrame.size.height + 44))
-        let navigationItem = UINavigationItem(title: "Add Category")
-        let cancelBarButton = UIBarButtonItem(title: "Cancel", style: .done, target: self, action: #selector(cancelBarButtonItemTapped(sender:)))
-        navigationItem.leftBarButtonItem = cancelBarButton
-        navigationBar.setItems([navigationItem], animated: false)
-        controller.presentedViewController.view.addSubview(navigationBar)
-        
-        // add extra top space
-        let addCategoryViewController = controller.presentedViewController as! AddCategoryViewController
-        addCategoryViewController.addExtraTopSpaceForCompatScreen()
-        
-        return controller.presentedViewController
-    }
-    
-    func cancelBarButtonItemTapped(sender: UIBarButtonItem) {
-        dismiss(animated: true, completion: nil)
     }
     
     func addCategory(category: Category) {

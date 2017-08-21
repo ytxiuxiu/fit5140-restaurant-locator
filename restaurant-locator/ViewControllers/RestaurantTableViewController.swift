@@ -26,6 +26,8 @@ protocol RestaurantTableDelegate {
 
 class RestaurantTableViewController: UITableViewController, UIPopoverPresentationControllerDelegate, RestaurantTableDelegate {
     
+    var restaurantMapViewController: RestaurantMapViewController?
+    
     var category: Category?
     
     var restaurants = [Restaurant]()
@@ -35,17 +37,12 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-//        navigationItem.leftBarButtonItem = editButtonItem
-        
         // get data
         if let categoryName = category?.name {
             restaurants = Restaurant.fetchByCategory(categoryName: categoryName)
         }
         
-        Location.sharedInstance.addCallback(key: "restaurantsDisntance", callback: {(latitude, longitude) in
+        Location.shared.addCallback(key: "restaurantsDisntance", callback: {(latitude, longitude) in
             for i in 0..<self.restaurants.count {
                 let restaurant = self.restaurants[i]
                 let _ = restaurant.calculateDistance(currentLocation: CLLocation(latitude: latitude, longitude: longitude))
@@ -67,7 +64,7 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        Location.sharedInstance.removeCallback(key: "restaurantsDisntance")
+        Location.shared.removeCallback(key: "restaurantsDisntance")
     }
 
     // MARK: - Table view data source
@@ -146,13 +143,10 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showAddRestaurantSegue" {
             let controller = segue.destination as! AddRestaurantViewController
+            
             controller.category = self.category
             controller.restaurantTableDelegate = self
             controller.categoryTableDelegate = self.delegate
-            
-            let popoverPresentationController = segue.destination.popoverPresentationController!
-            popoverPresentationController.delegate = self
-            popoverPresentationController.barButtonItem = sender as? UIBarButtonItem
             
         } else if segue.identifier == "showRestaurantDetailSegue" {
             let controller = segue.destination as! RestaurantDetailViewController
@@ -161,7 +155,75 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
             controller.title = restaurant.name
             controller.restaurant = restaurant
             controller.restaurantTableDelegate = self
+            
+        } else if segue.identifier == "showEditCategorySegue" {
+            let controller = segue.destination as! AddCategoryViewController
+            
+            controller.isEdit = true
+            controller.category = self.category
+            controller.restaurantTableDelegate = self
+            controller.categoryTableDelegate = self.delegate
         }
+    }
+    
+    func showViewControllerOnDetailViewController(controller: UIViewController) {
+        // if some view opened on the detail view conroller already, pop it
+        if restaurantMapViewController?.navigationController?.viewControllers.last != restaurantMapViewController {
+            restaurantMapViewController?.navigationController?.popViewController(animated: false)
+            restaurantMapViewController?.navigationController?.pushViewController(controller, animated: false)
+        } else {
+            restaurantMapViewController?.navigationController?.pushViewController(controller, animated: true)
+        }
+    }
+    
+    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
+        let device = UIDevice.current.userInterfaceIdiom
+        
+        if device == .pad {
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            
+            if identifier == "showAddRestaurantSegue" {
+                let controller = storyboard.instantiateViewController(withIdentifier: "editRestaurantViewController") as! AddRestaurantViewController
+                
+                controller.restaurantMapViewController = self.restaurantMapViewController
+                controller.category = self.category
+                controller.restaurantTableDelegate = self
+                controller.categoryTableDelegate = self.delegate
+                
+                showViewControllerOnDetailViewController(controller: controller)
+                
+                return false    // don't do the default segue
+                
+            } else if identifier == "showRestaurantDetailSegue" {
+                let restaurant = self.restaurants[(tableView.indexPathForSelectedRow?.row)!]
+                
+                let controller = storyboard.instantiateViewController(withIdentifier: "restaurantDetail") as! RestaurantDetailViewController
+                
+                controller.restaurantMapViewController = self.restaurantMapViewController
+                controller.title = restaurant.name
+                controller.restaurant = restaurant
+                controller.restaurantTableDelegate = self
+                
+                showViewControllerOnDetailViewController(controller: controller)
+                
+                return false    // don't do the default segue
+                
+            } else if identifier == "showEditCategorySegue" {
+                let controller = storyboard.instantiateViewController(withIdentifier: "editCategoryViewController") as! AddCategoryViewController
+                
+                controller.restaurantMapViewController = self.restaurantMapViewController
+                controller.isEdit = true
+                controller.category = self.category
+                controller.restaurantTableDelegate = self
+                controller.categoryTableDelegate = self.delegate
+                
+                showViewControllerOnDetailViewController(controller: controller)
+                
+                return false    // don't do the default segue
+            }
+        }
+        
+        return true
     }
 
     
@@ -171,41 +233,6 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
         return UIModalPresentationStyle.fullScreen
     }
     
-    func presentationController(_ controller: UIPresentationController, viewControllerForAdaptivePresentationStyle style: UIModalPresentationStyle) -> UIViewController? {
-        // add navigation bar
-        let navigationBar = UINavigationBar(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIApplication.shared.statusBarFrame.size.height + 44))
-        let navigationItem = UINavigationItem(title: "Add Restaurant")
-        let cancelBarButton = UIBarButtonItem(title: "Cancel", style: .done, target: self, action: #selector(cancelBarButtonItemTapped(sender:)))
-        navigationItem.leftBarButtonItem = cancelBarButton
-        navigationBar.setItems([navigationItem], animated: false)
-        controller.presentedViewController.view.addSubview(navigationBar)
-        
-        // add extra top space
-        let addRestaurantViewController = controller.presentedViewController as! AddRestaurantViewController
-        addRestaurantViewController.addExtraTopSpaceForCompatScreen()
-        
-        return controller.presentedViewController
-    }
-    
-    func cancelBarButtonItemTapped(sender: UIBarButtonItem) {
-        dismiss(animated: true, completion: nil)
-    }
-    
-    
-    // MARK: - Edit category
-    
-    @IBAction func onEditButtonTapped(_ sender: Any) {
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let controller = storyboard.instantiateViewController(withIdentifier: "editCategoryViewController") as! AddCategoryViewController
-        
-        controller.isEdit = true
-        controller.category = self.category
-        controller.restaurantTableDelegate = self
-        controller.categoryTableDelegate = self.delegate
-        
-        self.navigationController?.pushViewController(controller, animated: true)
-    }
-    
     
     // MARK: - Data
     
@@ -213,11 +240,11 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
         self.restaurants.append(restaurant)
         
         // get didtance for this newly added restaurant
-        Location.sharedInstance.addCallback(key: "newRestaurantDisntance", callback: {(latitude, longitude) in
+        Location.shared.addCallback(key: "newRestaurantDisntance", callback: {(latitude, longitude) in
             let _ = restaurant.calculateDistance(currentLocation: CLLocation(latitude: latitude, longitude: longitude))
             
             // one time call
-            Location.sharedInstance.removeCallback(key: "newRestaurantDisntance")
+            Location.shared.removeCallback(key: "newRestaurantDisntance")
         })
         
         tableView.reloadData()
@@ -225,11 +252,11 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
     
     func editRestaurant(restaurant: Restaurant) {
         // get didtance for this edited restaurant
-        Location.sharedInstance.addCallback(key: "editRestaurantDisntance", callback: {(latitude, longitude) in
+        Location.shared.addCallback(key: "editRestaurantDisntance", callback: {(latitude, longitude) in
             let _ = restaurant.calculateDistance(currentLocation: CLLocation(latitude: latitude, longitude: longitude))
             
             // one time call
-            Location.sharedInstance.removeCallback(key: "editRestaurantDisntance")
+            Location.shared.removeCallback(key: "editRestaurantDisntance")
         })
         
         tableView.reloadData()

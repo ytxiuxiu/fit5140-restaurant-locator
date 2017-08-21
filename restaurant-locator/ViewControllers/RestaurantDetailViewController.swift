@@ -31,6 +31,10 @@ class RestaurantDetailViewController: UIViewController, RestaurantDetailDelegate
     
     @IBOutlet weak var restaurantMapView: MKMapView!
     
+    @IBOutlet weak var categoryLabel: UILabel!
+    
+    var restaurantMapViewController: RestaurantMapViewController?
+    
     var restaurantTableDelegate: RestaurantTableDelegate?
     
     var restaurantAnnotationDelegate: RestaurantAnnotationDelegate?
@@ -59,7 +63,7 @@ class RestaurantDetailViewController: UIViewController, RestaurantDetailDelegate
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
-        Location.sharedInstance.removeCallback(key: "restaurantDetailMap")
+        Location.shared.removeCallback(key: "restaurantDetailMap")
     }
     
     func movePin(latitude: CLLocationDegrees, longitude: CLLocationDegrees, alsoMoveTheMap: Bool = true) {
@@ -79,6 +83,7 @@ class RestaurantDetailViewController: UIViewController, RestaurantDetailDelegate
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let controller = storyboard.instantiateViewController(withIdentifier: "editRestaurantViewController") as! AddRestaurantViewController
         
+        controller.restaurantMapViewController = self.restaurantMapViewController
         controller.isEdit = true
         controller.restaurant = self.restaurant
         controller.restaurantTableDelegate = self.restaurantTableDelegate
@@ -106,17 +111,6 @@ class RestaurantDetailViewController: UIViewController, RestaurantDetailDelegate
         mapItem.openInMaps(launchOptions: options)
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-    
     func editRestaurant(restaurant: Restaurant) {
         self.title = restaurant.name
         self.restaurantImageView.image = restaurant.getImage()
@@ -125,13 +119,13 @@ class RestaurantDetailViewController: UIViewController, RestaurantDetailDelegate
         
         self.restaurantAddressLabel.text = restaurant.address
         
-        Location.sharedInstance.addCallback(key: "restaurantDetailDisntance", callback: {(latitude, longitude) in
+        Location.shared.addCallback(key: "restaurantDetailDisntance", callback: {(latitude, longitude) in
             let distance = restaurant.calculateDistance(currentLocation: CLLocation(latitude: latitude, longitude: longitude))
             
             self.restaurantDistanceLabel.text = "\(Location.getDistanceString(distance: distance!)) from here"
             
             // one time call
-            Location.sharedInstance.removeCallback(key: "restaurantDetailDisntance")
+            Location.shared.removeCallback(key: "restaurantDetailDisntance")
         })
         
         // ✴️ Attributes:
@@ -147,6 +141,8 @@ class RestaurantDetailViewController: UIViewController, RestaurantDetailDelegate
         } else {
             self.restaurantNotificationRadiusLabel.text = "Never"
         }
+        
+        self.categoryLabel.text = restaurant.category?.name
         
         movePin(latitude: restaurant.latitude, longitude: restaurant.longitude)
     }

@@ -31,7 +31,6 @@ import SwiftValidator
 
 
 class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, ValidationDelegate {
-
     
     @IBOutlet weak var categoryIconsCollectionView: UICollectionView!
     
@@ -48,6 +47,8 @@ class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UIC
     @IBOutlet weak var categoryColor: UISegmentedControl!
     
     @IBOutlet weak var topSpaceConstraint: NSLayoutConstraint!
+    
+    var restaurantMapViewController: RestaurantMapViewController?
     
     var isEdit = false
     
@@ -167,16 +168,7 @@ class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UIC
     func addExtraTopSpaceForCompatScreen() {
         topSpaceConstraint.constant = UIApplication.shared.statusBarFrame.height + 44   // status bar + navigation bar + original top
     }
-    
-    /*
-    // MARK: - Navigation
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
     
     // MARK: Save
     
@@ -203,6 +195,7 @@ class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UIC
                     } else {
                         self.showError(message: "Could not save category: \(error)")
                     }
+                    return
                 }
                 
                 
@@ -221,9 +214,16 @@ class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UIC
                 try Data.shared.managedObjectContext.save()
             } catch {
                 self.showError(message: "Could not save category: \(error)")
+                return
             }
-            
+        }
+        
+        let device = UIDevice.current.userInterfaceIdiom
+        
+        if device == .phone {
             self.navigationController?.popViewController(animated: true)
+        } else if device == .pad {
+            self.restaurantMapViewController?.navigationController?.popViewController(animated: true)
         }
     }
     

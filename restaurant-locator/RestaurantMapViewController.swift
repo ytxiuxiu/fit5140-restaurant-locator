@@ -67,7 +67,7 @@ extension UIImage {
     }
 }
 
-class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDataSource, UIPickerViewDelegate {
+class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPickerViewDataSource, UIPickerViewDelegate {
 
     @IBOutlet weak var detailDescriptionLabel: UILabel!
 
@@ -124,7 +124,7 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
         mapView.showsUserLocation = true
         
         // start loction
-        Location.sharedInstance.addCallback(key: "mainMap", callback: {(latitude, longitude) in
+        Location.shared.addCallback(key: "mainMap", callback: {(latitude, longitude) in
             var updateRestaurants = false;
             if self.lastCLLocation == nil {
                 self.lastCLLocation = CLLocation(latitude: latitude, longitude: longitude)
@@ -177,7 +177,7 @@ class DetailViewController: UIViewController, MKMapViewDelegate, UIPickerViewDat
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
-        Location.sharedInstance.removeCallback(key: "mainMap")
+        Location.shared.removeCallback(key: "mainMap")
     }
     
     var detailItem: NSDate? {

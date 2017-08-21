@@ -59,6 +59,8 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     
     @IBOutlet weak var addButton: UIButton!
     
+    var restaurantMapViewController: RestaurantMapViewController?
+    
     var isEdit = false
     
     var restaurant: Restaurant?
@@ -113,19 +115,22 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
         self.restaurantMapView.delegate = self
         
         if !isEdit {
-            Location.sharedInstance.addCallback(key: "addRestaurantMap", callback: {(latitude, longitude) in
+            Location.shared.addCallback(key: "addRestaurantMap", callback: {(latitude, longitude) in
                 
                 // fill current address
-                Location.getAddress(latitude: latitude, longitude: longitude, callback: { (address) in
-                    if address != nil {
-                        self.restaurantAddressTextField.text = address
+                Location.getAddress(latitude: latitude, longitude: longitude, callback: { (address, error) in
+                    guard address != nil else {
+                        // ignore the error
+                        return
                     }
+                    
+                    self.restaurantAddressTextField.text = address
                 })
                 
                 self.movePin(latitude: latitude, longitude: longitude)
                 
                 // unsubscribe, just need location once
-                Location.sharedInstance.removeCallback(key: "addRestaurantMap")
+                Location.shared.removeCallback(key: "addRestaurantMap")
             })
         }
         
@@ -283,7 +288,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
                 let imagePicker = UIImagePickerController()
                 imagePicker.delegate = self
                 imagePicker.sourceType = UIImagePickerControllerSourceType.photoLibrary;
-                imagePicker.allowsEditing = true
+                imagePicker.allowsEditing = false
                 self.present(imagePicker, animated: true, completion: nil)
             } else {
                 self.showError(message: "Could not access to your photo library")
@@ -299,17 +304,22 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
         optionMenu.addAction(photoLibraryAction)
         optionMenu.addAction(cancelAction)
         
+        
+        // ✴️ Attribute:
+        // StackOverflow: UIActionSheet from Popover with iOS8 GM
+        //      https://stackoverflow.com/questions/25759885/uiactionsheet-from-popover-with-ios8-gm
+        
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            optionMenu.popoverPresentationController?.sourceView = self.restaurantPhotoImageView
+            optionMenu.popoverPresentationController?.sourceRect = self.restaurantPhotoImageView.bounds
+        }
+        
         self.present(optionMenu, animated: true, completion: nil)
     }
     
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-        if let pickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
-            self.restaurantPhotoImageView.image = pickedImage
-            
-            self.isPhotoSelected = true
-        } else {
-            self.showError(message: "Could not access to your selected photo")
-        }
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingImage image: UIImage!, editingInfo: [NSObject: AnyObject]) {
+        self.restaurantPhotoImageView.image = image
+        self.isPhotoSelected = true
         
         dismiss(animated: true, completion: nil)
     }
@@ -348,7 +358,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
         self.currentPin?.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
         
         if alsoMoveTheMap {
-            let region = Location().makeRegion(latitude: latitude, longitude: longitude)
+            let region = Location.shared.makeRegion(latitude: latitude, longitude: longitude)
             self.restaurantMapView.setRegion(region, animated: true)
         }
     }
@@ -357,7 +367,12 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
         let latitude = mapView.centerCoordinate.latitude
         let longitude = mapView.centerCoordinate.longitude
         
-        Location.getAddress(latitude: latitude, longitude: longitude) { (address) in
+        Location.getAddress(latitude: latitude, longitude: longitude) { (address, error) in
+            guard address == nil else {
+                // ignore the error
+                return
+            }
+            
             self.restaurantAddressTextField.text = address
         }
         
@@ -405,16 +420,6 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
         topSpaceConstraint.constant = UIApplication.shared.statusBarFrame.height + 44   // status bar + navigation bar + original top
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
     
     // MARK: - Save
     
@@ -453,7 +458,9 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
                 dismiss(animated: true, completion: nil)
             } else {
                 self.showError(message: "Please pick the current location of this restaurant. You see this message may be because you have not let this application access to your location.")
+                return
             }
+            
         } else {
             if let latitude = self.currentPin?.coordinate.latitude, let longitude = self.currentPin?.coordinate.longitude {
                 self.restaurant?.name = self.restaurantNameSearchTextField.text!
@@ -478,11 +485,19 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
                 self.restaurantTableDelegate?.editRestaurant(restaurant: self.restaurant!)
                 self.restaurantDetailDelegate?.editRestaurant(restaurant: self.restaurant!)
                 self.restaurantAnnotationDelegate?.editRestaurant(restaurant: self.restaurant!)
-                
-                self.navigationController?.popViewController(animated: true)
+
             } else {
                 self.showError(message: "Please pick the current location of this restaurant. You see this message may be because you have not let this application access to your location.")
+                return
             }
+        }
+        
+        let device = UIDevice.current.userInterfaceIdiom
+        
+        if device == .phone {
+            self.navigationController?.popViewController(animated: true)
+        } else if device == .pad {
+            self.restaurantMapViewController?.navigationController?.popViewController(animated: true)
         }
     }
     

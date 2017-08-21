@@ -16,8 +16,8 @@
 		65AB00851F45575500DE3DD9 /* RestaurantAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AB00841F45575500DE3DD9 /* RestaurantAnnotationView.swift */; };
 		65AB00871F45774D00DE3DD9 /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AB00861F45774D00DE3DD9 /* SplitViewController.swift */; };
 		65ADFEE31F35AEC800CB0A45 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ADFEE21F35AEC800CB0A45 /* AppDelegate.swift */; };
-		65ADFEE51F35AEC800CB0A45 /* MasterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ADFEE41F35AEC800CB0A45 /* MasterViewController.swift */; };
-		65ADFEE71F35AEC800CB0A45 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ADFEE61F35AEC800CB0A45 /* DetailViewController.swift */; };
+		65ADFEE51F35AEC800CB0A45 /* CategoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ADFEE41F35AEC800CB0A45 /* CategoryTableViewController.swift */; };
+		65ADFEE71F35AEC800CB0A45 /* RestaurantMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ADFEE61F35AEC800CB0A45 /* RestaurantMapViewController.swift */; };
 		65ADFEEA1F35AEC800CB0A45 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 65ADFEE81F35AEC800CB0A45 /* Main.storyboard */; };
 		65ADFEEC1F35AEC800CB0A45 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 65ADFEEB1F35AEC800CB0A45 /* Assets.xcassets */; };
 		65ADFEEF1F35AEC800CB0A45 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 65ADFEED1F35AEC800CB0A45 /* LaunchScreen.storyboard */; };
@@ -62,8 +62,8 @@
 		65AB00861F45774D00DE3DD9 /* SplitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SplitViewController.swift; path = ViewControllers/SplitViewController.swift; sourceTree = "<group>"; };
 		65ADFEDF1F35AEC800CB0A45 /* restaurant-locator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "restaurant-locator.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		65ADFEE21F35AEC800CB0A45 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		65ADFEE41F35AEC800CB0A45 /* MasterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterViewController.swift; sourceTree = "<group>"; };
-		65ADFEE61F35AEC800CB0A45 /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
+		65ADFEE41F35AEC800CB0A45 /* CategoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTableViewController.swift; sourceTree = "<group>"; };
+		65ADFEE61F35AEC800CB0A45 /* RestaurantMapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestaurantMapViewController.swift; sourceTree = "<group>"; };
 		65ADFEE91F35AEC800CB0A45 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		65ADFEEB1F35AEC800CB0A45 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		65ADFEEE1F35AEC800CB0A45 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -145,6 +145,15 @@
 			name = Map;
 			sourceTree = "<group>";
 		};
+		6579B5881F49C4D90056CF59 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				65423D581F39D1330038CCE4 /* Location.swift */,
+				65AB00801F426E7200DE3DD9 /* Colors.swift */,
+			);
+			name = Utils;
+			sourceTree = "<group>";
+		};
 		65ADFED61F35AEC800CB0A45 = {
 			isa = PBXGroup;
 			children = (
@@ -168,6 +177,7 @@
 		65ADFEE11F35AEC800CB0A45 /* restaurant-locator */ = {
 			isa = PBXGroup;
 			children = (
+				6579B5881F49C4D90056CF59 /* Utils */,
 				656BE4A21F41565C0048769A /* Map */,
 				65423D551F3955800038CCE4 /* Cells */,
 				65423D541F3950510038CCE4 /* Entities */,
@@ -177,9 +187,7 @@
 				65ADFEEB1F35AEC800CB0A45 /* Assets.xcassets */,
 				65ADFEED1F35AEC800CB0A45 /* LaunchScreen.storyboard */,
 				65ADFEF01F35AEC800CB0A45 /* Info.plist */,
-				65423D581F39D1330038CCE4 /* Location.swift */,
 				65D79FCE1F4166F200E377E9 /* restaurant.xcdatamodeld */,
-				65AB00801F426E7200DE3DD9 /* Colors.swift */,
 			);
 			path = "restaurant-locator";
 			sourceTree = "<group>";
@@ -196,8 +204,8 @@
 		65ADFF041F35B02600CB0A45 /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
-				65ADFEE61F35AEC800CB0A45 /* DetailViewController.swift */,
-				65ADFEE41F35AEC800CB0A45 /* MasterViewController.swift */,
+				65ADFEE61F35AEC800CB0A45 /* RestaurantMapViewController.swift */,
+				65ADFEE41F35AEC800CB0A45 /* CategoryTableViewController.swift */,
 				65ADFF051F35B04A00CB0A45 /* AddCategoryViewController.swift */,
 				65D039061F36E7FE0019A327 /* RestaurantTableViewController.swift */,
 				65D039081F36F8CC0019A327 /* AddRestaurantViewController.swift */,
@@ -404,10 +412,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				65ADFF061F35B04A00CB0A45 /* AddCategoryViewController.swift in Sources */,
-				65ADFEE71F35AEC800CB0A45 /* DetailViewController.swift in Sources */,
+				65ADFEE71F35AEC800CB0A45 /* RestaurantMapViewController.swift in Sources */,
 				65D7A0391F4175DC00E377E9 /* Restaurant+CoreDataClass.swift in Sources */,
 				65D039071F36E7FE0019A327 /* RestaurantTableViewController.swift in Sources */,
-				65ADFEE51F35AEC800CB0A45 /* MasterViewController.swift in Sources */,
+				65ADFEE51F35AEC800CB0A45 /* CategoryTableViewController.swift in Sources */,
 				65ADFEE31F35AEC800CB0A45 /* AppDelegate.swift in Sources */,
 				65AB00851F45575500DE3DD9 /* RestaurantAnnotationView.swift in Sources */,
 				65AB00831F447F5900DE3DD9 /* RestaurantDetailViewController.swift in Sources */,
