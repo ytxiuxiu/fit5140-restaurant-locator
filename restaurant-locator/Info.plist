@@ -23,11 +23,17 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Please allow me to ues your camera</string>
+	<string>By allowing me to access your camera, you can take a photo for a restaurant.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>By allowing me to always access your location, I can notify you when you are near restaurants you saved within the specified notification region</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Please allow me to know where you are at</string>
+	<string>By allowing me to access your location, I can show all restaurants you saved around you.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Please allow me to access your photo library</string>
+	<string>By allowing me to access your photo library, you can select a photo you have already taken for a restaurant.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

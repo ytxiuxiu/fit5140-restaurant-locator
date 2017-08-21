@@ -28,6 +28,8 @@ class RestaurantCalloutView: UIView {
     
     var restaurant: Restaurant?
     
+    var restaurantMapViewController: RestaurantMapViewController?
+    
     
     @IBAction func onRestaurantDetailTapped(_ sender: Any) {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
@@ -35,6 +37,7 @@ class RestaurantCalloutView: UIView {
         
         controller.restaurant = restaurant
         controller.restaurantAnnotationDelegate = self.restaurantAnnotationDelegate
+        controller.restaurantMapViewController = self.restaurantMapViewController
         
         self.navigationController?.pushViewController(controller, animated: true)
     }

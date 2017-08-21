@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
-    <device id="retina4_7" orientation="portrait">
+    <device id="retina4_7" orientation="landscape">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
@@ -20,34 +20,39 @@
                         <viewControllerLayoutGuide type="bottom" id="xb3-aO-Qok"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="667" height="375"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Restaurant Locator" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Sk-YS-BOI">
-                                <rect key="frame" x="16" y="316.5" width="343" height="33.5"/>
+                                <rect key="frame" x="20" y="295.5" width="627" height="34"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="restaurant" translatesAutoresizingMaskIntoConstraints="NO" id="ekQ-bz-DrZ">
-                                <rect key="frame" x="87.5" y="108" width="200" height="200"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Yingchen Liu" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ccY-8w-PRU">
+                                <rect key="frame" x="20" y="337.5" width="627" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="chef" translatesAutoresizingMaskIntoConstraints="NO" id="ekQ-bz-DrZ">
+                                <rect key="frame" x="233.5" y="87.5" width="200" height="200"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" secondItem="ekQ-bz-DrZ" secondAttribute="height" multiplier="1:1" id="8jC-Ew-YHL"/>
-                                    <constraint firstAttribute="height" constant="200" id="qIU-zN-OJZ"/>
+                                    <constraint firstAttribute="width" secondItem="ekQ-bz-DrZ" secondAttribute="height" multiplier="1:1" id="7qG-g8-zNp"/>
+                                    <constraint firstAttribute="width" constant="200" id="hKq-sT-laz"/>
                                 </constraints>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="7Sk-YS-BOI" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="MMt-St-jcN"/>
-                            <constraint firstItem="7Sk-YS-BOI" firstAttribute="trailing" secondItem="Ze5-6b-2t3" secondAttribute="trailingMargin" id="NFA-Ce-th6"/>
-                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="ekQ-bz-DrZ" secondAttribute="trailing" constant="8" id="Qow-uk-Xta"/>
-                            <constraint firstItem="7Sk-YS-BOI" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leadingMargin" id="Uml-Xg-Y2d"/>
-                            <constraint firstItem="7Sk-YS-BOI" firstAttribute="top" secondItem="ekQ-bz-DrZ" secondAttribute="bottom" constant="8" id="Uxi-F3-LhB"/>
-                            <constraint firstItem="ekQ-bz-DrZ" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="VbC-aN-2UW"/>
-                            <constraint firstItem="ekQ-bz-DrZ" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Ze5-6b-2t3" secondAttribute="leading" constant="8" id="kbg-uk-4EI"/>
-                            <constraint firstItem="7Sk-YS-BOI" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="wEL-sN-oXM"/>
-                            <constraint firstItem="ekQ-bz-DrZ" firstAttribute="top" relation="greaterThanOrEqual" secondItem="Ze5-6b-2t3" secondAttribute="top" constant="8" id="ygB-cK-lsi"/>
+                            <constraint firstItem="7Sk-YS-BOI" firstAttribute="trailing" secondItem="Ze5-6b-2t3" secondAttribute="trailingMargin" id="2fA-Uc-XIm"/>
+                            <constraint firstItem="7Sk-YS-BOI" firstAttribute="top" secondItem="ekQ-bz-DrZ" secondAttribute="bottom" constant="8" id="3UV-0P-JFw"/>
+                            <constraint firstItem="ccY-8w-PRU" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leadingMargin" id="3cP-iv-JSh"/>
+                            <constraint firstItem="ccY-8w-PRU" firstAttribute="trailing" secondItem="Ze5-6b-2t3" secondAttribute="trailingMargin" id="6Ip-zn-J1l"/>
+                            <constraint firstItem="ekQ-bz-DrZ" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="JlB-Tx-Bth"/>
+                            <constraint firstItem="ekQ-bz-DrZ" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="T99-a7-Dl9"/>
+                            <constraint firstItem="ccY-8w-PRU" firstAttribute="top" secondItem="7Sk-YS-BOI" secondAttribute="bottom" constant="8" id="VsW-BN-j9v"/>
+                            <constraint firstItem="7Sk-YS-BOI" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leadingMargin" id="jmX-2A-Kuf"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -57,6 +62,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="restaurant" width="512" height="512"/>
+        <image name="chef" width="512" height="512"/>
     </resources>
 </document>

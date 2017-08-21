@@ -89,7 +89,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     func insertDefaultData() {
         let categoryJapanese = Category.insertNewObject(name: "Japanese", color: 3, icon: 15, sort: 1)
         let categoryBakery = Category.insertNewObject(name: "Bakery", color: 2, icon: 1, sort: 2)
-        let categoryBrunch = Category.insertNewObject(name: "Brunch", color: 4, icon: 2, sort: 2)
+        let categoryBrunch = Category.insertNewObject(name: "Brunch", color: 4, icon: 2, sort: 3)
         
         let restaurantRestore = Restaurant.insertNewObject(name: "Restore Cafe Bar", rating: 3.1, address: "18 Derby Road, Caulfield East, Caulfield, Melbourne", latitude: -37.876051, longitude: 145.042027, notificationRadius: 4)
         restaurantRestore.saveImage(image: UIImage(named: "demo-restore-cafe")!)
@@ -123,7 +123,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController:UIViewController, onto primaryViewController:UIViewController) -> Bool {
         guard let secondaryAsNavController = secondaryViewController as? UINavigationController else { return false }
         guard let topAsDetailController = secondaryAsNavController.topViewController as? RestaurantMapViewController else { return false }
-        if topAsDetailController.detailItem == nil {
+        if topAsDetailController.mapView == nil {
             // Return true to indicate that we have handled the collapse by doing nothing; the secondary controller will be discarded.
             return true
         }

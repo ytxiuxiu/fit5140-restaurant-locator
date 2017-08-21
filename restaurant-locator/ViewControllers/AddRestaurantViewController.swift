@@ -368,8 +368,9 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
         let longitude = mapView.centerCoordinate.longitude
         
         Location.getAddress(latitude: latitude, longitude: longitude) { (address, error) in
-            guard address == nil else {
+            guard address != nil else {
                 // ignore the error
+                print("Could not get address: \(error)")
                 return
             }
             
@@ -423,14 +424,6 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     
     // MARK: - Save
     
-    @IBAction func onCancelButtonClicked(_ sender: Any) {
-        if !self.isEdit {
-            dismiss(animated: true, completion: nil)
-        } else {
-            self.navigationController?.popViewController(animated: true)
-        }
-    }
-    
     @IBAction func onAddButtonClicked(_ sender: Any) {
         validator.validate(self)
     }
@@ -454,6 +447,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
                 
                 self.restaurantTableDelegate?.addRestaurant(restaurant: restaurant)
                 self.categoryTableDelegate?.increaseNumberOfRestaurants(category: self.category!)
+                self.restaurantMapViewController?.addRestaurant(restaurant: restaurant)
                 
                 dismiss(animated: true, completion: nil)
             } else {
@@ -485,6 +479,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
                 self.restaurantTableDelegate?.editRestaurant(restaurant: self.restaurant!)
                 self.restaurantDetailDelegate?.editRestaurant(restaurant: self.restaurant!)
                 self.restaurantAnnotationDelegate?.editRestaurant(restaurant: self.restaurant!)
+                self.restaurantMapViewController?.editRestaurant(restaurant: self.restaurant!)
 
             } else {
                 self.showError(message: "Please pick the current location of this restaurant. You see this message may be because you have not let this application access to your location.")

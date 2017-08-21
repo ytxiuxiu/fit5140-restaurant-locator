@@ -8,4 +8,5 @@ target 'restaurant-locator' do
     pod 'SwiftyJSON'
     pod 'Cosmos', '~> 11.0'
     pod 'SwiftValidator', :git => 'https://github.com/jpotts18/SwiftValidator.git', :branch => 'master'
+    pod 'Whisper'
 end

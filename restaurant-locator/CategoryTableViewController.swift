@@ -16,6 +16,7 @@
 //              https://makeappicon.com
 
 import UIKit
+import CoreLocation
 
 
 protocol CategoryTableDelegate {
@@ -38,8 +39,32 @@ class CategoryTableViewController: UITableViewController, UIPopoverPresentationC
         navigationItem.leftBarButtonItem = editButtonItem
         
         categories = Category.fetchAll()
+        
+        let locationManager = Location.shared.locationManager
+        locationManager.requestAlwaysAuthorization()
+        
         for category in categories {
             category.numberOfRestaurants = Restaurant.countByCategory(categoryName: category.name)
+            
+            // monitor restaurants
+            // ✴️ Attribute:
+            // Swift Tutorial : CoreLocation and Region Monitoring in iOS 8
+            //      http://shrikar.com/swift-tutorial-corelocation-and-region-monitoring-in-ios-8/
+            
+            for restaurant in category.restaurants?.allObjects as! [Restaurant] {
+                if restaurant.notificationRadius != -1 {
+                    let center = CLLocationCoordinate2D(latitude: restaurant.latitude, longitude: restaurant.longitude)
+                    let radius = CLLocationDistance(Location.radius[Int(restaurant.notificationRadius)])
+                    let identifier = restaurant.name
+                    
+                    let region = CLCircularRegion(center: center, radius: radius, identifier: identifier)
+                    
+                    region.notifyOnEntry = true
+                    region.notifyOnExit = false
+                    
+                    locationManager.startMonitoring(for: region)
+                }
+            }
         }
     }
 

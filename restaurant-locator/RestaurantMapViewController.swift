@@ -67,7 +67,14 @@ extension UIImage {
     }
 }
 
-class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPickerViewDataSource, UIPickerViewDelegate {
+protocol RestaurantMapDelegate {
+    func addRestaurant(restaurant: Restaurant)
+    func editRestaurant(restaurant: Restaurant)
+    func deleteRestaurant(restaurant: Restaurant)
+    func getNavigationController() -> UINavigationController
+}
+
+class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPickerViewDataSource, UIPickerViewDelegate, RestaurantMapDelegate {
 
     @IBOutlet weak var detailDescriptionLabel: UILabel!
 
@@ -91,25 +98,21 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
     
     var restaurants = [Restaurant]()
     
+    var displayedRestaurants = [Restaurant]()
+    
+    var filteredRestaurants = [Restaurant]()
+    
     var restaurantAnnotations = [RestaurantAnnotation]()
     
     var restaurantPinImages = [String: UIImage]()
     
     var mapInited = false
     
-    
-    func configureView() {
-        // Update the user interface for the detail item.
-        if let detail = detailItem {
-            if let label = detailDescriptionLabel {
-                label.text = detail.description
-            }
-        }
-    }
-    
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        print("view did load")
         
         // menu icon
         // draw the menu button in portrait mode
@@ -122,51 +125,27 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
         
         mapView.delegate = self
         mapView.showsUserLocation = true
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         
         // start loction
         Location.shared.addCallback(key: "mainMap", callback: {(latitude, longitude) in
-            var updateRestaurants = false;
-            if self.lastCLLocation == nil {
-                self.lastCLLocation = CLLocation(latitude: latitude, longitude: longitude)
-            }
-            let currentCLLocation = CLLocation(latitude: latitude, longitude: longitude)
-            
-            // update restaurants only when move >= 20m
-            if !(self.lastCLLocation?.distance(from: currentCLLocation).isLess(than: 30.0))! {
-                
-                // move map to currant location only when move >= 500m
-                if !(self.lastCLLocation?.distance(from: currentCLLocation).isLess(than: 500.0))! {
-                    self.mapInited = false
-                }
-                
-                self.lastCLLocation = currentCLLocation
-                updateRestaurants = true
-            }
-            
             self.currentLocation = CLLocationCoordinate2DMake(latitude, longitude)
             
             if !self.mapInited {
                 let coordinateSpan: MKCoordinateSpan = MKCoordinateSpanMake(0.01, 0.01)
                 let coordinateRegion: MKCoordinateRegion = MKCoordinateRegionMake(self.currentLocation!, coordinateSpan)
-            
+                
                 self.mapView.setRegion(coordinateRegion, animated: true)
                 self.mapInited = true
-                updateRestaurants = true
             }
-                
             
-            if updateRestaurants {
-                self.showRadiusCircle()
-                self.showRestaurants(restaurants: self.filterRestaurants())
-            }
+            self.showRadiusCircle()
+            self.filterRestaurants()
+            self.showRestaurants()
         })
-        
-        configureView()
-    }
-    
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-        // self.navigationItem.leftBarButtonItem?.image = UIImage(named: "menu")
     }
 
     override func didReceiveMemoryWarning() {
@@ -178,13 +157,6 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
         super.viewWillDisappear(animated)
         
         Location.shared.removeCallback(key: "mainMap")
-    }
-    
-    var detailItem: NSDate? {
-        didSet {
-            // Update the view.
-            configureView()
-        }
     }
     
     // add radius circle
@@ -202,8 +174,8 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
         }
     }
     
-    func filterRestaurants() -> [Restaurant] {
-        return self.restaurants.filter() {
+    func filterRestaurants() {
+        self.filteredRestaurants = self.restaurants.filter() {
             let restaurant = $0
             
             if let location = self.currentLocation {
@@ -221,24 +193,55 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
     }
     
     
+    @IBAction func onCenterButtonTapped(_ sender: Any) {
+        let coordinateSpan: MKCoordinateSpan = MKCoordinateSpanMake(0.01, 0.01)
+        let coordinateRegion: MKCoordinateRegion = MKCoordinateRegionMake(self.mapView.userLocation.coordinate, coordinateSpan)
+        
+        self.mapView.setRegion(coordinateRegion, animated: true)
+    }
+    
+    
     // show restaurant annotations on the map
-    // ✴️ Attribute:
+    // ✴️ Attributes:
     // StackOverflow: iOS Swift MapKit Custom Annotation [closed]
     //      https://stackoverflow.com/questions/38274115/ios-swift-mapkit-custom-annotation
     // Website: Working with MapKit: Annotations and Shape Rendering
     //      http://www.appcoda.com/mapkit-beginner-guide/
     
-    func showRestaurants(restaurants: [Restaurant]) {
-        self.mapView.removeAnnotations(self.restaurantAnnotations)
+    func showRestaurants() {
         
-        for restaurant in restaurants {
+        // ✴️ Attributes:
+        // StackOverflow: Set operations (union, intersection) on Swift array?
+        //      https://stackoverflow.com/questions/24589181/set-operations-union-intersection-on-swift-array
+        // Documentation: subtract(_:)
+        //      https://developer.apple.com/documentation/swift/set/1779475-subtract
+
+        var toBeRemoved: Set<Restaurant> = Set(displayedRestaurants)
+        var toBeAdded: Set<Restaurant> = Set(filteredRestaurants)
+        let displayed: Set<Restaurant> = Set(displayedRestaurants)
+        
+        // restaurants to be removed = last displayed restaurants - newly filtered restaurants
+        toBeRemoved.subtract(toBeAdded)
+        
+        // restaurants to be added = newly filtered restaurants - last displayed restaurants
+        toBeAdded.subtract(displayed)
+        
+        for restaurantAnnotation in restaurantAnnotations {
+            if toBeRemoved.contains(restaurantAnnotation.restaurant!) {
+                self.mapView.removeAnnotation(restaurantAnnotation)
+            }
+        }
+        
+        for restaurant in toBeAdded {
             let restaurantAnnotation = RestaurantAnnotation()
             restaurantAnnotation.coordinate = CLLocationCoordinate2D(latitude: restaurant.latitude, longitude: restaurant.longitude)
             restaurantAnnotation.restaurant = restaurant
-                
+
             self.restaurantAnnotations.append(restaurantAnnotation)
             self.mapView.addAnnotation(restaurantAnnotation)
         }
+        
+        self.displayedRestaurants = self.filteredRestaurants
     }
     
     // ✴️ Attribute:
@@ -268,7 +271,7 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
         annotationView?.image = generatePinImage(for: restaurantAnnotation)
         annotationView?.navigationController = self.navigationController
         annotationView?.restaurant = restaurantAnnotation.restaurant
-        
+        annotationView?.restaurantMapViewController = self
         
         return annotationView
     }
@@ -281,9 +284,10 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
     
     func generatePinImage(for restaurantAnnotation: RestaurantAnnotation) -> UIImage {
         let restaurant = restaurantAnnotation.restaurant
+        let restaurantPinImage = restaurantPinImages[restaurant?.image ?? ""]
         
-        if let restaurantPinImage = restaurantPinImages[(restaurant?.image!)!] {
-            return restaurantPinImage
+        if restaurantPinImage != nil {
+            return restaurantPinImage!
         } else {
             let pinSize = CGSize(width: 53, height: 59)
             let backgroundSize = CGSize(width: 50, height: 56)
@@ -303,12 +307,12 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
             
             restaurantAnnotation.image = UIGraphicsGetImageFromCurrentImageContext()
             
-            // cache
-            restaurantPinImages.updateValue(restaurantAnnotation.image!, forKey: (restaurant?.image!)!)
+            // cache pin image
+            restaurantPinImages.updateValue(restaurantAnnotation.image!, forKey: (restaurant?.image ?? "")!)
             
             UIGraphicsEndImageContext()
             
-            return restaurantPinImages[restaurant!.image!]!
+            return restaurantPinImages[restaurant!.image ?? ""]!
         }
         
         
@@ -392,8 +396,9 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
             let radiusText = Location.radiusText[self.currentRadius]
             self.radiusBarButton.title = radiusText
             
-            self.showRadiusCircle();
-            self.showRestaurants(restaurants: self.filterRestaurants())
+            self.showRadiusCircle()
+            self.filterRestaurants()
+            self.showRestaurants()
             
             self.dismiss(animated: true, completion: nil)
         }
@@ -405,6 +410,52 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
         alert.view.addSubview(picker)
         
         present(alert, animated: true, completion: nil)
+    }
+    
+    func addRestaurant(restaurant: Restaurant) {
+        self.restaurants.append(restaurant)
+        
+        self.filterRestaurants()
+        self.showRestaurants()
+    }
+    
+    func editRestaurant(restaurant: Restaurant) {
+        for restaurantAnnotation in restaurantAnnotations {
+            if restaurantAnnotation.restaurant == restaurant {
+                
+                // ✴️ Attribute
+                // StackOverflow: iOS refresh annotations on mapview
+                //      https://stackoverflow.com/questions/14131345/ios-refresh-annotations-on-mapview
+                
+                self.mapView.removeAnnotation(restaurantAnnotation)
+                restaurantPinImages.remove(at: restaurantPinImages.index(forKey: restaurant.image ?? "")!)
+                
+                restaurantAnnotation.coordinate = CLLocationCoordinate2D(latitude: restaurant.latitude, longitude: restaurant.longitude)
+                restaurantAnnotation.image = self.generatePinImage(for: restaurantAnnotation)
+                
+                self.mapView.addAnnotation(restaurantAnnotation)
+                break;
+            }
+        }
+    }
+    
+    func deleteRestaurant(restaurant: Restaurant) {
+        var i = 0
+        for oldRestaurant in restaurants {
+            if oldRestaurant == restaurant {
+                break
+            }
+            i = i + 1
+        }
+        restaurants.remove(at: i)
+        restaurantPinImages.remove(at: restaurantPinImages.index(forKey: restaurant.image ?? "")!)
+        
+        self.filterRestaurants()
+        self.showRestaurants()
+    }
+    
+    func getNavigationController() -> UINavigationController {
+        return self.navigationController!
     }
     
 }

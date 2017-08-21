@@ -37,10 +37,7 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // get data
-        if let categoryName = category?.name {
-            restaurants = Restaurant.fetchByCategory(categoryName: categoryName)
-        }
+        restaurants = category?.restaurants?.allObjects as! [Restaurant]
         
         Location.shared.addCallback(key: "restaurantsDisntance", callback: {(latitude, longitude) in
             for i in 0..<self.restaurants.count {
@@ -123,6 +120,7 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
                 tableView.deleteRows(at: [indexPath], with: .fade)
                 
                 self.delegate?.reduceNumberOfRestaurants(category: self.category!)
+                self.restaurantMapViewController?.deleteRestaurant(restaurant: restaurant)
                 
                 self.dismiss(animated: true, completion: nil)
             }

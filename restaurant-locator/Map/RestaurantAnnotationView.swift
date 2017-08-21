@@ -24,6 +24,8 @@ class RestaurantAnnotationView: MKAnnotationView, RestaurantAnnotationDelegate {
     var navigationController: UINavigationController?
     
     var restaurant: Restaurant?
+    
+    var restaurantMapViewController: RestaurantMapViewController?
 
     override init(annotation: MKAnnotation?, reuseIdentifier: String?) {
         super.init(annotation: annotation, reuseIdentifier: reuseIdentifier)
@@ -54,6 +56,7 @@ class RestaurantAnnotationView: MKAnnotationView, RestaurantAnnotationDelegate {
                 newCustomCalloutView.navigationController = self.navigationController
                 newCustomCalloutView.restaurantAnnotationDelegate = self
                 newCustomCalloutView.restaurant = self.restaurant
+                newCustomCalloutView.restaurantMapViewController = self.restaurantMapViewController
                 
                 newCustomCalloutView.layer.cornerRadius = 5
                 

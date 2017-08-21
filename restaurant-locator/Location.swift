@@ -55,13 +55,15 @@ class Location: NSObject, CLLocationManagerDelegate {
         }
     }
     
-    // https://stackoverflow.com/questions/37498438/didenterregion-didexitregion-not-being-called
+    // ✴️ Attributes:
+    // Website: Swift Tutorial : CoreLocation and Region Monitoring in iOS 8
+    //      http://shrikar.com/swift-tutorial-corelocation-and-region-monitoring-in-ios-8/
+    // StackOverflow: didEnterRegion, didExitRegion not being called
+    //      https://stackoverflow.com/questions/37498438/didenterregion-didexitregion-not-being-called
     
     func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
-        
+        print(region.identifier)
     }
-    
-    
     
     // ✴️ Attribute:
     // StackOverflow: Swift - Generate an Address Format from Reverse Geocoding
