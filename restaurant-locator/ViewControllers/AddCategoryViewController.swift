@@ -48,8 +48,6 @@ class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UIC
     
     @IBOutlet weak var topSpaceConstraint: NSLayoutConstraint!
     
-    var restaurantMapViewController: RestaurantMapViewController?
-    
     var isEdit = false
     
     var category: Category?
@@ -102,6 +100,14 @@ class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UIC
             self.categoryIconImageView.image = UIImage(named: "category-\(icon)")
             
             self.title = "Edit Category"
+        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            tabBarController?.tabBar.isHidden = true
         }
     }
     
@@ -179,6 +185,8 @@ class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UIC
     }
     
     func validationSuccessful() {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        
         if !isEdit {
             if let sort = self.sort {
                 let uuid = UUID().uuidString
@@ -224,7 +232,7 @@ class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UIC
         if device == .phone {
             self.navigationController?.popViewController(animated: true)
         } else if device == .pad {
-            self.restaurantMapViewController?.navigationController?.popViewController(animated: true)
+           appDelegate.detailNavigationController?.popViewController(animated: true)
         }
     }
     

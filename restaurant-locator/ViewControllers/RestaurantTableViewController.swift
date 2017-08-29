@@ -29,8 +29,6 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
     
     @IBOutlet weak var sortingSegmentControl: UISegmentedControl!
     
-    var restaurantMapViewController: RestaurantMapViewController?
-    
     var category: Category?
     
     var restaurants = [Restaurant]()
@@ -76,6 +74,10 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
     override func viewWillAppear(_ animated: Bool) {
         clearsSelectionOnViewWillAppear = splitViewController!.isCollapsed
         super.viewWillAppear(animated)
+        
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            tabBarController?.tabBar.isHidden = false
+        }
     }
     
     override func didReceiveMemoryWarning() {
@@ -154,6 +156,7 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
  
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
             let restaurant = restaurants[indexPath.row]
             
             let alert = UIAlertController(title: "Delete?", message: "Are you sure to delete the restaurant \"\(restaurant.name)\"?", preferredStyle: .alert);
@@ -173,7 +176,7 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
                 tableView.deleteRows(at: [indexPath], with: .fade)
                 
                 self.categoryTableDelegate?.removeRestaurant(restaurant: restaurant)
-                self.restaurantMapViewController?.deleteRestaurant(restaurant: restaurant)
+                appDelegate.restaurantMapDelegate?.deleteRestaurant(restaurant: restaurant)
                 
                 self.dismiss(animated: true, completion: nil)
             }
@@ -328,7 +331,6 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
             if identifier == "showAddRestaurantSegue" {
                 let controller = storyboard.instantiateViewController(withIdentifier: "editRestaurantViewController") as! AddRestaurantViewController
                 
-                controller.restaurantMapViewController = self.restaurantMapViewController
                 controller.category = self.category
                 controller.restaurantTableDelegate = self
                 controller.categoryTableDelegate = self.categoryTableDelegate
@@ -342,7 +344,6 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
                 
                 let controller = storyboard.instantiateViewController(withIdentifier: "restaurantDetail") as! RestaurantDetailViewController
                 
-                controller.restaurantMapViewController = self.restaurantMapViewController
                 controller.title = restaurant.name
                 controller.restaurant = restaurant
                 controller.restaurantTableDelegate = self
@@ -350,7 +351,6 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
                 showViewControllerOnDetailViewController(controller: controller)
                 
                 return false    // don't do the default segue
-                
             }
         }
         
@@ -403,7 +403,6 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
         
         let controller = storyboard.instantiateViewController(withIdentifier: "editRestaurantViewController") as! AddRestaurantViewController
         
-        controller.restaurantMapViewController = self.restaurantMapViewController
         controller.isEdit = true
         controller.restaurant = restaurant
         controller.restaurantTableDelegate = self

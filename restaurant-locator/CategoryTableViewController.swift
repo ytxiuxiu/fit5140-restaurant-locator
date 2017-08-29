@@ -49,7 +49,7 @@ class CategoryTableViewController: UITableViewController, UIPopoverPresentationC
         
         // notification
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert,.sound,.badge], completionHandler: { (granted,error) in
-            guard !granted else {
+            guard granted else {
                 return
             }
             
@@ -71,6 +71,10 @@ class CategoryTableViewController: UITableViewController, UIPopoverPresentationC
     override func viewWillAppear(_ animated: Bool) {
         clearsSelectionOnViewWillAppear = splitViewController!.isCollapsed
         super.viewWillAppear(animated)
+        
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            tabBarController?.tabBar.isHidden = false
+        }
     }
 
     override func didReceiveMemoryWarning() {

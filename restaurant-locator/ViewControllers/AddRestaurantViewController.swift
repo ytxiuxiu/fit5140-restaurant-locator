@@ -59,8 +59,6 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     
     @IBOutlet weak var addButton: UIButton!
     
-    var restaurantMapViewController: RestaurantMapViewController?
-    
     var isEdit = false
     
     var restaurant: Restaurant?
@@ -245,6 +243,14 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
         }
         
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            tabBarController?.tabBar.isHidden = true
+        }
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -253,8 +259,6 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        
-        
     }
 
     
@@ -431,6 +435,8 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     }
     
     func validationSuccessful() {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        
         if !isEdit {
             if let latitude = self.currentPin?.coordinate.latitude, let longitude = self.currentPin?.coordinate.longitude {
                 let uuid = UUID().uuidString
@@ -450,7 +456,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
                 
                 self.restaurantTableDelegate?.addRestaurant(restaurant: restaurant)
                 self.categoryTableDelegate?.addRestaurant(restaurant: restaurant)
-                self.restaurantMapViewController?.addRestaurant(restaurant: restaurant)
+                appDelegate.restaurantMapDelegate?.addRestaurant(restaurant: restaurant)
                 
                 dismiss(animated: true, completion: nil)
             } else {
@@ -466,7 +472,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
                 self.restaurant?.latitude = latitude
                 self.restaurant?.longitude = longitude
                 self.restaurant?.notificationRadius = Int64(self.currentRaidus)
-                self.restaurant?.sort = Int64(self.sort!)
+                self.restaurant?.sort = Int64(self.sort ?? 0)
                 
                 if isPhotoSelected {
                     restaurant?.saveImage(image: self.restaurantPhotoImageView.image!)
@@ -483,7 +489,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
                 self.restaurantTableDelegate?.editRestaurant(restaurant: self.restaurant!)
                 self.restaurantDetailDelegate?.editRestaurant(restaurant: self.restaurant!)
                 self.restaurantAnnotationDelegate?.editRestaurant(restaurant: self.restaurant!)
-                self.restaurantMapViewController?.editRestaurant(restaurant: self.restaurant!)
+                appDelegate.restaurantMapDelegate?.addRestaurant(restaurant: restaurant!)
 
             } else {
                 self.showError(message: "Please pick the current location of this restaurant. You see this message may be because you have not let this application access to your location.")
@@ -496,7 +502,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
         if device == .phone {
             self.navigationController?.popViewController(animated: true)
         } else if device == .pad {
-            self.restaurantMapViewController?.navigationController?.popViewController(animated: true)
+            appDelegate.detailNavigationController?.popViewController(animated: true)
         }
     }
     

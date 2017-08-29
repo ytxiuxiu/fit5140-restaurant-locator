@@ -9,9 +9,9 @@
 import UIKit
 import CoreLocation
 import MapKit
-import Alamofire
 import SwiftyJSON
 import UserNotifications
+import Whisper
 
 
 class Location: NSObject, CLLocationManagerDelegate {
@@ -73,6 +73,9 @@ class Location: NSObject, CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
         let restaurant = monitoringRestaurants[region.identifier]
+        
+        print("entered restaurant region \(restaurant?.name ?? "no name restaurant")")
+        
         let content = UNMutableNotificationContent()
         
         content.title = "You are near \(restaurant?.name ?? "a restaurant")"
@@ -86,6 +89,14 @@ class Location: NSObject, CLLocationManagerDelegate {
         
         let request = UNNotificationRequest(identifier: region.identifier, content: content, trigger: nil)
         UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
+        
+        // In-app notification
+        // ✴️ Attribute:
+        // GitHub: hyperoslo/Whisper
+        //      https://github.com/hyperoslo/Whisper
+        let murmur = Murmur(title: "You are near \(restaurant?.name ?? "a restaurant")")
+        Whisper.show(whistle: murmur, action: .show(3))
+
     }
     
     // ✴️ Attribute:
@@ -160,6 +171,8 @@ class Location: NSObject, CLLocationManagerDelegate {
         region.notifyOnExit = false
         
         locationManager.startMonitoring(for: region)
+        
+        print("start to monitor restaurant \(restaurant.name)")
     }
     
     func removeMonitor(restaurant: Restaurant) {

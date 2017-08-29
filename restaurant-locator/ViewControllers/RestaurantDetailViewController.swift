@@ -32,9 +32,7 @@ class RestaurantDetailViewController: UIViewController, RestaurantDetailDelegate
     @IBOutlet weak var restaurantMapView: MKMapView!
     
     @IBOutlet weak var categoryLabel: UILabel!
-    
-    var restaurantMapViewController: RestaurantMapViewController?
-    
+
     var restaurantTableDelegate: RestaurantTableDelegate?
     
     var restaurantAnnotationDelegate: RestaurantAnnotationDelegate?
@@ -53,6 +51,14 @@ class RestaurantDetailViewController: UIViewController, RestaurantDetailDelegate
         
         let editBarButton = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editBarButtonItemTapped(sender:)))
         navigationItem.rightBarButtonItem = editBarButton
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            tabBarController?.tabBar.isHidden = true
+        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -83,7 +89,6 @@ class RestaurantDetailViewController: UIViewController, RestaurantDetailDelegate
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let controller = storyboard.instantiateViewController(withIdentifier: "editRestaurantViewController") as! AddRestaurantViewController
         
-        controller.restaurantMapViewController = self.restaurantMapViewController
         controller.isEdit = true
         controller.restaurant = self.restaurant
         controller.restaurantTableDelegate = self.restaurantTableDelegate

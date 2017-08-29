@@ -43,12 +43,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         let splitViewController = window!.rootViewController as! UISplitViewController
-        let navigationController = splitViewController.viewControllers[splitViewController.viewControllers.count-1] as! UINavigationController
+        let navigationController = splitViewController.viewControllers[splitViewController.viewControllers.count - 1] as! UINavigationController
         navigationController.topViewController!.navigationItem.leftBarButtonItem = splitViewController.displayModeButtonItem
         splitViewController.delegate = self
         
-        self.masterNavigationController = splitViewController.viewControllers.first as? UINavigationController
-        self.categoryTableDelegate = self.masterNavigationController?.viewControllers.first as! CategoryTableViewController
+        let tabBarController = splitViewController.viewControllers.first as? TabBarController
+        self.masterNavigationController = tabBarController?.viewControllers?.first as? UINavigationController
+        self.categoryTableDelegate = masterNavigationController?.viewControllers.first as! CategoryTableViewController
         
         self.detailNavigationController = splitViewController.viewControllers.last as? UINavigationController
         self.restaurantMapDelegate = self.detailNavigationController?.viewControllers.first as! RestaurantMapViewController
@@ -99,25 +100,48 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     
     func insertDefaultData() {
         let categoryJapanese = Category.insertNewObject(id: "0088a457-ab11-4fb3-a7f0-0bf7a8d1572b", name: "Japanese", color: 3, icon: 15, sort: 1)
-        let categoryBakery = Category.insertNewObject(id: "0b797cd0-febf-479c-af42-d400feeb4ca0", name: "Bakery", color: 2, icon: 1, sort: 2)
-        let categoryBrunch = Category.insertNewObject(id: "13c7281a-b72c-49eb-973b-312fbc3452c5", name: "Brunch", color: 4, icon: 2, sort: 3)
+        let categoryChinese = Category.insertNewObject(id: "0b797cd0-febf-479c-af42-d400feeb4ca0", name: "Chinese", color: 2, icon: 11, sort: 2)
+        let categoryCafe = Category.insertNewObject(id: "13c7281a-b72c-49eb-973b-312fbc3452c5", name: "Cafe", color: 4, icon: 2, sort: 3)
         
-        let restaurantRestore = Restaurant.insertNewObject(id: "adf152fc-2dc5-4293-946c-d2f10ace5d41", name: "Restore Cafe Bar", rating: 3.1, address: "18 Derby Road, Caulfield East, Caulfield, Melbourne", latitude: -37.876051, longitude: 145.042027, notificationRadius: 4)
-        restaurantRestore.saveImage(image: UIImage(named: "demo-restore-cafe")!)
-        categoryJapanese.addToRestaurants(restaurantRestore)
+        // japanese
+        let restaurantGochi = Restaurant.insertNewObject(id: "adf152fc-2dc5-4293-946c-d2f10ace5d41", name: "Gochi Japanese Fusion Tapas", rating: 4.3, address: "19980 Homestead Rd, Cupertino, CA 95014, USA", latitude: 37.3368349, longitude: -122.0226261, notificationRadius: 4)
+        restaurantGochi.saveImage(image: UIImage(named: "demo-gochi")!)
+        categoryJapanese.addToRestaurants(restaurantGochi)
         
-        let restaurantSakuraSushi = Restaurant.insertNewObject(id: "e9a4054d-e68a-43e4-880a-f5a2ed14db60", name: "Sakura Kaiten Sushi", rating: 4.3, address: "61, Little Collins Street, CBD, Melbourne, VIC", latitude: -37.8129954, longitude: 144.9716862, notificationRadius: 4)
-        restaurantSakuraSushi.saveImage(image: UIImage(named: "demo-sakura-sushi")!)
-        categoryJapanese.addToRestaurants(restaurantSakuraSushi)
+        let restaurantYayoi = Restaurant.insertNewObject(id: "e9a4054d-e68a-43e4-880a-f5a2ed14db60", name: "YAYOI", rating: 4.3, address: "20682 Homestead Rd, Cupertino, CA 95014, USA", latitude: 37.3371498, longitude: -122.0364847, notificationRadius: -1)
+        restaurantYayoi.saveImage(image: UIImage(named: "demo-yayoi")!)
+        categoryJapanese.addToRestaurants(restaurantYayoi)
         
-        let restaurantHakata = Restaurant.insertNewObject(id: "a85a4818-b83a-4f75-b11f-f40f8caf236f", name: "Hakata Gensuke Ramen Professionals", rating: 4.2, address: "168, Russell Street, CBD, Melbourne, VIC", latitude: -37.8122201, longitude: 144.9682514, notificationRadius: 3)
-        restaurantHakata.saveImage(image: UIImage(named: "demo-hakata-gensuke")!)
-        categoryJapanese.addToRestaurants(restaurantHakata)
+        let restaurantBaySushi = Restaurant.insertNewObject(id: "a85a4818-b83a-4f75-b11f-f40f8caf236f", name: "Bay Sushi", rating: 4.2, address: "1647 Hollenbeck Ave, Sunnyvale, CA 94087, USA", latitude: 37.3395547, longitude: -122.0426439, notificationRadius: 3)
+        restaurantBaySushi.saveImage(image: UIImage(named: "demo-bay-sushi")!)
+        categoryJapanese.addToRestaurants(restaurantBaySushi)
         
-        let restaurantCorner = Restaurant.insertNewObject(id: "16091ddb-c018-49bf-a7c8-24f712dd00a1", name: "The Corner Kitchen", rating: 3.2, address: "98 Waverley Road, Malvern East, Melbourne", latitude: -37.876054, longitude: 145.047481, notificationRadius: -1)
-        restaurantCorner.saveImage(image: UIImage(named: "demo-corner-kitchen")!)
-        categoryBrunch.addToRestaurants(restaurantCorner)
+        // chinese
+        let restaurantShanghaiGarden = Restaurant.insertNewObject(id: "adf152fc-2dc5-4293-946c-d2f10ace5d41", name: "Shanghai Garden", rating: 3.9, address: "20956 Homestead Rd, Cupertino, CA 95014, USA", latitude: 37.3367452, longitude: -122.0401997, notificationRadius: 4)
+        restaurantShanghaiGarden.saveImage(image: UIImage(named: "demo-shanghai-garden")!)
+        categoryChinese.addToRestaurants(restaurantShanghaiGarden)
+        
+        let restaurantLeiGarden = Restaurant.insertNewObject(id: "adf152fc-2dc5-4293-946c-d2f10ace5d41", name: "Lei Garden", rating: 3.8, address: "10125 Bandley Dr, Cupertino, CA 95014, USA", latitude: 37.3246344, longitude: -122.0347423, notificationRadius: -1)
+        restaurantLeiGarden.saveImage(image: UIImage(named: "demo-lei-garden")!)
+        categoryChinese.addToRestaurants(restaurantLeiGarden)
 
+        let restaurantAppleGreenBistro = Restaurant.insertNewObject(id: "adf152fc-2dc5-4293-946c-d2f10ace5d41", name: "Apple Green Bistro", rating: 4.0, address: "10885 N Wolfe Rd, Cupertino, CA 95014, USA", latitude: 37.3357997, longitude: -122.0157513, notificationRadius: 1)
+        restaurantAppleGreenBistro.saveImage(image: UIImage(named: "demo-apple-green")!)
+        categoryChinese.addToRestaurants(restaurantAppleGreenBistro)
+        
+        // cafe
+        let restaurantBagelStreetCafe = Restaurant.insertNewObject(id: "16091ddb-c018-49bf-a7c8-24f712dd00a1", name: "Bagel Street Cafe", rating: 4.2, address: "10591 N De Anza Blvd, Cupertino, CA 95014, USA", latitude: 37.3311769, longitude: -122.031641, notificationRadius: 3)
+        restaurantBagelStreetCafe.saveImage(image: UIImage(named: "demo-bagel-street-cafe")!)
+        categoryCafe.addToRestaurants(restaurantBagelStreetCafe)
+        
+        let restaurantLaTerra = Restaurant.insertNewObject(id: "16091ddb-c018-49bf-a7c8-24f712dd00a1", name: "La Terra Bakery & Cafe", rating: 4.5, address: "19960 Homestead Rd, Cupertino, CA 95014, USA", latitude: 37.3367832, longitude: -122.0224656, notificationRadius: 2)
+        restaurantLaTerra.saveImage(image: UIImage(named: "demo-la-terra")!)
+        categoryCafe.addToRestaurants(restaurantLaTerra)
+
+        let restaurantPaneraBread = Restaurant.insertNewObject(id: "16091ddb-c018-49bf-a7c8-24f712dd00a1", name: "Panera Bread", rating: 4.5, address: "20807 Stevens Creek Blvd, Cupertino, CA 95014, USA", latitude: 37.3231982, longitude: -122.0380849, notificationRadius: 1)
+        restaurantPaneraBread.saveImage(image: UIImage(named: "demo-la-terra")!)
+        categoryCafe.addToRestaurants(restaurantPaneraBread)
+        
         saveContext()
     }
     

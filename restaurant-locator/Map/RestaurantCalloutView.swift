@@ -37,7 +37,6 @@ class RestaurantCalloutView: UIView {
         
         controller.restaurant = restaurant
         controller.restaurantAnnotationDelegate = self.restaurantAnnotationDelegate
-        controller.restaurantMapViewController = self.restaurantMapViewController
         
         self.navigationController?.pushViewController(controller, animated: true)
     }

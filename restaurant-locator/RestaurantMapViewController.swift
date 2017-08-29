@@ -76,8 +76,6 @@ protocol RestaurantMapDelegate {
 
 class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPickerViewDataSource, UIPickerViewDelegate, RestaurantMapDelegate {
 
-    @IBOutlet weak var detailDescriptionLabel: UILabel!
-
     // ✴️ Attribute:
     // StackOverflow: weak may only be applied to class and class-bound protocol types not <<errortype>>
     //      https://stackoverflow.com/questions/38005594/weak-may-only-be-applied-to-class-and-class-bound-protocol-types-not-errortype
@@ -112,8 +110,6 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        print("view did load")
-        
         // menu icon
         // draw the menu button in portrait mode
         if let splitView = self.navigationController?.splitViewController, !splitView.isCollapsed {
@@ -129,6 +125,10 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            tabBarController?.tabBar.isHidden = false
+        }
         
         // start loction
         Location.shared.addCallback(key: "mainMap", callback: {(latitude, longitude) in
@@ -146,6 +146,12 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
             self.filterRestaurants()
             self.showRestaurants()
         })
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        moveToCurrentLocation()
     }
 
     override func didReceiveMemoryWarning() {
@@ -192,12 +198,16 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
         }
     }
     
-    
-    @IBAction func onCenterButtonTapped(_ sender: Any) {
+    func moveToCurrentLocation() {
         let coordinateSpan: MKCoordinateSpan = MKCoordinateSpanMake(0.01, 0.01)
         let coordinateRegion: MKCoordinateRegion = MKCoordinateRegionMake(self.mapView.userLocation.coordinate, coordinateSpan)
         
         self.mapView.setRegion(coordinateRegion, animated: true)
+    }
+    
+    
+    @IBAction func onCenterButtonTapped(_ sender: Any) {
+        self.moveToCurrentLocation()
     }
     
     
@@ -312,7 +322,7 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
             
             UIGraphicsEndImageContext()
             
-            return restaurantPinImages[restaurant!.image ?? ""]!
+            return restaurantPinImages[restaurant?.id ?? ""]!
         }
         
         
