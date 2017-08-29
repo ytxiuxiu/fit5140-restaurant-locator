@@ -15,65 +15,48 @@
 import UIKit
 import MapKit
 
-// ✴️ Attribute:
-// StackOverflow: Cropping image with Swift and put it on center position
-//      https://stackoverflow.com/questions/32041420/cropping-image-with-swift-and-put-it-on-center-position
 
-extension UIImage {
-    func crop(to:CGSize) -> UIImage {
-        guard let cgimage = self.cgImage else { return self }
-        
-        let contextImage: UIImage = UIImage(cgImage: cgimage)
-        
-        let contextSize: CGSize = contextImage.size
-        
-        //Set to square
-        var posX: CGFloat = 0.0
-        var posY: CGFloat = 0.0
-        let cropAspect: CGFloat = to.width / to.height
-        
-        var cropWidth: CGFloat = to.width
-        var cropHeight: CGFloat = to.height
-        
-        if to.width > to.height { // landscape
-            cropWidth = contextSize.width
-            cropHeight = contextSize.width / cropAspect
-            posY = (contextSize.height - cropHeight) / 2
-        } else if to.width < to.height { // portrait
-            cropHeight = contextSize.height
-            cropWidth = contextSize.height * cropAspect
-            posX = (contextSize.width - cropWidth) / 2
-        } else { // square
-            if contextSize.width >= contextSize.height { // square on landscape (or square)
-                cropHeight = contextSize.height
-                cropWidth = contextSize.height * cropAspect
-                posX = (contextSize.width - cropWidth) / 2
-            } else { // square on portrait
-                cropWidth = contextSize.width
-                cropHeight = contextSize.width / cropAspect
-                posY = (contextSize.height - cropHeight) / 2
-            }
-        }
-        
-        let rect: CGRect = CGRect(x: posX, y: posY, width: cropWidth, height: cropHeight)
-        
-        // Create bitmap image from context using the rect
-        let imageRef: CGImage = contextImage.cgImage!.cropping(to: rect)!
-
-        // Create a new image based on the imageRef and rotate back to the original orientation
-        let cropped: UIImage = UIImage(cgImage: imageRef, scale: self.scale, orientation: self.imageOrientation)
-        
-        return cropped
-    }
-}
-
+/**
+ Restaurant Map Delegate
+ */
 protocol RestaurantMapDelegate {
+    
+    /**
+     Add restaurant, it should add the specific restaurant to the map
+     
+     - Parameters:
+        - restaurant: Added restaurant
+     */
     func addRestaurant(restaurant: Restaurant)
+    
+    /**
+     Edit restaurant, it should update the location, pin image and callout view of the annotation of the restaurant
+     
+     - Parameters:
+        - restaurant: Edited restaurant
+     */
     func editRestaurant(restaurant: Restaurant)
+    
+    /**
+     Delete restaurant, it should delete the annotation of the restaurant
+     
+     - Parameters:
+        - restaurant: The restaurant to be deleted
+     */
     func deleteRestaurant(restaurant: Restaurant)
+    
+    /**
+     Get navigation controller of the restaurant map view
+    
+     - Returns: The navigation controller
+     */
     func getNavigationController() -> UINavigationController
 }
 
+
+/**
+ Restaurant Map
+ */
 class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPickerViewDataSource, UIPickerViewDelegate, RestaurantMapDelegate {
 
     // ✴️ Attribute:
@@ -94,18 +77,35 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
     
     var radiusCircle: MKCircle?
     
+    /**
+     All restaurants
+     */
     var restaurants = [Restaurant]()
     
+    /**
+     Last displayed restaurants on the map
+     */
     var displayedRestaurants = [Restaurant]()
     
+    /**
+     Restaurants just filtered in the specific radius
+     */
     var filteredRestaurants = [Restaurant]()
     
+    /**
+     Restaurant annotations
+     */
     var restaurantAnnotations = [RestaurantAnnotation]()
     
+    /**
+     Cached pin images
+     */
     var restaurantPinImages = [String: UIImage]()
     
     var mapInited = false
     
+    
+    // MARK: - View Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -165,11 +165,17 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
         Location.shared.removeCallback(key: "mainMap")
     }
     
+    
+    // MARK: - Map
+    
     // add radius circle
     // ✴️ Attribute:
     // StackOverflow: Draw a circle of 1000m radius around users location in MKMapView
     //      https://stackoverflow.com/questions/9056451/draw-a-circle-of-1000m-radius-around-users-location-in-mkmapview
     
+    /**
+     Show radius cicle on the map
+     */
     func showRadiusCircle() {
         if let oldCircle = self.radiusCircle {
             self.mapView.remove(oldCircle)
@@ -180,24 +186,9 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
         }
     }
     
-    func filterRestaurants() {
-        self.filteredRestaurants = self.restaurants.filter() {
-            let restaurant = $0
-            
-            if let location = self.currentLocation {
-                let distanceToCurrentLocation = restaurant.calculateDistance(currentLocation: CLLocation(latitude: location.latitude, longitude: location.longitude))
-                
-                if let distance = distanceToCurrentLocation {
-                    return distance < Location.radius[self.currentRadius]
-                } else {
-                    return false;
-                }
-            } else {
-                return false;
-            }
-        }
-    }
-    
+    /**
+     Move the map to the current location
+     */
     func moveToCurrentLocation() {
         let coordinateSpan: MKCoordinateSpan = MKCoordinateSpanMake(0.01, 0.01)
         let coordinateRegion: MKCoordinateRegion = MKCoordinateRegionMake(self.mapView.userLocation.coordinate, coordinateSpan)
@@ -205,19 +196,15 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
         self.mapView.setRegion(coordinateRegion, animated: true)
     }
     
-    
-    @IBAction func onCenterButtonTapped(_ sender: Any) {
-        self.moveToCurrentLocation()
-    }
-    
-    
-    // show restaurant annotations on the map
     // ✴️ Attributes:
     // StackOverflow: iOS Swift MapKit Custom Annotation [closed]
     //      https://stackoverflow.com/questions/38274115/ios-swift-mapkit-custom-annotation
     // Website: Working with MapKit: Annotations and Shape Rendering
     //      http://www.appcoda.com/mapkit-beginner-guide/
     
+    /**
+     Show restaurant annotations on the map
+     */
     func showRestaurants() {
         
         // ✴️ Attributes:
@@ -225,7 +212,7 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
         //      https://stackoverflow.com/questions/24589181/set-operations-union-intersection-on-swift-array
         // Documentation: subtract(_:)
         //      https://developer.apple.com/documentation/swift/set/1779475-subtract
-
+        
         var toBeRemoved: Set<Restaurant> = Set(displayedRestaurants)
         var toBeAdded: Set<Restaurant> = Set(filteredRestaurants)
         let displayed: Set<Restaurant> = Set(displayedRestaurants)
@@ -246,13 +233,93 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
             let restaurantAnnotation = RestaurantAnnotation()
             restaurantAnnotation.coordinate = CLLocationCoordinate2D(latitude: restaurant.latitude, longitude: restaurant.longitude)
             restaurantAnnotation.restaurant = restaurant
-
+            
             self.restaurantAnnotations.append(restaurantAnnotation)
             self.mapView.addAnnotation(restaurantAnnotation)
         }
         
         self.displayedRestaurants = self.filteredRestaurants
     }
+    
+    // ✴️ Attribute:
+    // StackOverflow: Saving an image on top of another image in Swift
+    // https://stackoverflow.com/questions/29062225/saving-an-image-on-top-of-another-image-in-swift
+    
+    /**
+     Generate pin image for a restaurant annotation
+     
+     - Parameters:
+     - for: Image to be generated for which restaurant annotation
+     - Returns: Image
+     */
+    func generatePinImage(for restaurantAnnotation: RestaurantAnnotation) -> UIImage {
+        let restaurant = restaurantAnnotation.restaurant
+        let restaurantPinImage = restaurantPinImages[restaurant?.id ?? ""]
+        
+        if restaurantPinImage != nil {
+            return restaurantPinImage!
+        } else {
+            let pinSize = CGSize(width: 53, height: 59)
+            let backgroundSize = CGSize(width: 50, height: 56)
+            let imageSize = CGSize(width: 40, height: 40)
+            let cropedRestaurantImage = restaurant?.getImage().crop(to: imageSize)
+            let pinBackgroundImage = UIImage(named: "pin")
+            let notificationImage = UIImage(named: "notification")
+            
+            UIGraphicsBeginImageContext(pinSize)
+            
+            cropedRestaurantImage?.draw(in: CGRect(origin: CGPoint(x: 8, y: 8), size: imageSize))
+            pinBackgroundImage?.draw(in: CGRect(origin: CGPoint(x: 3, y: 3), size: backgroundSize))
+            
+            if restaurant?.notificationRadius != -1 {
+                notificationImage?.draw(in: CGRect(origin: CGPoint.zero, size: CGSize(width: 16, height: 16)))
+            }
+            
+            restaurantAnnotation.image = UIGraphicsGetImageFromCurrentImageContext()
+            
+            // cache pin image
+            restaurantPinImages.updateValue(restaurantAnnotation.image!, forKey: (restaurant?.id ?? "")!)
+            
+            UIGraphicsEndImageContext()
+            
+            return restaurantPinImages[restaurant?.id ?? ""]!
+        }
+    }
+    
+    
+    // MARK: - Data
+    
+    /**
+     Filter restaurants within specified radius
+     */
+    func filterRestaurants() {
+        self.filteredRestaurants = self.restaurants.filter() {
+            let restaurant = $0
+            
+            if let location = self.currentLocation {
+                let distanceToCurrentLocation = restaurant.calculateDistance(currentLocation: CLLocation(latitude: location.latitude, longitude: location.longitude))
+                
+                if let distance = distanceToCurrentLocation {
+                    return distance < Location.radius[self.currentRadius]
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+    }
+    
+    
+    // MARK: - Events
+    
+    // Center button tapped (move map to the current location)
+    @IBAction func onCenterButtonTapped(_ sender: Any) {
+        self.moveToCurrentLocation()
+    }
+    
+    
+    // MARK: - Map Lifecycle
     
     // ✴️ Attribute:
     // Website: Building The Perfect IOS Map (II): Completely Custom Annotation Views
@@ -286,53 +353,11 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
         return annotationView
     }
     
-    
-    // generate pin image for a restaurant annotation
-    // ✴️ Attribute:
-    // StackOverflow: Saving an image on top of another image in Swift
-    // https://stackoverflow.com/questions/29062225/saving-an-image-on-top-of-another-image-in-swift
-    
-    func generatePinImage(for restaurantAnnotation: RestaurantAnnotation) -> UIImage {
-        let restaurant = restaurantAnnotation.restaurant
-        let restaurantPinImage = restaurantPinImages[restaurant?.id ?? ""]
-        
-        if restaurantPinImage != nil {
-            return restaurantPinImage!
-        } else {
-            let pinSize = CGSize(width: 53, height: 59)
-            let backgroundSize = CGSize(width: 50, height: 56)
-            let imageSize = CGSize(width: 40, height: 40)
-            let cropedRestaurantImage = restaurant?.getImage().crop(to: imageSize)
-            let pinBackgroundImage = UIImage(named: "pin")
-            let notificationImage = UIImage(named: "notification")
-            
-            UIGraphicsBeginImageContext(pinSize)
-            
-            cropedRestaurantImage?.draw(in: CGRect(origin: CGPoint(x: 8, y: 8), size: imageSize))
-            pinBackgroundImage?.draw(in: CGRect(origin: CGPoint(x: 3, y: 3), size: backgroundSize))
-            
-            if restaurant?.notificationRadius != -1 {
-                notificationImage?.draw(in: CGRect(origin: CGPoint.zero, size: CGSize(width: 16, height: 16)))
-            }
-            
-            restaurantAnnotation.image = UIGraphicsGetImageFromCurrentImageContext()
-            
-            // cache pin image
-            restaurantPinImages.updateValue(restaurantAnnotation.image!, forKey: (restaurant?.id ?? "")!)
-            
-            UIGraphicsEndImageContext()
-            
-            return restaurantPinImages[restaurant?.id ?? ""]!
-        }
-        
-        
-    }
-    
-    // customized annotation
     // ✴️ Attribute:
     // Website: How To Completely Customise Your Map Annotations Callout Views
     //      http://sweettutos.com/2016/03/16/how-to-completely-customise-your-map-annotations-callout-views/
     
+    // Annotation did select
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         if !(view.annotation is RestaurantAnnotation) {
             return
@@ -348,11 +373,11 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
         }
     }
     
-    // draw radius circle
     // ✴️ Attribute:
     // StackOverflow: Draw a circle of 1000m radius around users location in MKMapView
     //      https://stackoverflow.com/questions/9056451/draw-a-circle-of-1000m-radius-around-users-location-in-mkmapview
     
+    // View of radius (overlay)
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
         if overlay is MKCircle {
             let circle = MKCircleRenderer(overlay: overlay)
@@ -366,7 +391,7 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
     }
     
     
-    // MARK: Radius Picker
+    // MARK: - Radius Picker
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
@@ -380,11 +405,11 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
         return Location.radiusText[row]
     }
     
-    
     // ✴️ Attribute
     // StackOverflow: Sizing a UIPickerView inside a UIAlertView
     //      https://stackoverflow.com/questions/41361177/sizing-a-uipickerview-inside-a-uialertview
     
+    // Radius button tapped
     @IBAction func onRadiusClicked(_ sender: Any) {
         let alert = UIAlertController(title: "Filter Restaurants", message: "\n\n\n\n\n\n\n\n\n\n", preferredStyle: .alert);
         alert.isModalInPopover = true;
@@ -422,6 +447,9 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
         present(alert, animated: true, completion: nil)
     }
     
+    
+    // MARK: - Restaurant Map Delegate
+    
     func addRestaurant(restaurant: Restaurant) {
         self.restaurants.append(restaurant)
         
@@ -438,7 +466,10 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
                 //      https://stackoverflow.com/questions/14131345/ios-refresh-annotations-on-mapview
                 
                 self.mapView.removeAnnotation(restaurantAnnotation)
-                restaurantPinImages.remove(at: restaurantPinImages.index(forKey: restaurant.image ?? "")!)
+                
+                if let index = restaurantPinImages.index(forKey: restaurant.id) {
+                    restaurantPinImages.remove(at: index)
+                }
                 
                 restaurantAnnotation.coordinate = CLLocationCoordinate2D(latitude: restaurant.latitude, longitude: restaurant.longitude)
                 restaurantAnnotation.image = self.generatePinImage(for: restaurantAnnotation)
@@ -452,13 +483,16 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
     func deleteRestaurant(restaurant: Restaurant) {
         var i = 0
         for oldRestaurant in restaurants {
-            if oldRestaurant == restaurant {
+            if oldRestaurant.id == restaurant.id {
+                restaurants.remove(at: i)
                 break
             }
             i = i + 1
         }
-        restaurants.remove(at: i)
-        restaurantPinImages.remove(at: restaurantPinImages.index(forKey: restaurant.image ?? "")!)
+        
+        if let index = restaurantPinImages.index(forKey: restaurant.id) {
+            restaurantPinImages.remove(at: index)
+        }
         
         self.filterRestaurants()
         self.showRestaurants()

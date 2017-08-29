@@ -8,6 +8,10 @@
 
 import UIKit
 
+
+/**
+ Cell for category table
+ */
 class CategoryTableViewCell: UITableViewCell {
     
     @IBOutlet weak var categoryImageView: UIImageView!
@@ -26,17 +30,19 @@ class CategoryTableViewCell: UITableViewCell {
     
     var categoryTableDelegate: CategoryTableDelegate?
     
+    
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
     }
     
+    
+    // MARK: - Events
+    
+    // Category edit button tapped
     @IBAction func onCategoryEditButtonTapped(_ sender: Any) {
         self.categoryTableDelegate?.showEditCategory(category: category!)
     }

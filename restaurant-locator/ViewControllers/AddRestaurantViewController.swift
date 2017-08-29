@@ -35,6 +35,9 @@ import Alamofire
 import SwiftValidator
 
 
+/**
+ Add Restaurant
+ */
 class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource, UIImagePickerControllerDelegate, UINavigationControllerDelegate, ValidationDelegate, MKLocalSearchCompleterDelegate, MKMapViewDelegate {
     
     @IBOutlet weak var restaurantNameSearchTextField: SearchTextField!
@@ -55,9 +58,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     
     @IBOutlet weak var notificationPickerView: UIPickerView!
     
-    @IBOutlet weak var topSpaceConstraint: NSLayoutConstraint!
-    
-    @IBOutlet weak var addButton: UIButton!
+    @IBOutlet weak var scrollView: UIScrollView!
     
     var isEdit = false
     
@@ -89,71 +90,99 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     
     var currentPin: MKPointAnnotation?
     
+    /**
+     Current radius selected
+     */
     var currentRaidus = 3
     
     var radiusCircle: MKCircle?
     
+    /**
+     If the photo is selected
+     */
     var isPhotoSelected = false
     
+    /**
+     The sort of the new restaurant should be
+     */
     var sort: Int?
     
+    
+    // MARK: - View Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // save button
+        // Save button
         let saveBarButtonItem = UIBarButtonItem(title: "Save", style: .done, target: self, action: #selector(onAddButtonClicked(_:)))
         self.navigationItem.rightBarButtonItem = saveBarButtonItem
         
-        // rating
+        // Map
+        self.restaurantMapView.delegate = self
+        
+        // Notification picker
+        self.notificationPickerView.delegate = self
+        self.notificationPickerView.dataSource = self
+        
+        initRating()
+        initPhoto()
+        initAddress()
+        initNotificationPicker()
+        initValidation();
+        
+        if !isEdit {
+            initAddMode()
+        } else {
+            initEditMode()
+        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            tabBarController?.tabBar.isHidden = true
+        }
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+    }
+    
+    // MARK: - Init
+    /**
+     Init rating
+     */
+    func initRating() {
         self.restaurantRatingView.settings.fillMode = .precise
         self.restaurantRatingView.didTouchCosmos = { rating in
             self.restaurantRatingLabel.text = String(format: "%.1f", rating)
         }
-        
-        // start loction
-        self.restaurantMapView.delegate = self
-        
-        if !isEdit {
-            Location.shared.addCallback(key: "addRestaurantMap", callback: {(latitude, longitude) in
-                
-                // fill current address
-                Location.getAddress(latitude: latitude, longitude: longitude, callback: { (address, error) in
-                    guard address != nil else {
-                        // ignore the error
-                        return
-                    }
-                    
-                    self.restaurantAddressTextField.text = address
-                })
-                
-                self.movePin(latitude: latitude, longitude: longitude)
-                
-                // unsubscribe, just need location once
-                Location.shared.removeCallback(key: "addRestaurantMap")
-            })
-        }
-        
-        // restaurant suggestion
-        self.restaurantNameSearchTextField.theme.bgColor = UIColor.white
-
-        
-        // photo
-        // ✴️ Attribute:
-        // StackOverflow: UIImageView as button
-        //      https://stackoverflow.com/questions/11330544/uiimageview-as-button
-        
+    }
+    
+    // ✴️ Attribute:
+    // StackOverflow: UIImageView as button
+    //      https://stackoverflow.com/questions/11330544/uiimageview-as-button
+    
+    /**
+     Init photo
+     */
+    func initPhoto() {
         self.restaurantPhotoImageView.isUserInteractionEnabled = true
         let singleTap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(restaurantPhotoImageViewTapped(_:)))
         singleTap.numberOfTapsRequired = 1;
         self.restaurantPhotoImageView.addGestureRecognizer(singleTap)
-        
-        // notification picker
-        self.notificationPickerView.delegate = self
-        self.notificationPickerView.dataSource = self
-        
-        
-        // address
+    }
+    
+    /**
+     Init address
+     */
+    func initAddress() {
         self.restaurantAddressTextField.theme.bgColor = UIColor.white
         
         self.restaurantAddressTextField.userStoppedTypingHandler = {
@@ -198,69 +227,76 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
                 }
             }
         }
-        
-        // notification
-        
+    }
+    
+    /**
+     Init notification picker
+     */
+    func initNotificationPicker() {
         self.notificationPickerView.selectRow(3, inComponent: 0, animated: false)
+    }
+    
+    /**
+     Init add mode
+     */
+    func initAddMode() {
+        Location.shared.addCallback(key: "addRestaurantMap", callback: {(latitude, longitude) in
+            
+            // fill current address
+            Location.getAddress(latitude: latitude, longitude: longitude, callback: { (address, error) in
+                guard address != nil else {
+                    // ignore the error
+                    return
+                }
+                
+                self.restaurantAddressTextField.text = address
+            })
+            
+            self.movePin(latitude: latitude, longitude: longitude)
+            
+            // unsubscribe, just need location once
+            Location.shared.removeCallback(key: "addRestaurantMap")
+        })
+    }
+    
+    /**
+     Init edit mode
+     */
+    func initEditMode() {
+        // fill all the fields with values
+        self.restaurantNameSearchTextField.text = restaurant?.name
+        if restaurant?.image != nil {
+            self.isPhotoSelected = true
+            self.restaurantPhotoImageView.image = restaurant?.getImage(defaultImage: UIImage(named: "photo-banner")!)
+        } else {
+            self.restaurantPhotoImageView.image = UIImage(named: "photo-add")
+        }
+        self.restaurantRatingView.rating = (restaurant?.rating)!
+        self.restaurantRatingLabel.text = String(format: "%.1f", (restaurant?.rating)!)
+        self.restaurantAddressTextField.text = restaurant?.address
         
-        // validation
+        movePin(latitude: (restaurant?.latitude)!, longitude: (restaurant?.longitude)!)
         
+        self.currentRaidus = Int((restaurant?.notificationRadius)!)
+        if restaurant?.notificationRadius != -1 {
+            self.notificationPickerView.selectRow(Int((restaurant?.notificationRadius)!), inComponent: 0, animated: false)
+        } else {
+            self.notificationPickerView.selectRow(Location.radius.count, inComponent: 0, animated: false)
+        }
+        
+        // change title and button
+        self.title = "Edit Restaurant"
+    }
+    
+    /**
+     Init validation
+     */
+    func initValidation() {
         self.validator.registerField(restaurantNameSearchTextField, errorLabel: restaurantNameErrorLabel, rules: [RequiredRule(message: "Give it a name!")])
         
         self.validator.registerField(restaurantAddressTextField, rules: [RequiredRule(message: "Where is this restaurant?")])
-        
-        // edit
-        if isEdit {
-            // fill all the fields with values
-            self.restaurantNameSearchTextField.text = restaurant?.name
-            if restaurant?.image != nil {
-                self.isPhotoSelected = true
-                self.restaurantPhotoImageView.image = restaurant?.getImage(defaultImage: UIImage(named: "photo-banner")!)
-            } else {
-                self.restaurantPhotoImageView.image = UIImage(named: "photo-add")
-            }
-            self.restaurantRatingView.rating = (restaurant?.rating)!
-            self.restaurantRatingLabel.text = String(format: "%.1f", (restaurant?.rating)!)
-            self.restaurantAddressTextField.text = restaurant?.address
-            
-            movePin(latitude: (restaurant?.latitude)!, longitude: (restaurant?.longitude)!)
-            
-            self.currentRaidus = Int((restaurant?.notificationRadius)!)
-            if restaurant?.notificationRadius != -1 {
-                self.notificationPickerView.selectRow(Int((restaurant?.notificationRadius)!), inComponent: 0, animated: false)
-            } else {
-                self.notificationPickerView.selectRow(Location.radius.count, inComponent: 0, animated: false)
-            }
-            
-            // change title and button
-            self.title = "Edit Restaurant"
-            
-            // ✴️ Attribute:
-            // StackOverflow: How to change button text in Swift Xcode 6?
-            //      https://stackoverflow.com/questions/26641571/how-to-change-button-text-in-swift-xcode-6
-            
-//            self.addButton.setTitle("Edit", for: .normal)
-        }
-        
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        if UIDevice.current.userInterfaceIdiom == .phone {
-            tabBarController?.tabBar.isHidden = true
-        }
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-    }
-
     
     // MARK: - Photo
     
@@ -331,7 +367,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     }
     
     
-    // MARK: Address
+    // MARK: - Address
     
     // Auto complete address
     // ✴️ Attributes:
@@ -375,8 +411,9 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
         
         Location.getAddress(latitude: latitude, longitude: longitude) { (address, error) in
             guard address != nil else {
-                // ignore the error
-                print("Could not get address: \(error)")
+                if error != nil {
+                    print("Could not get address: \(error!)")
+                }
                 return
             }
             
@@ -414,26 +451,14 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     }
     
     
-    // MARK: - Navigation Bar
-    
-    // Add extra top space for compat screen as a navigation bar will be added to this popover
-    // ✴️ Attributes:
-    // StackOverflow: How to change constraints programmatically that is added from storyboard?
-    //      https://stackoverflow.com/questions/40583602/how-to-change-constraints-programmatically-that-is-added-from-storyboard
-    // StackOverflow: How to add Navigation bar to a view without Navigation controller
-    //      https://stackoverflow.com/questions/23859785/how-to-add-navigation-bar-to-a-view-without-navigation-controller
-    
-    func addExtraTopSpaceForCompatScreen() {
-        topSpaceConstraint.constant = UIApplication.shared.statusBarFrame.height + 44   // status bar + navigation bar + original top
-    }
-    
-    
     // MARK: - Save
     
+    // Save button tapped
     @IBAction func onAddButtonClicked(_ sender: Any) {
         validator.validate(self)
     }
     
+    // Validation successful
     func validationSuccessful() {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
@@ -506,16 +531,30 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
         }
     }
     
+    // On validation failed
     func validationFailed(_ errors:[(Validatable ,ValidationError)]) {
         // show validation error
+        var i = 0
         for (field, error) in errors {
             if let field = field as? UITextField {
                 field.layer.borderColor = Colors.red(alpha: 0.7).cgColor
                 field.layer.borderWidth = 1.0
             }
-            error.errorLabel?.text = error.errorMessage
-            error.errorLabel?.isHidden = false
+            
+            if let label = error.errorLabel {
+                // scroll to the first error
+                if i == 0 {
+                    scrollView.scrollToView(view: label, animated: true)
+                }
+                
+                label.text = error.errorMessage
+                label.isHidden = false
+            }
+            
+            i = i + 1
         }
+        
+        
     }
     
 

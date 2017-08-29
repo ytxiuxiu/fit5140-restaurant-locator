@@ -13,7 +13,9 @@ import SwiftyJSON
 import UserNotifications
 import Whisper
 
-
+/**
+ Deal with location related functionalities
+ */
 class Location: NSObject, CLLocationManagerDelegate {
     
     static let shared = Location()
@@ -43,15 +45,22 @@ class Location: NSObject, CLLocationManagerDelegate {
         super.init()
         self.locationManager.delegate = self
         
+        // accuracy
         self.locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
         self.locationManager.distanceFilter = 5.0
         
+        // privacy
         self.locationManager.requestWhenInUseAuthorization()
+        
         self.locationManager.startUpdatingLocation()
         
         self.appDelegate = UIApplication.shared.delegate as? AppDelegate
     }
     
+    
+    // MARK: - Location Manager
+    
+    // Location did updated
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         let location = locations[0] // most recent location
         
@@ -71,6 +80,7 @@ class Location: NSObject, CLLocationManagerDelegate {
     // Website: How to Make Local Notifications in iOS 10
     //      https://makeapppie.com/2016/08/08/how-to-make-local-notifications-in-ios-10/
     
+    // Did enter monitored region
     func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
         let restaurant = monitoringRestaurants[region.identifier]
         
@@ -99,10 +109,23 @@ class Location: NSObject, CLLocationManagerDelegate {
 
     }
     
+    
+    // MARK: - Tools
+    
     // ✴️ Attribute:
     // StackOverflow: Swift - Generate an Address Format from Reverse Geocoding
     //      https://stackoverflow.com/questions/41358423/swift-generate-an-address-format-from-reverse-geocoding
     
+    /**
+     Get address string from a location
+ 
+     - Parameters:
+        - latitude: Current latitude
+        - longitude: Current longitude
+        - callback: Callback function after getting the address
+        - address: String format of the address
+        - error: Error
+     */
     static func getAddress(latitude: CLLocationDegrees, longitude: CLLocationDegrees, callback: @escaping (_ address: String?, _ error: Error?) -> Void) {
 
         geocoder.reverseGeocodeLocation(CLLocation(latitude: latitude, longitude: longitude)) { (placemark, error) in
@@ -138,12 +161,27 @@ class Location: NSObject, CLLocationManagerDelegate {
         }
     }
     
+    /**
+     Make a MKCoordinateRegion for maps
+     
+     - Parameters:
+        - latitude: Current latitude
+        - longitude: Current longitude
+     - Returns: MKCoordinateRegion
+     */
     func makeRegion(latitude: CLLocationDegrees, longitude: CLLocationDegrees) -> MKCoordinateRegion {
         let coordinateLocation: CLLocationCoordinate2D = CLLocationCoordinate2DMake(latitude, longitude)
         let coordinateSpan: MKCoordinateSpan = MKCoordinateSpanMake(0.01, 0.01)
         return MKCoordinateRegionMake(coordinateLocation, coordinateSpan)
     }
     
+    /**
+     Get string format of a distance
+     
+     - Parameters:
+        - distance: Distance in Double
+     - Returns: String format of the distance
+     */
     static func getDistanceString(distance: Double) -> String {
         if (distance < 1000) {
             return String(format: "%.0f m", distance)
@@ -152,11 +190,19 @@ class Location: NSObject, CLLocationManagerDelegate {
         }
     }
     
-    // monitor restaurants
+    
+    // MARK: - Add and Remove
+    
     // ✴️ Attribute:
     // Swift Tutorial : CoreLocation and Region Monitoring in iOS 8
     //      http://shrikar.com/swift-tutorial-corelocation-and-region-monitoring-in-ios-8/
     
+    /**
+     Add enter radius monitor to a restaurant
+     
+     - Parameters:
+        - restaurant: The restaurant to be monitored
+     */
     func addMonitor(restaurant: Restaurant) {
         let center = CLLocationCoordinate2D(latitude: restaurant.latitude, longitude: restaurant.longitude)
         let radius = CLLocationDistance(Location.radius[Int(restaurant.notificationRadius)])
@@ -175,11 +221,31 @@ class Location: NSObject, CLLocationManagerDelegate {
         print("start to monitor restaurant \(restaurant.name)")
     }
     
+    /**
+     Remove enter radius monitor of a restaurant
+     
+     - Parameters:
+        - restaurant: The restaurant will be removed from monitoring
+     */
     func removeMonitor(restaurant: Restaurant) {
-        monitoringRegions.remove(at: monitoringRegions.index(forKey: restaurant.id)!)
-        monitoringRestaurants.remove(at: monitoringRestaurants.index(forKey: restaurant.id)!)
+        if let index = monitoringRegions.index(forKey: restaurant.id) {
+            monitoringRegions.remove(at: index)
+        }
+        
+        if let index = monitoringRestaurants.index(forKey: restaurant.id) {
+            monitoringRestaurants.remove(at: index)
+        }
     }
     
+    /**
+     Add a callback function when the current location has updated
+     
+     - Parameters:
+        - key: key of the callback function, it makes it easier to remove a certain callback
+        - callback: callback function itself
+        - latitude: current latitude
+        - longitude: current longitude
+     */
     func addCallback(key: String, callback: @escaping (_ latitude: CLLocationDegrees, _ longitude: CLLocationDegrees) -> Void) {
         self.callbacks[key] = callback
         
@@ -190,6 +256,12 @@ class Location: NSObject, CLLocationManagerDelegate {
         self.locationManager.startUpdatingLocation()
     }
     
+    /**
+     Remove a callback function for location updates
+     
+     - Parameters:
+        - key: key of the callback function to remove
+     */
     func removeCallback(key: String) {
         self.callbacks.removeValue(forKey: key)
         

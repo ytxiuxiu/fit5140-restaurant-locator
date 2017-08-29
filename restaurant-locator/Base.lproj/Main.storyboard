@@ -529,6 +529,7 @@
                         <outlet property="restaurantPhotoImageView" destination="3gO-ja-Avx" id="Vyn-zh-FM6"/>
                         <outlet property="restaurantRatingLabel" destination="2Eo-eo-B6j" id="gSO-Id-frB"/>
                         <outlet property="restaurantRatingView" destination="t2F-mK-8aI" id="Slz-cc-0a4"/>
+                        <outlet property="scrollView" destination="ov9-Ef-FcM" id="pnt-Jq-gDz"/>
                         <outlet property="topSpaceConstraint" destination="wuz-MG-yOd" id="iP2-Mc-IPL"/>
                     </connections>
                 </viewController>
@@ -840,9 +841,16 @@
                                             <action selector="onNavigationButtonTapped:" destination="RhQ-Ko-2Kd" eventType="touchUpInside" id="diF-7j-o3i"/>
                                         </connections>
                                     </button>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="3.0" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iCm-X7-Qi8">
+                                        <rect key="frame" x="340.66666666666674" y="171" width="26.333333333333314" height="21"/>
+                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                                        <color key="textColor" red="0.99948805570602417" green="0.63209049211702117" blue="0.28566129444367644" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="highlightedColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </label>
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="Lfb-40-aEX" firstAttribute="top" secondItem="AMX-nx-93v" secondAttribute="bottom" constant="8" symbolic="YES" id="1Dm-9H-AW4"/>
+                                    <constraint firstItem="iCm-X7-Qi8" firstAttribute="trailing" secondItem="goW-eM-l5u" secondAttribute="trailing" constant="-8" id="2U7-1f-qPm"/>
                                     <constraint firstItem="Wgz-7r-owK" firstAttribute="leading" secondItem="QgC-XN-m0z" secondAttribute="leading" id="3d8-Ol-Yuw"/>
                                     <constraint firstItem="Lfb-40-aEX" firstAttribute="leading" secondItem="RfH-Ox-X3M" secondAttribute="leading" id="7sw-jU-oIQ"/>
                                     <constraint firstItem="WOD-2O-lmn" firstAttribute="leading" secondItem="QgC-XN-m0z" secondAttribute="leading" constant="62" id="94P-yT-5qR"/>
@@ -856,6 +864,7 @@
                                     <constraint firstItem="uLF-E2-INf" firstAttribute="bottom" secondItem="Wgz-7r-owK" secondAttribute="bottom" constant="-8" id="HXd-tj-QVm"/>
                                     <constraint firstItem="tDe-bz-fhY" firstAttribute="leading" secondItem="AMX-nx-93v" secondAttribute="trailing" constant="8" symbolic="YES" id="HbG-KS-bUO"/>
                                     <constraint firstItem="WTl-WP-LX7" firstAttribute="bottom" secondItem="goW-eM-l5u" secondAttribute="bottom" constant="-8" id="Hx9-hO-cB3"/>
+                                    <constraint firstItem="iCm-X7-Qi8" firstAttribute="bottom" secondItem="WTl-WP-LX7" secondAttribute="bottom" id="IYF-On-tTk"/>
                                     <constraint firstItem="uLF-E2-INf" firstAttribute="trailing" secondItem="Wgz-7r-owK" secondAttribute="trailing" constant="-8" id="IgS-ze-ENc"/>
                                     <constraint firstItem="WTl-WP-LX7" firstAttribute="leading" secondItem="goW-eM-l5u" secondAttribute="leading" constant="8" id="NdL-Cg-L2F"/>
                                     <constraint firstItem="Lfb-40-aEX" firstAttribute="width" secondItem="AMX-nx-93v" secondAttribute="width" id="Nfs-rB-8v2"/>
@@ -909,6 +918,7 @@
                         <outlet property="restaurantImageView" destination="goW-eM-l5u" id="zK8-v5-Rss"/>
                         <outlet property="restaurantMapView" destination="Wgz-7r-owK" id="UoX-AO-Br5"/>
                         <outlet property="restaurantNotificationRadiusLabel" destination="4Wy-0j-Brh" id="c1x-E8-ZIN"/>
+                        <outlet property="restaurantRatingLabel" destination="iCm-X7-Qi8" id="gef-5u-ZV7"/>
                         <outlet property="restaurantRatingView" destination="WTl-WP-LX7" id="8DG-Pg-Uq1"/>
                     </connections>
                 </viewController>

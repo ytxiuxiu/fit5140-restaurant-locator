@@ -9,6 +9,9 @@
 import UIKit
 import MapKit
 
+/**
+ Pin of restaurant on the map
+ */
 class RestaurantAnnotation: MKPointAnnotation {
     
     var restaurant: Restaurant?

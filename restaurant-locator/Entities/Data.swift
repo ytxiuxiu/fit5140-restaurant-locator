@@ -9,6 +9,9 @@
 import UIKit
 import CoreData
 
+/**
+ Help easy access to CoreData managed object context
+ */
 class Data: NSObject {
     
     static let shared = Data()

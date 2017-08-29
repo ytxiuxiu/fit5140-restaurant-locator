@@ -8,6 +8,9 @@
 
 import UIKit
 
+/**
+ Application specific colors
+ */
 class Colors: NSObject {
     
     static func red(alpha: Float) -> UIColor {
@@ -30,8 +33,14 @@ class Colors: NSObject {
         return UIColor(red: 52/255, green: 152/255, blue: 219/255, alpha: CGFloat(alpha))
     }
     
+    /**
+     Colors for category
+     */
     static let categoryColors: [UIColor] = [Colors.red(alpha: 0.5), Colors.orange(alpha: 0.5), Colors.yellow(alpha: 0.5), Colors.green(alpha: 0.5), Colors.blue(alpha: 0.5)]
     
+    /**
+     Colors for category in segment control
+     */
     static let categorySegmentColors: [UIColor] = [Colors.red(alpha: 1), Colors.orange(alpha: 1), Colors.yellow(alpha: 1), Colors.green(alpha: 1), Colors.blue(alpha: 1)]
     
 }

@@ -13,10 +13,23 @@ import UIKit
 import MapKit
 
 
+/**
+ Restaurant annotation delegate, it is used for updating callout view
+ */
 protocol RestaurantAnnotationDelegate {
+    
+    /**
+     Edit restaurant, it should update the callout view of the restaurant
+     
+     - Parameters:
+        - restaurant: The restaurant edited
+     */
     func editRestaurant(restaurant: Restaurant)
 }
 
+/**
+ View for restaurant annotation on the map
+ */
 class RestaurantAnnotationView: MKAnnotationView, RestaurantAnnotationDelegate {
     
     var customCalloutView: RestaurantCalloutView?
@@ -37,7 +50,9 @@ class RestaurantAnnotationView: MKAnnotationView, RestaurantAnnotationDelegate {
         self.canShowCallout = false // don't show default callout
     }
     
+    
     // MARK: - callout showing and hiding
+    
     // Important: the selected state of the annotation view controls when the
     // view must be shown or not. We should show it when selected and hide it
     // when de-selected.
@@ -77,6 +92,11 @@ class RestaurantAnnotationView: MKAnnotationView, RestaurantAnnotationDelegate {
         }
     }
     
+    /**
+     Load custom callout view
+     
+     - Returns: The view of the callout of this annotation
+     */
     func loadCustomCalloutView() -> RestaurantCalloutView? {
         if let views = Bundle.main.loadNibNamed("RestaurantCalloutView", owner: self, options: nil) as? [RestaurantCalloutView], views.count > 0 {
             return views.first!
@@ -88,6 +108,7 @@ class RestaurantAnnotationView: MKAnnotationView, RestaurantAnnotationDelegate {
         super.prepareForReuse()
         self.customCalloutView?.removeFromSuperview()
     }
+    
     
     // MARK: - Detecting and reaction to taps on custom callout.
     
@@ -102,6 +123,9 @@ class RestaurantAnnotationView: MKAnnotationView, RestaurantAnnotationDelegate {
             }
         }
     }
+    
+    
+    // MARK: - Restaurant Annotation Delegate
     
     func editRestaurant(restaurant: Restaurant) {
         self.customCalloutView?.restaurantImageView.image = restaurant.getImage()

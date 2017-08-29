@@ -10,11 +10,27 @@ import UIKit
 import Foundation
 import CoreData
 
+
+/**
+ Category entity
+ */
 @objc(Category)
 public class Category: NSManagedObject {
     
     var numberOfRestaurants: Int = 0
 
+    
+    /**
+     Create a new category object
+    
+     - Parameters:
+        - id: UUID for the category
+        - name: Name
+        - color: Category color index
+        - icon: Category icon index
+        - sort: Sort
+     - Returns: Category object
+     */
     static func insertNewObject(id: String, name: String, color: Int, icon: Int, sort: Int) -> Category {
         let category = NSEntityDescription.insertNewObject(forEntityName: "Category", into: Data.shared.managedObjectContext) as! Category
         category.id = id
@@ -26,6 +42,11 @@ public class Category: NSManagedObject {
         return category
     }
     
+    /**
+     Fetch all categories
+     
+     - Returns: List of all categories
+     */
     static func fetchAll() -> [Category] {
         let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Category")
         

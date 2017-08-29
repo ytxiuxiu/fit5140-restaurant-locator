@@ -8,6 +8,10 @@
 
 import UIKit
 
+
+/**
+ Split view controller for iPad
+ */
 class SplitViewController: UISplitViewController {
 
     override func viewDidLoad() {
@@ -23,7 +27,6 @@ class SplitViewController: UISplitViewController {
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
 }

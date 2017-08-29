@@ -11,12 +11,29 @@ import Foundation
 import CoreData
 import CoreLocation
 
+
+/**
+ Restaurant entity
+ */
 @objc(Restaurant)
 public class Restaurant: NSManagedObject {
 
     var distance: Double?
     
     
+    /**
+     Create a new restaurant object
+    
+     - Parameters:
+        - id: UUID of the restaurant
+        - name: Name
+        - rating: Rating (5 stars)
+        - address: Address
+        - latitude: Latitude
+        - longitude: Longitude
+        - notificationRadius: Notification radius index (-1 for no notification)
+     - Returns: Restaurant object
+     */
     static func insertNewObject(id: String, name: String, rating: Double, address: String, latitude: Double, longitude: Double, notificationRadius: Int) -> Restaurant {
         let restaurant = NSEntityDescription.insertNewObject(forEntityName: "Restaurant", into: Data.shared.managedObjectContext) as! Restaurant
         restaurant.id = id
@@ -31,6 +48,11 @@ public class Restaurant: NSManagedObject {
         return restaurant
     }
     
+    /**
+     Fetch all restaurants
+    
+     - Returns: List of all restaurants
+     */
     static func fetchAll() -> [Restaurant] {
         let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Restaurant")
         
@@ -41,37 +63,9 @@ public class Restaurant: NSManagedObject {
         }
     }
     
-    static func fetchByCategory(categoryName: String) -> [Restaurant] {
-        let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Restaurant")
-        
-        fetch.predicate = NSPredicate(format: "category.name = %@", categoryName)
-        
-        do {
-            return try Data.shared.managedObjectContext.fetch(fetch) as! [Restaurant]
-        } catch {
-            fatalError("Failed to fetch restaurants: \(error)")
-        }
-    }
     
-    // count restaurants in a category
-    // ✴️ Attribute:
-    // StackOverflow: countForFetchRequest in Swift 2.0
-    //      https://stackoverflow.com/questions/34652618/countforfetchrequest-in-swift-2-0
+    // MARK: - Photo
     
-    static func countByCategory(categoryName: String) -> Int {
-        let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Restaurant")
-        
-        fetch.predicate = NSPredicate(format: "category.name = %@", categoryName)
-        
-        do {
-            return try Data.shared.managedObjectContext.count(for: fetch)
-        } catch {
-            fatalError("Failed to count restaurants: \(error)")
-        }
-    }
-    
-    
-    // save restaurant photo
     // ✴️ Attribute:
     // Website: How to save a UIImage to a file using UIImagePNGRepresentation
     //      https://www.hackingwithswift.com/example-code/media/how-to-save-a-uiimage-to-a-file-using-uiimagepngrepresentation
@@ -80,6 +74,11 @@ public class Restaurant: NSManagedObject {
     // GitHub: Dougly/PersistingImages
     //      https://github.com/Dougly/PersistingImages
     
+    /**
+     Generate directory url for saving photos
+     
+     - Returns: URL
+     */
     func getDirecotryURL() -> URL {
         let url = Data.shared.directoryURL.appendingPathComponent("restaurants")
         return url
@@ -89,6 +88,11 @@ public class Restaurant: NSManagedObject {
     // Generate a UUID on iOS from Swift
     //      https://stackoverflow.com/questions/24428250/generate-a-uuid-on-ios-from-swift
     
+    /**
+     Get url for the restaurant's image
+     
+     - Returns: URL
+     */
     func getImageURL() -> URL? {
         if let filename = self.image {
             return getDirecotryURL().appendingPathComponent("\(filename).png")
@@ -97,11 +101,22 @@ public class Restaurant: NSManagedObject {
         }
     }
     
+    /**
+     Generate url for the restaurant's image
+     
+     - Returns: URL
+     */
     func generateImageUrl() -> URL {
         self.image = UUID().uuidString
         return getDirecotryURL().appendingPathComponent("\(self.image ?? "").png")
     }
     
+    /**
+     Save a image for this restaurant
+     
+     - Parameters:
+        - image: The image to save
+     */
     func saveImage(image: UIImage) {
         let fileManager = FileManager.default
         
@@ -138,6 +153,13 @@ public class Restaurant: NSManagedObject {
         }
     }
     
+    /**
+     Get the image for this restaurant
+    
+     - Parameters:
+        - defaultImage: Default image used when there is no image for this restaurant
+     - Returns: Image
+     */
     func getImage(defaultImage: UIImage = UIImage(named: "photo")!) -> UIImage {
         let fileManager = FileManager.default
         
@@ -149,7 +171,17 @@ public class Restaurant: NSManagedObject {
         
         return defaultImage
     }
+
+
+    // MARK: - Distance
+
+    /**
+     Calculate the distance between this restaurant to a certain loction
     
+     - Parameters:
+        - currentLocation: The certain location
+     - Returns: Distance in meters
+     */
     func calculateDistance(currentLocation: CLLocation) -> Double? {
         let location = CLLocation(latitude: self.latitude, longitude: self.longitude)
         self.distance = location.distance(from: currentLocation)

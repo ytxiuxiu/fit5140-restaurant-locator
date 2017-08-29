@@ -30,6 +30,9 @@ import UIKit
 import SwiftValidator
 
 
+/**
+ Add Category
+ */
 class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, ValidationDelegate {
     
     @IBOutlet weak var categoryIconsCollectionView: UICollectionView!
@@ -46,8 +49,6 @@ class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UIC
     
     @IBOutlet weak var categoryColor: UISegmentedControl!
     
-    @IBOutlet weak var topSpaceConstraint: NSLayoutConstraint!
-    
     var isEdit = false
     
     var category: Category?
@@ -56,8 +57,14 @@ class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UIC
     
     var categoryTableDelegate: CategoryTableDelegate?
     
+    /**
+     The sort of this new category should be
+     */
     var sort: Int?
     
+    /**
+     Currently selected category icon
+     */
     var selectedCategoryIcon = 1
     
     let validator = Validator()
@@ -66,13 +73,42 @@ class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UIC
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // save button
+        // Save button
         let saveBarButtonItem = UIBarButtonItem(title: "Save", style: .done, target: self, action: #selector(onAddCategoryButtonClicked(_:)))
         self.navigationItem.rightBarButtonItem = saveBarButtonItem
         
-        // category color
+        // Register category color segment event
         self.categoryColor.addTarget(self, action: #selector(onColorSegmentedValueChanged(sender:)), for: .valueChanged)
         
+        // Init
+        initCategoryIconCollection()
+        initValidation()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        // Hide the tab bar
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            tabBarController?.tabBar.isHidden = true
+        }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        self.categoryIconsCollectionView.selectItem(at: IndexPath(row: selectedCategoryIcon - 1, section: 0), animated: false, scrollPosition: UICollectionViewScrollPosition.top)
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+    }
+    
+    
+    // MARK: - Init
+    
+    /**
+     Init category icon collection
+     */
+    func initCategoryIconCollection() {
         // category icons collection
         self.categoryIconsCollectionView.delegate = self
         self.categoryIconsCollectionView.dataSource = self
@@ -84,8 +120,12 @@ class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UIC
         self.categoryIconsCollectionViewLayout.sectionInset = UIEdgeInsets(top: 2, left: 2, bottom: 5, right: 2)
         self.categoryIconsCollectionViewLayout.minimumInteritemSpacing = 2
         self.categoryIconsCollectionViewLayout.minimumLineSpacing = 5
-        
-        // validation
+    }
+    
+    /**
+     Init validation
+     */
+    func initValidation() {
         validator.registerField(categoryNameTextField, errorLabel: categoryNameErrorLabel, rules: [RequiredRule(message: "Give it a name")])
         
         if isEdit {
@@ -103,24 +143,7 @@ class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UIC
         }
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        if UIDevice.current.userInterfaceIdiom == .phone {
-            tabBarController?.tabBar.isHidden = true
-        }
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        self.categoryIconsCollectionView.selectItem(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: UICollectionViewScrollPosition.top)
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
-    // MARK: - Category Icons Collection
+    // MARK: - Category Icons Collection Lifecycle
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "categoryIconCell", for: indexPath) as! CategoryIconsCollectionViewCell
@@ -161,33 +184,22 @@ class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UIC
     func onColorSegmentedValueChanged(sender: UISegmentedControl) {
         sender.tintColor = Colors.categorySegmentColors[sender.selectedSegmentIndex]
     }
-    
-    // MARK: Navigation Bar
-    
-    // Add extra top space for compat screen as a navigation bar will be added to this popover
-    // ✴️ Attributes:
-    // StackOverflow: How to change constraints programmatically that is added from storyboard?
-    //      https://stackoverflow.com/questions/40583602/how-to-change-constraints-programmatically-that-is-added-from-storyboard
-    // StackOverflow: How to add Navigation bar to a view without Navigation controller
-    //      https://stackoverflow.com/questions/23859785/how-to-add-navigation-bar-to-a-view-without-navigation-controller
-    
-    func addExtraTopSpaceForCompatScreen() {
-        topSpaceConstraint.constant = UIApplication.shared.statusBarFrame.height + 44   // status bar + navigation bar + original top
-    }
 
     
     // MARK: Save
     
+    // Save button tapped
     @IBAction func onAddCategoryButtonClicked(_ sender: Any) {
-        
         validator.validate(self)
-        
     }
     
+    // Validation successful
     func validationSuccessful() {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
         if !isEdit {
+            // For editing
+            
             if let sort = self.sort {
                 let uuid = UUID().uuidString
                 let category = Category.insertNewObject(id: uuid, name: self.categoryNameTextField.text!, color: categoryColor.selectedSegmentIndex, icon: selectedCategoryIcon, sort: sort)
@@ -212,6 +224,8 @@ class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UIC
                 fatalError("No sort provided")
             }
         } else {
+            // For adding
+            
             category?.name = self.categoryNameTextField.text!
             category?.color = Int64(categoryColor.selectedSegmentIndex)
             category?.icon = Int64(selectedCategoryIcon)
@@ -236,6 +250,7 @@ class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UIC
         }
     }
     
+    // On validation failed
     func validationFailed(_ errors:[(Validatable ,ValidationError)]) {
         // show validation error
         for (field, error) in errors {

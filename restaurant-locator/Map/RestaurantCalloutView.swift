@@ -8,6 +8,10 @@
 
 import UIKit
 
+
+/**
+ View of restaurant callout on the map
+ */
 class RestaurantCalloutView: UIView {
     
     @IBOutlet weak var restaurantImageView: UIImageView!
@@ -30,7 +34,7 @@ class RestaurantCalloutView: UIView {
     
     var restaurantMapViewController: RestaurantMapViewController?
     
-    
+    // Restaurant detail button on the callout has been tapped
     @IBAction func onRestaurantDetailTapped(_ sender: Any) {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let controller = storyboard.instantiateViewController(withIdentifier: "restaurantDetail") as! RestaurantDetailViewController

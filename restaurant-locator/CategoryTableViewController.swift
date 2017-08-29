@@ -20,34 +20,113 @@ import CoreLocation
 import UserNotifications
 
 
+/**
+ Category Table Delegate
+ */
 protocol CategoryTableDelegate {
+    
+    /**
+     Add category, it should add the category to the table
+     
+     - Parameters:
+        - category: Category added
+     */
     func addCategory(category: Category)
+    
+    /**
+     Edit category, it should update the cell view of the category
+     
+     - Parameters:
+        - category: Category edited
+     */
     func editCategory(category: Category)
+    
+    /**
+     Add restaurant, it should update the number of restaurants in the corresponding category and add region monitor
+ 
+     - Parameters:
+        - restaurant: Restaurant added
+     */
     func addRestaurant(restaurant: Restaurant)
-    func removeRestaurant(restaurant: Restaurant)
+    
+    /**
+     Edit restaurant
+     
+     - Parameters:
+        - restaurant: Restaurant edited
+     */
     func editRestaurant(restaurant: Restaurant)
+    
+    /**
+     Remove restaurant, it should update the number of restaurants and remove region monitor
+     
+     - Parameters:
+        - restaurant: Restaurant to be removed
+     */
+    func removeRestaurant(restaurant: Restaurant)
+    
+    /**
+     Show edit category, it should show edit category view
+     
+     - Parameters:
+        - category: Category to be edited
+     */
     func showEditCategory(category: Category)
 }
 
+
+/**
+ Category table
+ */
 class CategoryTableViewController: UITableViewController, UIPopoverPresentationControllerDelegate, CategoryTableDelegate {
 
+    
     var categories = [Category]()
     
-    var isGrantedNotificationAccess = false
-
+    
+    // MARK: - View Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         navigationItem.rightBarButtonItems?.append(editButtonItem)
         
+        // Init
         categories = Category.fetchAll()
+        requestLocationPrivacy()
+        setupRegionMonitors()
+        calculateNumberOfRestaurants()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        clearsSelectionOnViewWillAppear = splitViewController!.isCollapsed
+        super.viewWillAppear(animated)
         
-        // request location authorization
+        // Hide the tab bar
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            tabBarController?.tabBar.isHidden = false
+        }
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+    }
+    
+    
+    // MARK: - Init methods
+    
+    /**
+     Request location privacy
+     */
+    func requestLocationPrivacy() {
         let locationManager = Location.shared.locationManager
         locationManager.requestAlwaysAuthorization()
-        
-        // notification
+    }
+    
+    /**
+     Setup region monitors
+     */
+    func setupRegionMonitors() {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert,.sound,.badge], completionHandler: { (granted,error) in
             guard granted else {
                 return
@@ -61,25 +140,15 @@ class CategoryTableViewController: UITableViewController, UIPopoverPresentationC
                 }
             }
         })
-        
-        // number of restaurants
+    }
+    
+    /**
+     Calculate number of restaurants for each category
+     */
+    func calculateNumberOfRestaurants() {
         for category in categories {
             category.numberOfRestaurants = category.restaurants?.count ?? 0
         }
-    }
-
-    override func viewWillAppear(_ animated: Bool) {
-        clearsSelectionOnViewWillAppear = splitViewController!.isCollapsed
-        super.viewWillAppear(animated)
-        
-        if UIDevice.current.userInterfaceIdiom == .phone {
-            tabBarController?.tabBar.isHidden = false
-        }
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
 
 
@@ -87,6 +156,8 @@ class CategoryTableViewController: UITableViewController, UIPopoverPresentationC
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showRestaurantsInCategorySegue" {
+            // Show restaurant table view
+            
             if let indexPath = tableView.indexPathForSelectedRow {
                 let category = categories[indexPath.row]
                 let controller = segue.destination as! RestaurantTableViewController
@@ -99,6 +170,8 @@ class CategoryTableViewController: UITableViewController, UIPopoverPresentationC
             }
             
         } else if segue.identifier == "showAddCategorySegue" {
+            // Show add category view
+            
             let controller = segue.destination as! AddCategoryViewController
             
             controller.categoryTableDelegate = self
@@ -107,23 +180,10 @@ class CategoryTableViewController: UITableViewController, UIPopoverPresentationC
         }
     }
     
-    func showViewControllerOnDetailViewController(controller: UIViewController) {
-        let appDelegate = UIApplication.shared.delegate as? AppDelegate
-        if let detailNavigationController = appDelegate?.detailNavigationController {
-        
-            // if some view opened on the detail view conroller already, pop it
-            if !(detailNavigationController.viewControllers.last is RestaurantMapViewController) {
-                detailNavigationController.popViewController(animated: false)
-                detailNavigationController.pushViewController(controller, animated: false)
-            } else {
-                detailNavigationController.pushViewController(controller, animated: true)
-            }
-        }
-    }
-    
     override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
         let device = UIDevice.current.userInterfaceIdiom
         
+        // If it is a iPad, show following views on top of the detail view controller
         if device == .pad {
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
             
@@ -143,7 +203,7 @@ class CategoryTableViewController: UITableViewController, UIPopoverPresentationC
     }
 
     
-    // MARK: - Table View
+    // MARK: - Table View Lifecycle
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
@@ -161,10 +221,10 @@ class CategoryTableViewController: UITableViewController, UIPopoverPresentationC
         cell.category = category
         cell.categoryImageView.image = UIImage(named: "category-\(category.icon)")
         cell.categoryNameLabel.text = category.name
-        cell.numberOfRestaurantsLabel.text = "\(category.numberOfRestaurants) restaurants"
+        cell.numberOfRestaurantsLabel.text = "\(category.numberOfRestaurants) restaurant\(category.numberOfRestaurants <= 1 ? "" : "s")"
         cell.backgroundColor = Colors.categoryColors[Int(category.color)]
         
-        // Add edit button
+        // Toggle edit button
         // ✴️ Attribute:
         // Website: UITableView Custom Edit Button In Each Row With Swift
         //      http://www.iosinsight.com/uitableview-custom-edit-button-in-each-row-with-swift/
@@ -238,7 +298,6 @@ class CategoryTableViewController: UITableViewController, UIPopoverPresentationC
         }
     }
     
-    
     // Re-arrange Categories
     // ✴️ Attribute:
     // Website: Reordering Rows from Table View in iOS8 with Swift
@@ -266,11 +325,7 @@ class CategoryTableViewController: UITableViewController, UIPopoverPresentationC
     }
 
     
-    // MARK: - Presentation Controller - only will be executed on compact screen
-    
-    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
-        return UIModalPresentationStyle.fullScreen
-    }
+    // MARK: - Category Table Delegate
     
     func addCategory(category: Category) {
         categories.append(category)
@@ -282,20 +337,20 @@ class CategoryTableViewController: UITableViewController, UIPopoverPresentationC
     }
     
     func removeRestaurant(restaurant: Restaurant) {
+        Location.shared.removeMonitor(restaurant: restaurant)
+        
         for categoryInTheTable in categories {
-            if categoryInTheTable.name == restaurant.category?.name {
+            if categoryInTheTable.id == restaurant.category?.id {
                 categoryInTheTable.numberOfRestaurants = categoryInTheTable.numberOfRestaurants - 1
                 self.tableView.reloadData()
                 return
             }
         }
-        
-        Location.shared.removeMonitor(restaurant: restaurant)
     }
     
     func addRestaurant(restaurant: Restaurant) {
         for categoryInTheTable in categories {
-            if categoryInTheTable.name == restaurant.category?.name {
+            if categoryInTheTable.id == restaurant.category?.id {
                 categoryInTheTable.numberOfRestaurants = categoryInTheTable.numberOfRestaurants + 1
                 self.tableView.reloadData()
                 return

@@ -11,22 +11,6 @@ import CoreData
 import UserNotifications
 
 
-extension UIViewController {
-    
-    func showError(message: String) {
-        let alertController = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
-        
-        let cancelAction = UIAlertAction(title: "OK", style: .cancel, handler: {
-            (alert: UIAlertAction!) -> Void in
-            alertController.dismiss(animated: true, completion: nil)
-        })
-        
-        alertController.addAction(cancelAction)
-        
-        self.present(alertController, animated: true, completion: nil)
-    }
-}
-
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDelegate {
 
@@ -41,7 +25,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     var restaurantMapDelegate: RestaurantMapDelegate?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
         let splitViewController = window!.rootViewController as! UISplitViewController
         let navigationController = splitViewController.viewControllers[splitViewController.viewControllers.count - 1] as! UINavigationController
         navigationController.topViewController!.navigationItem.leftBarButtonItem = splitViewController.displayModeButtonItem
@@ -54,7 +37,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         self.detailNavigationController = splitViewController.viewControllers.last as? UINavigationController
         self.restaurantMapDelegate = self.detailNavigationController?.viewControllers.first as! RestaurantMapViewController
         
-        // insert default data when first launch
+        // Insert default data when first launch
         // ✴️ Attributes:
         // StackOverflow: Detect first launch of iOS app [duplicate]
         //      https://stackoverflow.com/questions/27208103/detect-first-launch-of-ios-app
@@ -98,12 +81,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         self.saveContext()
     }
     
+    /**
+     Insert default data
+     */
     func insertDefaultData() {
         let categoryJapanese = Category.insertNewObject(id: "0088a457-ab11-4fb3-a7f0-0bf7a8d1572b", name: "Japanese", color: 3, icon: 15, sort: 1)
         let categoryChinese = Category.insertNewObject(id: "0b797cd0-febf-479c-af42-d400feeb4ca0", name: "Chinese", color: 2, icon: 11, sort: 2)
         let categoryCafe = Category.insertNewObject(id: "13c7281a-b72c-49eb-973b-312fbc3452c5", name: "Cafe", color: 4, icon: 2, sort: 3)
         
-        // japanese
+        // Japanese
         let restaurantGochi = Restaurant.insertNewObject(id: "adf152fc-2dc5-4293-946c-d2f10ace5d41", name: "Gochi Japanese Fusion Tapas", rating: 4.3, address: "19980 Homestead Rd, Cupertino, CA 95014, USA", latitude: 37.3368349, longitude: -122.0226261, notificationRadius: 4)
         restaurantGochi.saveImage(image: UIImage(named: "demo-gochi")!)
         categoryJapanese.addToRestaurants(restaurantGochi)
@@ -116,41 +102,47 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         restaurantBaySushi.saveImage(image: UIImage(named: "demo-bay-sushi")!)
         categoryJapanese.addToRestaurants(restaurantBaySushi)
         
-        // chinese
-        let restaurantShanghaiGarden = Restaurant.insertNewObject(id: "adf152fc-2dc5-4293-946c-d2f10ace5d41", name: "Shanghai Garden", rating: 3.9, address: "20956 Homestead Rd, Cupertino, CA 95014, USA", latitude: 37.3367452, longitude: -122.0401997, notificationRadius: 4)
+        // Chinese
+        let restaurantShanghaiGarden = Restaurant.insertNewObject(id: "6a7235e2-2b87-4b6d-b760-cb79f1e7e351", name: "Shanghai Garden", rating: 3.9, address: "20956 Homestead Rd, Cupertino, CA 95014, USA", latitude: 37.3367452, longitude: -122.0401997, notificationRadius: 4)
         restaurantShanghaiGarden.saveImage(image: UIImage(named: "demo-shanghai-garden")!)
         categoryChinese.addToRestaurants(restaurantShanghaiGarden)
         
-        let restaurantLeiGarden = Restaurant.insertNewObject(id: "adf152fc-2dc5-4293-946c-d2f10ace5d41", name: "Lei Garden", rating: 3.8, address: "10125 Bandley Dr, Cupertino, CA 95014, USA", latitude: 37.3246344, longitude: -122.0347423, notificationRadius: -1)
+        let restaurantLeiGarden = Restaurant.insertNewObject(id: "7fed4e09-a046-440e-b512-2fef511cfd3c", name: "Lei Garden", rating: 3.8, address: "10125 Bandley Dr, Cupertino, CA 95014, USA", latitude: 37.3246344, longitude: -122.0347423, notificationRadius: -1)
         restaurantLeiGarden.saveImage(image: UIImage(named: "demo-lei-garden")!)
         categoryChinese.addToRestaurants(restaurantLeiGarden)
 
-        let restaurantAppleGreenBistro = Restaurant.insertNewObject(id: "adf152fc-2dc5-4293-946c-d2f10ace5d41", name: "Apple Green Bistro", rating: 4.0, address: "10885 N Wolfe Rd, Cupertino, CA 95014, USA", latitude: 37.3357997, longitude: -122.0157513, notificationRadius: 1)
+        let restaurantAppleGreenBistro = Restaurant.insertNewObject(id: "c83cbea9-6778-4a85-943d-96af0de9b3eb", name: "Apple Green Bistro", rating: 4.0, address: "10885 N Wolfe Rd, Cupertino, CA 95014, USA", latitude: 37.3357997, longitude: -122.0157513, notificationRadius: 1)
         restaurantAppleGreenBistro.saveImage(image: UIImage(named: "demo-apple-green")!)
         categoryChinese.addToRestaurants(restaurantAppleGreenBistro)
         
-        // cafe
-        let restaurantBagelStreetCafe = Restaurant.insertNewObject(id: "16091ddb-c018-49bf-a7c8-24f712dd00a1", name: "Bagel Street Cafe", rating: 4.2, address: "10591 N De Anza Blvd, Cupertino, CA 95014, USA", latitude: 37.3311769, longitude: -122.031641, notificationRadius: 3)
+        // Cafe
+        let restaurantBagelStreetCafe = Restaurant.insertNewObject(id: "b9e3362d-2e1c-4047-8957-ad61b6b73118", name: "Bagel Street Cafe", rating: 4.2, address: "10591 N De Anza Blvd, Cupertino, CA 95014, USA", latitude: 37.3311769, longitude: -122.031641, notificationRadius: 3)
         restaurantBagelStreetCafe.saveImage(image: UIImage(named: "demo-bagel-street-cafe")!)
         categoryCafe.addToRestaurants(restaurantBagelStreetCafe)
         
-        let restaurantLaTerra = Restaurant.insertNewObject(id: "16091ddb-c018-49bf-a7c8-24f712dd00a1", name: "La Terra Bakery & Cafe", rating: 4.5, address: "19960 Homestead Rd, Cupertino, CA 95014, USA", latitude: 37.3367832, longitude: -122.0224656, notificationRadius: 2)
+        let restaurantLaTerra = Restaurant.insertNewObject(id: "f21743f3-82ab-4fe7-8d6a-c74faf3c0351", name: "La Terra Bakery & Cafe", rating: 4.5, address: "19960 Homestead Rd, Cupertino, CA 95014, USA", latitude: 37.3367832, longitude: -122.0224656, notificationRadius: 2)
         restaurantLaTerra.saveImage(image: UIImage(named: "demo-la-terra")!)
         categoryCafe.addToRestaurants(restaurantLaTerra)
 
-        let restaurantPaneraBread = Restaurant.insertNewObject(id: "16091ddb-c018-49bf-a7c8-24f712dd00a1", name: "Panera Bread", rating: 4.5, address: "20807 Stevens Creek Blvd, Cupertino, CA 95014, USA", latitude: 37.3231982, longitude: -122.0380849, notificationRadius: 1)
+        let restaurantPaneraBread = Restaurant.insertNewObject(id: "a185e475-fc57-4685-a1c5-8d9cd5c64b8c", name: "Panera Bread", rating: 4.5, address: "20807 Stevens Creek Blvd, Cupertino, CA 95014, USA", latitude: 37.3231982, longitude: -122.0380849, notificationRadius: 1)
         restaurantPaneraBread.saveImage(image: UIImage(named: "demo-la-terra")!)
         categoryCafe.addToRestaurants(restaurantPaneraBread)
         
         saveContext()
     }
     
+    /**
+     Get direcotry url to store files
+    
+     - Returns: URL
+     */
     func getDirecotryURL() -> URL {
         let fileManager = FileManager.default
         
         return fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
     }
 
+    
     // MARK: - Split view
     
     // make category table view controller on top when on iPhone (rather than iPad) devices
@@ -166,7 +158,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     }
     
     
-    // MARK: - Core Data stack
+    // MARK: - Core Data
     
     lazy var persistentContainer: NSPersistentContainer = {
         /*
@@ -194,8 +186,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         })
         return container
     }()
-    
-    // MARK: - Core Data Saving support
     
     func saveContext () {
         let context = persistentContainer.viewContext

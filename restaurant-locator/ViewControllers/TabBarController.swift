@@ -8,6 +8,10 @@
 
 import UIKit
 
+
+/**
+ Tab bar controller for iPhone
+ */
 class TabBarController: UITabBarController, UITabBarControllerDelegate {
 
     override func viewDidLoad() {
@@ -24,7 +28,6 @@ class TabBarController: UITabBarController, UITabBarControllerDelegate {
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
 }
