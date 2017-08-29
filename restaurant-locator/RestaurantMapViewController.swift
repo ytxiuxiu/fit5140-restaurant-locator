@@ -284,7 +284,7 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
     
     func generatePinImage(for restaurantAnnotation: RestaurantAnnotation) -> UIImage {
         let restaurant = restaurantAnnotation.restaurant
-        let restaurantPinImage = restaurantPinImages[restaurant?.image ?? ""]
+        let restaurantPinImage = restaurantPinImages[restaurant?.id ?? ""]
         
         if restaurantPinImage != nil {
             return restaurantPinImage!
@@ -308,7 +308,7 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
             restaurantAnnotation.image = UIGraphicsGetImageFromCurrentImageContext()
             
             // cache pin image
-            restaurantPinImages.updateValue(restaurantAnnotation.image!, forKey: (restaurant?.image ?? "")!)
+            restaurantPinImages.updateValue(restaurantAnnotation.image!, forKey: (restaurant?.id ?? "")!)
             
             UIGraphicsEndImageContext()
             

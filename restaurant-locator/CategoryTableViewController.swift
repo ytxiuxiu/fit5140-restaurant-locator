@@ -190,6 +190,18 @@ class CategoryTableViewController: UITableViewController, UIPopoverPresentationC
         return true
     }
     
+    // Disable swipe to delete because it is too problematic. We can still delete a restaurant in editing mode
+    // ✴️ Attribute:
+    // StackOverflow: Swift: How to delete with Edit button and deactivate swipe to delete?
+    //      https://stackoverflow.com/questions/29672666/swift-how-to-delete-with-edit-button-and-deactivate-swipe-to-delete
+    
+    override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCellEditingStyle {
+        if tableView.isEditing {
+            return .delete
+        }
+        return .none
+    }
+    
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             let category = categories[indexPath.row]
