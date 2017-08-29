@@ -21,6 +21,15 @@ class RestaurantTableViewCell: UITableViewCell {
     
     @IBOutlet weak var restaurantDistanceLabel: UILabel!
     
+    @IBOutlet weak var restaurantEditButton: UIImageView!
+    
+    @IBOutlet weak var restaurantEditButtonWidthConstraint: NSLayoutConstraint!
+    
+    @IBOutlet weak var restaurantEditButtonRightConstraint: NSLayoutConstraint!
+    
+    var restaurant: Restaurant?
+    
+    var restaurantTableDelegate: RestaurantTableDelegate?
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -33,4 +42,7 @@ class RestaurantTableViewCell: UITableViewCell {
         // Configure the view for the selected state
     }
 
+    @IBAction func onRestaurantEditButtonTapped(_ sender: Any) {
+        self.restaurantTableDelegate?.showEditRestaurant(restaurant: restaurant!)
+    }
 }

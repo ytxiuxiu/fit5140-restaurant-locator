@@ -17,54 +17,54 @@
 
 import UIKit
 import CoreLocation
+import UserNotifications
 
 
 protocol CategoryTableDelegate {
     func addCategory(category: Category)
     func editCategory(category: Category)
-    func reduceNumberOfRestaurants(category: Category)
-    func increaseNumberOfRestaurants(category: Category)
+    func addRestaurant(restaurant: Restaurant)
+    func removeRestaurant(restaurant: Restaurant)
+    func editRestaurant(restaurant: Restaurant)
+    func showEditCategory(category: Category)
 }
 
 class CategoryTableViewController: UITableViewController, UIPopoverPresentationControllerDelegate, CategoryTableDelegate {
 
-    var restaurantMapViewController: RestaurantMapViewController?
-    
     var categories = [Category]()
+    
+    var isGrantedNotificationAccess = false
 
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationItem.leftBarButtonItem = editButtonItem
+        navigationItem.rightBarButtonItems?.append(editButtonItem)
         
         categories = Category.fetchAll()
         
+        // request location authorization
         let locationManager = Location.shared.locationManager
         locationManager.requestAlwaysAuthorization()
         
-        for category in categories {
-            category.numberOfRestaurants = Restaurant.countByCategory(categoryName: category.name)
+        // notification
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert,.sound,.badge], completionHandler: { (granted,error) in
+            guard !granted else {
+                return
+            }
             
-            // monitor restaurants
-            // ✴️ Attribute:
-            // Swift Tutorial : CoreLocation and Region Monitoring in iOS 8
-            //      http://shrikar.com/swift-tutorial-corelocation-and-region-monitoring-in-ios-8/
-            
-            for restaurant in category.restaurants?.allObjects as! [Restaurant] {
-                if restaurant.notificationRadius != -1 {
-                    let center = CLLocationCoordinate2D(latitude: restaurant.latitude, longitude: restaurant.longitude)
-                    let radius = CLLocationDistance(Location.radius[Int(restaurant.notificationRadius)])
-                    let identifier = restaurant.name
-                    
-                    let region = CLCircularRegion(center: center, radius: radius, identifier: identifier)
-                    
-                    region.notifyOnEntry = true
-                    region.notifyOnExit = false
-                    
-                    locationManager.startMonitoring(for: region)
+            for category in self.categories {
+                for restaurant in category.restaurants?.allObjects as! [Restaurant] {
+                    if restaurant.notificationRadius != -1 {
+                        Location.shared.addMonitor(restaurant: restaurant)
+                    }
                 }
             }
+        })
+        
+        // number of restaurants
+        for category in categories {
+            category.numberOfRestaurants = category.restaurants?.count ?? 0
         }
     }
 
@@ -87,12 +87,11 @@ class CategoryTableViewController: UITableViewController, UIPopoverPresentationC
                 let category = categories[indexPath.row]
                 let controller = segue.destination as! RestaurantTableViewController
                 
-                controller.restaurantMapViewController = self.restaurantMapViewController
                 controller.category = category
                 controller.title = category.name
                 //controller.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
                 controller.navigationItem.leftItemsSupplementBackButton = true
-                controller.delegate = self
+                controller.categoryTableDelegate = self
             }
             
         } else if segue.identifier == "showAddCategorySegue" {
@@ -105,12 +104,16 @@ class CategoryTableViewController: UITableViewController, UIPopoverPresentationC
     }
     
     func showViewControllerOnDetailViewController(controller: UIViewController) {
-        // if some view opened on the detail view conroller already, pop it
-        if restaurantMapViewController?.navigationController?.viewControllers.last != restaurantMapViewController {
-            restaurantMapViewController?.navigationController?.popViewController(animated: false)
-            restaurantMapViewController?.navigationController?.pushViewController(controller, animated: false)
-        } else {
-            restaurantMapViewController?.navigationController?.pushViewController(controller, animated: true)
+        let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        if let detailNavigationController = appDelegate?.detailNavigationController {
+        
+            // if some view opened on the detail view conroller already, pop it
+            if !(detailNavigationController.viewControllers.last is RestaurantMapViewController) {
+                detailNavigationController.popViewController(animated: false)
+                detailNavigationController.pushViewController(controller, animated: false)
+            } else {
+                detailNavigationController.pushViewController(controller, animated: true)
+            }
         }
     }
     
@@ -123,7 +126,6 @@ class CategoryTableViewController: UITableViewController, UIPopoverPresentationC
             if identifier == "showAddCategorySegue" {
                 let controller = storyboard.instantiateViewController(withIdentifier: "editCategoryViewController") as! AddCategoryViewController
                 
-                controller.restaurantMapViewController = self.restaurantMapViewController
                 controller.categoryTableDelegate = self
                 controller.sort = categories.count  // new sort
                 
@@ -149,22 +151,45 @@ class CategoryTableViewController: UITableViewController, UIPopoverPresentationC
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "categoryCell", for: indexPath) as! CategoryTableViewCell
-
         let category = categories[indexPath.row]
         
+        cell.categoryTableDelegate = self
+        cell.category = category
         cell.categoryImageView.image = UIImage(named: "category-\(category.icon)")
         cell.categoryNameLabel.text = category.name
         cell.numberOfRestaurantsLabel.text = "\(category.numberOfRestaurants) restaurants"
         cell.backgroundColor = Colors.categoryColors[Int(category.color)]
         
+        // Add edit button
+        // ✴️ Attribute:
+        // Website: UITableView Custom Edit Button In Each Row With Swift
+        //      http://www.iosinsight.com/uitableview-custom-edit-button-in-each-row-with-swift/
+        
+        if (tableView.isEditing && self.tableView(tableView, canEditRowAt: indexPath)) {
+            cell.categoryEditButton.isHidden = false
+            cell.categoryEditButtonWidthConstraint.constant = 30
+            cell.categoryEditButtonRightConstraint.constant = 8
+        } else {
+            cell.categoryEditButton.isHidden = true
+            cell.categoryEditButtonWidthConstraint.constant = 0
+            cell.categoryEditButtonRightConstraint.constant = 0
+        }
+        
         return cell
+    }
+    
+    override func setEditing(_ editing: Bool, animated: Bool) {
+        super.setEditing(editing, animated: animated)
+        
+        // Update the view so that it can toggle the edit button
+        tableView.reloadData()
     }
 
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
         return true
     }
-
+    
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             let category = categories[indexPath.row]
@@ -240,23 +265,53 @@ class CategoryTableViewController: UITableViewController, UIPopoverPresentationC
         self.tableView.reloadData()
     }
     
-    func reduceNumberOfRestaurants(category: Category) {
+    func removeRestaurant(restaurant: Restaurant) {
         for categoryInTheTable in categories {
-            if categoryInTheTable.name == category.name {
+            if categoryInTheTable.name == restaurant.category?.name {
                 categoryInTheTable.numberOfRestaurants = categoryInTheTable.numberOfRestaurants - 1
                 self.tableView.reloadData()
                 return
             }
         }
+        
+        Location.shared.removeMonitor(restaurant: restaurant)
     }
     
-    func increaseNumberOfRestaurants(category: Category) {
+    func addRestaurant(restaurant: Restaurant) {
         for categoryInTheTable in categories {
-            if categoryInTheTable.name == category.name {
+            if categoryInTheTable.name == restaurant.category?.name {
                 categoryInTheTable.numberOfRestaurants = categoryInTheTable.numberOfRestaurants + 1
                 self.tableView.reloadData()
                 return
             }
+        }
+        
+        if restaurant.notificationRadius != -1 {
+            Location.shared.removeMonitor(restaurant: restaurant)
+        }
+    }
+    
+    func editRestaurant(restaurant: Restaurant) {
+        Location.shared.removeMonitor(restaurant: restaurant)
+        if restaurant.notificationRadius != -1 {
+            Location.shared.removeMonitor(restaurant: restaurant)
+        }
+    }
+    
+    func showEditCategory(category: Category) {
+        let device = UIDevice.current.userInterfaceIdiom
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            
+        let controller = storyboard.instantiateViewController(withIdentifier: "editCategoryViewController") as! AddCategoryViewController
+
+        controller.isEdit = true
+        controller.category = category
+        controller.categoryTableDelegate = self
+
+        if device == .pad {
+            showViewControllerOnDetailViewController(controller: controller)
+        } else {
+            self.navigationController?.pushViewController(controller, animated: true)
         }
     }
 }

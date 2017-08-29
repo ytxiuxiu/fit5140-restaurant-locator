@@ -16,6 +16,7 @@ extension Restaurant {
         return NSFetchRequest<Restaurant>(entityName: "Restaurant")
     }
 
+    @NSManaged public var id: String
     @NSManaged public var addedAt: NSDate
     @NSManaged public var address: String
     @NSManaged public var image: String?
@@ -25,5 +26,6 @@ extension Restaurant {
     @NSManaged public var rating: Double
     @NSManaged public var category: Category?
     @NSManaged public var notificationRadius: Int64
+    @NSManaged public var sort: Int64
 
 }

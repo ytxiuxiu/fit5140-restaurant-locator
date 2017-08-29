@@ -15,8 +15,9 @@ public class Category: NSManagedObject {
     
     var numberOfRestaurants: Int = 0
 
-    static func insertNewObject(name: String, color: Int, icon: Int, sort: Int) -> Category {
+    static func insertNewObject(id: String, name: String, color: Int, icon: Int, sort: Int) -> Category {
         let category = NSEntityDescription.insertNewObject(forEntityName: "Category", into: Data.shared.managedObjectContext) as! Category
+        category.id = id
         category.name = name
         category.color = Int64(color)
         category.icon = Int64(icon)

@@ -17,8 +17,9 @@ public class Restaurant: NSManagedObject {
     var distance: Double?
     
     
-    static func insertNewObject(name: String, rating: Double, address: String, latitude: Double, longitude: Double, notificationRadius: Int) -> Restaurant {
+    static func insertNewObject(id: String, name: String, rating: Double, address: String, latitude: Double, longitude: Double, notificationRadius: Int) -> Restaurant {
         let restaurant = NSEntityDescription.insertNewObject(forEntityName: "Restaurant", into: Data.shared.managedObjectContext) as! Restaurant
+        restaurant.id = id
         restaurant.name = name
         restaurant.rating = rating
         restaurant.address = address

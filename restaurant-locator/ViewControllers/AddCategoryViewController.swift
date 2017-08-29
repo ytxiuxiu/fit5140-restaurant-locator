@@ -181,7 +181,8 @@ class AddCategoryViewController: UIViewController, UICollectionViewDelegate, UIC
     func validationSuccessful() {
         if !isEdit {
             if let sort = self.sort {
-                let category = Category.insertNewObject(name: self.categoryNameTextField.text!, color: categoryColor.selectedSegmentIndex, icon: selectedCategoryIcon, sort: sort)
+                let uuid = UUID().uuidString
+                let category = Category.insertNewObject(id: uuid, name: self.categoryNameTextField.text!, color: categoryColor.selectedSegmentIndex, icon: selectedCategoryIcon, sort: sort)
                 
                 do {
                     try Data.shared.managedObjectContext.save()

@@ -97,6 +97,8 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     
     var isPhotoSelected = false
     
+    var sort: Int?
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -185,7 +187,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
             let localSearch = MKLocalSearch(request: localSearchRequest)
             localSearch.start { (localSearchResponse, error) -> Void in
                 if localSearchResponse == nil {
-                    fatalError("Could not found location of this address")
+                    self.showError(message: "Could not found location of this address.")
                 } else {
                     let latitude = localSearchResponse?.boundingRegion.center.latitude
                     let longitude = localSearchResponse?.boundingRegion.center.longitude
@@ -193,7 +195,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
                     if let pinLatitude = latitude, let pinLongitude = longitude {
                         self.movePin(latitude: pinLatitude, longitude: pinLongitude)
                     } else {
-                        fatalError("Could not found location of this address")
+                        self.showError(message: "Could not found location of this address.")
                     }
                 }
             }
@@ -215,7 +217,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
             self.restaurantNameSearchTextField.text = restaurant?.name
             if restaurant?.image != nil {
                 self.isPhotoSelected = true
-                self.restaurantPhotoImageView.image = restaurant?.getImage()
+                self.restaurantPhotoImageView.image = restaurant?.getImage(defaultImage: UIImage(named: "photo-banner")!)
             } else {
                 self.restaurantPhotoImageView.image = UIImage(named: "photo-add")
             }
@@ -431,7 +433,8 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     func validationSuccessful() {
         if !isEdit {
             if let latitude = self.currentPin?.coordinate.latitude, let longitude = self.currentPin?.coordinate.longitude {
-                let restaurant = Restaurant.insertNewObject(name: self.restaurantNameSearchTextField.text!, rating: self.restaurantRatingView.rating, address: restaurantAddressTextField.text!, latitude: latitude, longitude: longitude, notificationRadius: self.currentRaidus)
+                let uuid = UUID().uuidString
+                let restaurant = Restaurant.insertNewObject(id: uuid, name: self.restaurantNameSearchTextField.text!, rating: self.restaurantRatingView.rating, address: restaurantAddressTextField.text!, latitude: latitude, longitude: longitude, notificationRadius: self.currentRaidus)
                 
                 self.category?.addToRestaurants(restaurant)
                 
@@ -442,11 +445,11 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
                 do {
                     try Data.shared.managedObjectContext.save()
                 } catch {
-                    fatalError("Could not save restaurant: \(error)")
+                    self.showError(message: "Could not save restaurant: \(error)")
                 }
                 
                 self.restaurantTableDelegate?.addRestaurant(restaurant: restaurant)
-                self.categoryTableDelegate?.increaseNumberOfRestaurants(category: self.category!)
+                self.categoryTableDelegate?.addRestaurant(restaurant: restaurant)
                 self.restaurantMapViewController?.addRestaurant(restaurant: restaurant)
                 
                 dismiss(animated: true, completion: nil)
@@ -463,6 +466,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
                 self.restaurant?.latitude = latitude
                 self.restaurant?.longitude = longitude
                 self.restaurant?.notificationRadius = Int64(self.currentRaidus)
+                self.restaurant?.sort = Int64(self.sort!)
                 
                 if isPhotoSelected {
                     restaurant?.saveImage(image: self.restaurantPhotoImageView.image!)
@@ -473,7 +477,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
                 do {
                     try Data.shared.managedObjectContext.save()
                 } catch {
-                    fatalError("Could not save restaurant: \(error)")
+                    self.showError(message: "Could not save restaurant: \(error)")
                 }
                 
                 self.restaurantTableDelegate?.editRestaurant(restaurant: self.restaurant!)

@@ -119,7 +119,6 @@
 				65D7A0341F4175DC00E377E9 /* Category+CoreDataProperties.swift */,
 				65D7A0351F4175DC00E377E9 /* Restaurant+CoreDataClass.swift */,
 				65D7A0361F4175DC00E377E9 /* Restaurant+CoreDataProperties.swift */,
-				65D7A03B1F41881A00E377E9 /* Data.swift */,
 			);
 			name = Entities;
 			sourceTree = "<group>";
@@ -148,6 +147,7 @@
 		6579B5881F49C4D90056CF59 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				65D7A03B1F41881A00E377E9 /* Data.swift */,
 				65423D581F39D1330038CCE4 /* Location.swift */,
 				65AB00801F426E7200DE3DD9 /* Colors.swift */,
 			);

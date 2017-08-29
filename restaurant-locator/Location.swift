@@ -11,6 +11,7 @@ import CoreLocation
 import MapKit
 import Alamofire
 import SwiftyJSON
+import UserNotifications
 
 
 class Location: NSObject, CLLocationManagerDelegate {
@@ -23,6 +24,10 @@ class Location: NSObject, CLLocationManagerDelegate {
     
     let locationManager = CLLocationManager()
     
+    private var monitoringRestaurants = [String: Restaurant]()
+    
+    private var monitoringRegions = [String: CLRegion]()
+    
     static let geocoder = CLGeocoder();
     
     private var callbacks = [String: (latitude: CLLocationDegrees, longitude: CLLocationDegrees) -> Void]()
@@ -30,6 +35,8 @@ class Location: NSObject, CLLocationManagerDelegate {
     var lastLatitude: CLLocationDegrees?
     
     var lastLongitude: CLLocationDegrees?
+    
+    var appDelegate: AppDelegate?
     
     
     override init() {
@@ -41,12 +48,13 @@ class Location: NSObject, CLLocationManagerDelegate {
         
         self.locationManager.requestWhenInUseAuthorization()
         self.locationManager.startUpdatingLocation()
+        
+        self.appDelegate = UIApplication.shared.delegate as? AppDelegate
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         let location = locations[0] // most recent location
         
-
         for (_, callback) in self.callbacks {
             self.lastLatitude = location.coordinate.latitude
             self.lastLongitude = location.coordinate.longitude
@@ -60,9 +68,24 @@ class Location: NSObject, CLLocationManagerDelegate {
     //      http://shrikar.com/swift-tutorial-corelocation-and-region-monitoring-in-ios-8/
     // StackOverflow: didEnterRegion, didExitRegion not being called
     //      https://stackoverflow.com/questions/37498438/didenterregion-didexitregion-not-being-called
+    // Website: How to Make Local Notifications in iOS 10
+    //      https://makeapppie.com/2016/08/08/how-to-make-local-notifications-in-ios-10/
     
     func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
-        print(region.identifier)
+        let restaurant = monitoringRestaurants[region.identifier]
+        let content = UNMutableNotificationContent()
+        
+        content.title = "You are near \(restaurant?.name ?? "a restaurant")"
+        content.sound = UNNotificationSound.default()
+        if let distance = restaurant?.distance {
+            content.subtitle = "\(Location.getDistanceString(distance: distance)) away from here"
+        }
+        content.body = "\(restaurant?.address ?? "")"
+        content.categoryIdentifier = "nearRestaurant"
+        content.badge = UIApplication.shared.applicationIconBadgeNumber + 1 as NSNumber
+        
+        let request = UNNotificationRequest(identifier: region.identifier, content: content, trigger: nil)
+        UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
     }
     
     // ✴️ Attribute:
@@ -116,6 +139,32 @@ class Location: NSObject, CLLocationManagerDelegate {
         } else {
             return String(format: "%.1f km", distance / 1000)
         }
+    }
+    
+    // monitor restaurants
+    // ✴️ Attribute:
+    // Swift Tutorial : CoreLocation and Region Monitoring in iOS 8
+    //      http://shrikar.com/swift-tutorial-corelocation-and-region-monitoring-in-ios-8/
+    
+    func addMonitor(restaurant: Restaurant) {
+        let center = CLLocationCoordinate2D(latitude: restaurant.latitude, longitude: restaurant.longitude)
+        let radius = CLLocationDistance(Location.radius[Int(restaurant.notificationRadius)])
+        let identifier = restaurant.id
+        
+        let region = CLCircularRegion(center: center, radius: radius, identifier: identifier)
+        
+        monitoringRegions.updateValue(region, forKey: restaurant.id)
+        monitoringRestaurants.updateValue(restaurant, forKey: restaurant.id)
+        
+        region.notifyOnEntry = true
+        region.notifyOnExit = false
+        
+        locationManager.startMonitoring(for: region)
+    }
+    
+    func removeMonitor(restaurant: Restaurant) {
+        monitoringRegions.remove(at: monitoringRegions.index(forKey: restaurant.id)!)
+        monitoringRestaurants.remove(at: monitoringRestaurants.index(forKey: restaurant.id)!)
     }
     
     func addCallback(key: String, callback: @escaping (_ latitude: CLLocationDegrees, _ longitude: CLLocationDegrees) -> Void) {

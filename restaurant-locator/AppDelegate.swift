@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreData
+import UserNotifications
 
 
 extension UIViewController {
@@ -31,6 +32,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
 
     var window: UIWindow?
 
+    var masterNavigationController: UINavigationController?
+    
+    var categoryTableDelegate: CategoryTableDelegate?
+    
+    var detailNavigationController: UINavigationController?
+    
+    var restaurantMapDelegate: RestaurantMapDelegate?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
@@ -39,14 +47,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         navigationController.topViewController!.navigationItem.leftBarButtonItem = splitViewController.displayModeButtonItem
         splitViewController.delegate = self
         
-        let masterNavigationController = splitViewController.viewControllers.first as! UINavigationController
-        let categoryTableViewController = masterNavigationController.viewControllers.first as! CategoryTableViewController
+        self.masterNavigationController = splitViewController.viewControllers.first as? UINavigationController
+        self.categoryTableDelegate = self.masterNavigationController?.viewControllers.first as! CategoryTableViewController
         
-        
-        let detailNavigationController = splitViewController.viewControllers.last as! UINavigationController
-        let restaurantMapViewController = detailNavigationController.viewControllers.first as! RestaurantMapViewController
-        
-        categoryTableViewController.restaurantMapViewController = restaurantMapViewController
+        self.detailNavigationController = splitViewController.viewControllers.last as? UINavigationController
+        self.restaurantMapDelegate = self.detailNavigationController?.viewControllers.first as! RestaurantMapViewController
         
         // insert default data when first launch
         // ✴️ Attributes:
@@ -57,8 +62,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
             self.insertDefaultData()
             UserDefaults.standard.set(true, forKey: "launchedBefore")
         }
-        
-        
+    
         return true
     }
 
@@ -76,8 +80,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
     }
 
+    
+    // ✴️ Attribute:
+    // StackOverflow: Swift- Remove Push Notification Badge number?
+    //      https://stackoverflow.com/questions/27769074/swift-remove-push-notification-badge-number
+    
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        
+        application.applicationIconBadgeNumber = 0
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
@@ -87,23 +98,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     }
     
     func insertDefaultData() {
-        let categoryJapanese = Category.insertNewObject(name: "Japanese", color: 3, icon: 15, sort: 1)
-        let categoryBakery = Category.insertNewObject(name: "Bakery", color: 2, icon: 1, sort: 2)
-        let categoryBrunch = Category.insertNewObject(name: "Brunch", color: 4, icon: 2, sort: 3)
+        let categoryJapanese = Category.insertNewObject(id: "0088a457-ab11-4fb3-a7f0-0bf7a8d1572b", name: "Japanese", color: 3, icon: 15, sort: 1)
+        let categoryBakery = Category.insertNewObject(id: "0b797cd0-febf-479c-af42-d400feeb4ca0", name: "Bakery", color: 2, icon: 1, sort: 2)
+        let categoryBrunch = Category.insertNewObject(id: "13c7281a-b72c-49eb-973b-312fbc3452c5", name: "Brunch", color: 4, icon: 2, sort: 3)
         
-        let restaurantRestore = Restaurant.insertNewObject(name: "Restore Cafe Bar", rating: 3.1, address: "18 Derby Road, Caulfield East, Caulfield, Melbourne", latitude: -37.876051, longitude: 145.042027, notificationRadius: 4)
+        let restaurantRestore = Restaurant.insertNewObject(id: "adf152fc-2dc5-4293-946c-d2f10ace5d41", name: "Restore Cafe Bar", rating: 3.1, address: "18 Derby Road, Caulfield East, Caulfield, Melbourne", latitude: -37.876051, longitude: 145.042027, notificationRadius: 4)
         restaurantRestore.saveImage(image: UIImage(named: "demo-restore-cafe")!)
         categoryJapanese.addToRestaurants(restaurantRestore)
         
-        let restaurantSakuraSushi = Restaurant.insertNewObject(name: "Sakura Kaiten Sushi", rating: 4.3, address: "61, Little Collins Street, CBD, Melbourne, VIC", latitude: -37.8129954, longitude: 144.9716862, notificationRadius: 4)
+        let restaurantSakuraSushi = Restaurant.insertNewObject(id: "e9a4054d-e68a-43e4-880a-f5a2ed14db60", name: "Sakura Kaiten Sushi", rating: 4.3, address: "61, Little Collins Street, CBD, Melbourne, VIC", latitude: -37.8129954, longitude: 144.9716862, notificationRadius: 4)
         restaurantSakuraSushi.saveImage(image: UIImage(named: "demo-sakura-sushi")!)
         categoryJapanese.addToRestaurants(restaurantSakuraSushi)
         
-        let restaurantHakata = Restaurant.insertNewObject(name: "Hakata Gensuke Ramen Professionals", rating: 4.2, address: "168, Russell Street, CBD, Melbourne, VIC", latitude: -37.8122201, longitude: 144.9682514, notificationRadius: 3)
+        let restaurantHakata = Restaurant.insertNewObject(id: "a85a4818-b83a-4f75-b11f-f40f8caf236f", name: "Hakata Gensuke Ramen Professionals", rating: 4.2, address: "168, Russell Street, CBD, Melbourne, VIC", latitude: -37.8122201, longitude: 144.9682514, notificationRadius: 3)
         restaurantHakata.saveImage(image: UIImage(named: "demo-hakata-gensuke")!)
         categoryJapanese.addToRestaurants(restaurantHakata)
         
-        let restaurantCorner = Restaurant.insertNewObject(name: "The Corner Kitchen", rating: 3.2, address: "98 Waverley Road, Malvern East, Melbourne", latitude: -37.876054, longitude: 145.047481, notificationRadius: -1)
+        let restaurantCorner = Restaurant.insertNewObject(id: "16091ddb-c018-49bf-a7c8-24f712dd00a1", name: "The Corner Kitchen", rating: 3.2, address: "98 Waverley Road, Malvern East, Melbourne", latitude: -37.876054, longitude: 145.047481, notificationRadius: -1)
         restaurantCorner.saveImage(image: UIImage(named: "demo-corner-kitchen")!)
         categoryBrunch.addToRestaurants(restaurantCorner)
 

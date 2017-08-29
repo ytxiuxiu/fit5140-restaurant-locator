@@ -22,9 +22,12 @@ protocol RestaurantTableDelegate {
     func addRestaurant(restaurant: Restaurant)
     func editRestaurant(restaurant: Restaurant)
     func editCategory(category: Category)
+    func showEditRestaurant(restaurant: Restaurant)
 }
 
 class RestaurantTableViewController: UITableViewController, UIPopoverPresentationControllerDelegate, RestaurantTableDelegate {
+    
+    @IBOutlet weak var sortingSegmentControl: UISegmentedControl!
     
     var restaurantMapViewController: RestaurantMapViewController?
     
@@ -32,14 +35,30 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
     
     var restaurants = [Restaurant]()
     
-    var delegate: CategoryTableDelegate?
+    var categoryTableDelegate: CategoryTableDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        navigationItem.rightBarButtonItems?.append(editButtonItem)
+        
         restaurants = category?.restaurants?.allObjects as! [Restaurant]
         
+        // Sort restaurants: if the user has defined a customized order, then sort them as this order, otherwise use default order: by added date
+        if isCustomSort() {
+            sort(by: 3)
+            self.sortingSegmentControl.selectedSegmentIndex = 3
+        } else {
+            sort(by: 0)
+        }
+        
         Location.shared.addCallback(key: "restaurantsDisntance", callback: {(latitude, longitude) in
+            // Do not update the distance during edit mode because it may crash when the user reorder items.
+            // (Attempt to update the same row at the same time)
+            guard !self.tableView.isEditing else {
+                return
+            }
+            
             for i in 0..<self.restaurants.count {
                 let restaurant = self.restaurants[i]
                 let _ = restaurant.calculateDistance(currentLocation: CLLocation(latitude: latitude, longitude: longitude))
@@ -52,6 +71,11 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
                 self.tableView.reloadRows(at: [indexPath], with: .none)
             }
         })
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        clearsSelectionOnViewWillAppear = splitViewController!.isCollapsed
+        super.viewWillAppear(animated)
     }
     
     override func didReceiveMemoryWarning() {
@@ -86,9 +110,26 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
         cell.restaurantRatingView.rating = restaurant.rating
         cell.restaurantRatingView.settings.updateOnTouch = false    // disable editing
         cell.restaurantAddressLabel.text = restaurant.address
+        cell.restaurantTableDelegate = self
+        cell.restaurant = restaurant
         
         if let distance = restaurant.distance {
             cell.restaurantDistanceLabel.text = Location.getDistanceString(distance: distance)
+        }
+        
+        // Add edit button
+        // ✴️ Attribute:
+        // Website: UITableView Custom Edit Button In Each Row With Swift
+        //      http://www.iosinsight.com/uitableview-custom-edit-button-in-each-row-with-swift/
+        
+        if (tableView.isEditing && self.tableView(tableView, canEditRowAt: indexPath)) {
+            cell.restaurantEditButton.isHidden = false
+            cell.restaurantEditButtonWidthConstraint.constant = 30
+            cell.restaurantEditButtonRightConstraint.constant = 8
+        } else {
+            cell.restaurantEditButton.isHidden = true
+            cell.restaurantEditButtonWidthConstraint.constant = 0
+            cell.restaurantEditButtonRightConstraint.constant = 0
         }
 
         return cell
@@ -119,7 +160,7 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
                 self.restaurants.remove(at: indexPath.row)
                 tableView.deleteRows(at: [indexPath], with: .fade)
                 
-                self.delegate?.reduceNumberOfRestaurants(category: self.category!)
+                self.categoryTableDelegate?.removeRestaurant(restaurant: restaurant)
                 self.restaurantMapViewController?.deleteRestaurant(restaurant: restaurant)
                 
                 self.dismiss(animated: true, completion: nil)
@@ -134,7 +175,96 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
 
         }
     }
-
+    
+    override func setEditing(_ editing: Bool, animated: Bool) {
+        super.setEditing(editing, animated: animated)
+        
+        if (editing) {
+            // go to custom sorting mode to allow user to re-arrange
+            self.sortingSegmentControl.selectedSegmentIndex = 3
+            
+            sort(by: 3)
+            
+            self.sortingSegmentControl.isEnabled = false
+        } else {
+            self.sortingSegmentControl.isEnabled = true
+        }
+        
+        // Update the view so that it can toggle the edit button
+        tableView.reloadData()
+    }
+    
+    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        let restaurant = restaurants[sourceIndexPath.row]
+        restaurants.remove(at: sourceIndexPath.row)
+        restaurants.insert(restaurant, at: destinationIndexPath.row)
+        
+        for i in 0..<restaurants.count {
+            restaurants[i].sort = Int64(i)
+        }
+        
+        // ⚠️ TODO: save it later, after finish editing
+        do {
+            try Data.shared.managedObjectContext.save()
+        } catch {
+            self.showError(message: "Could not re-arrange restaurant: \(error)")
+        }
+    }
+    
+    func sort(by: Int) {
+        switch by {
+        case 1:
+            restaurants.sort(by: { (a, b) -> Bool in
+                return a.name < b.name
+            })
+            break;
+        case 2:
+            restaurants.sort(by: { (a, b) -> Bool in
+                return a.rating > b.rating
+            })
+            break;
+        case 3:
+            restaurants.sort(by: { (a, b) -> Bool in
+                return a.sort < b.sort
+            })
+            break;
+        default:
+            // ✴️ Attribute:
+            // Check if date is before current date (Swift)
+            //      https://stackoverflow.com/questions/26807416/check-if-date-is-before-current-date-swift
+            
+            restaurants.sort(by: { (a, b) -> Bool in
+                return !(a.addedAt as Date > b.addedAt as Date)
+            })
+            break;
+        }
+        
+        tableView.reloadData()
+    }
+    
+    func isCustomSort() -> Bool {
+        var isCustomSort = false
+        for restaurant in restaurants {
+            if restaurant.sort > 0 {
+                isCustomSort = true
+                break;
+            }
+        }
+        return isCustomSort
+    }
+    
+    @IBAction func onSortingSegmentChanged(_ sender: Any) {
+        let segmentControl = sender as! UISegmentedControl
+        let index = segmentControl.selectedSegmentIndex
+        
+        sort(by: index)
+    }
+    
+    
 
     // MARK: - Navigation
 
@@ -144,7 +274,13 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
             
             controller.category = self.category
             controller.restaurantTableDelegate = self
-            controller.categoryTableDelegate = self.delegate
+            controller.categoryTableDelegate = self.categoryTableDelegate
+            
+            if isCustomSort() {
+                controller.sort = self.restaurants.count
+            } else {
+                controller.sort = 0
+            }
             
         } else if segue.identifier == "showRestaurantDetailSegue" {
             let controller = segue.destination as! RestaurantDetailViewController
@@ -154,23 +290,20 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
             controller.restaurant = restaurant
             controller.restaurantTableDelegate = self
             
-        } else if segue.identifier == "showEditCategorySegue" {
-            let controller = segue.destination as! AddCategoryViewController
-            
-            controller.isEdit = true
-            controller.category = self.category
-            controller.restaurantTableDelegate = self
-            controller.categoryTableDelegate = self.delegate
         }
     }
     
     func showViewControllerOnDetailViewController(controller: UIViewController) {
-        // if some view opened on the detail view conroller already, pop it
-        if restaurantMapViewController?.navigationController?.viewControllers.last != restaurantMapViewController {
-            restaurantMapViewController?.navigationController?.popViewController(animated: false)
-            restaurantMapViewController?.navigationController?.pushViewController(controller, animated: false)
-        } else {
-            restaurantMapViewController?.navigationController?.pushViewController(controller, animated: true)
+        let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        if let detailNavigationController = appDelegate?.detailNavigationController {
+            
+            // if some view opened on the detail view conroller already, pop it
+            if !(detailNavigationController.viewControllers.last is RestaurantMapViewController) {
+                detailNavigationController.popViewController(animated: false)
+                detailNavigationController.pushViewController(controller, animated: false)
+            } else {
+                detailNavigationController.pushViewController(controller, animated: true)
+            }
         }
     }
     
@@ -186,7 +319,7 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
                 controller.restaurantMapViewController = self.restaurantMapViewController
                 controller.category = self.category
                 controller.restaurantTableDelegate = self
-                controller.categoryTableDelegate = self.delegate
+                controller.categoryTableDelegate = self.categoryTableDelegate
                 
                 showViewControllerOnDetailViewController(controller: controller)
                 
@@ -206,18 +339,6 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
                 
                 return false    // don't do the default segue
                 
-            } else if identifier == "showEditCategorySegue" {
-                let controller = storyboard.instantiateViewController(withIdentifier: "editCategoryViewController") as! AddCategoryViewController
-                
-                controller.restaurantMapViewController = self.restaurantMapViewController
-                controller.isEdit = true
-                controller.category = self.category
-                controller.restaurantTableDelegate = self
-                controller.categoryTableDelegate = self.delegate
-                
-                showViewControllerOnDetailViewController(controller: controller)
-                
-                return false    // don't do the default segue
             }
         }
         
@@ -262,5 +383,23 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
     
     func editCategory(category: Category) {
         self.title = category.name
+    }
+    
+    func showEditRestaurant(restaurant: Restaurant) {
+        let device = UIDevice.current.userInterfaceIdiom
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        
+        let controller = storyboard.instantiateViewController(withIdentifier: "editRestaurantViewController") as! AddRestaurantViewController
+        
+        controller.restaurantMapViewController = self.restaurantMapViewController
+        controller.isEdit = true
+        controller.restaurant = restaurant
+        controller.restaurantTableDelegate = self
+        
+        if device == .pad {
+            showViewControllerOnDetailViewController(controller: controller)
+        } else {
+            self.navigationController?.pushViewController(controller, animated: true)
+        }
     }
 }

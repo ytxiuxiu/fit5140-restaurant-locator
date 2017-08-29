@@ -15,7 +15,17 @@ class CategoryTableViewCell: UITableViewCell {
     @IBOutlet weak var categoryNameLabel: UILabel!
     
     @IBOutlet weak var numberOfRestaurantsLabel: UILabel!
+    
+    @IBOutlet weak var categoryEditButton: UIButton!
 
+    @IBOutlet weak var categoryEditButtonWidthConstraint: NSLayoutConstraint!
+
+    @IBOutlet weak var categoryEditButtonRightConstraint: NSLayoutConstraint!
+    
+    var category: Category?
+    
+    var categoryTableDelegate: CategoryTableDelegate?
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
@@ -26,5 +36,9 @@ class CategoryTableViewCell: UITableViewCell {
 
         // Configure the view for the selected state
     }
-
+    
+    @IBAction func onCategoryEditButtonTapped(_ sender: Any) {
+        self.categoryTableDelegate?.showEditCategory(category: category!)
+    }
+    
 }

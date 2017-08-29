@@ -113,7 +113,7 @@ class RestaurantDetailViewController: UIViewController, RestaurantDetailDelegate
     
     func editRestaurant(restaurant: Restaurant) {
         self.title = restaurant.name
-        self.restaurantImageView.image = restaurant.getImage()
+        self.restaurantImageView.image = restaurant.getImage(defaultImage: UIImage(named: "photo-banner")!)
         self.restaurantRatingView.rating = restaurant.rating
         self.restaurantRatingView.settings.updateOnTouch = false
         
