@@ -191,5 +191,12 @@ class RestaurantDetailViewController: UIViewController, RestaurantDetailDelegate
         
         self.navigationController?.pushViewController(controller, animated: true)
     }
+    
+    
+    // MARK: - Restaurant Detial Delegate
+    
+    func editRestaurant(restaurant: Restaurant) {
+        updateRestaurantDetail(restaurant: restaurant)
+    }
 
 }
