@@ -530,7 +530,6 @@
                         <outlet property="restaurantRatingLabel" destination="2Eo-eo-B6j" id="gSO-Id-frB"/>
                         <outlet property="restaurantRatingView" destination="t2F-mK-8aI" id="Slz-cc-0a4"/>
                         <outlet property="scrollView" destination="ov9-Ef-FcM" id="pnt-Jq-gDz"/>
-                        <outlet property="topSpaceConstraint" destination="wuz-MG-yOd" id="iP2-Mc-IPL"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="pj3-CW-XfM" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -724,7 +723,6 @@
                         <outlet property="categoryNameErrorLabel" destination="aVj-Au-Max" id="DfC-17-O7S"/>
                         <outlet property="categoryNameTextField" destination="k0w-7H-Prl" id="hZS-L7-2A6"/>
                         <outlet property="categoryView" destination="kmo-9F-9eY" id="vKg-l8-D10"/>
-                        <outlet property="topSpaceConstraint" destination="NB2-qR-tW6" id="5fK-25-tNh"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="wR2-Eu-EaV" userLabel="First Responder" sceneMemberID="firstResponder"/>

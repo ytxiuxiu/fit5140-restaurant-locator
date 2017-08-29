@@ -190,10 +190,10 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
      Move the map to the current location
      */
     func moveToCurrentLocation() {
-        let coordinateSpan: MKCoordinateSpan = MKCoordinateSpanMake(0.01, 0.01)
-        let coordinateRegion: MKCoordinateRegion = MKCoordinateRegionMake(self.mapView.userLocation.coordinate, coordinateSpan)
-        
-        self.mapView.setRegion(coordinateRegion, animated: true)
+        if let latitude = currentLocation?.latitude, let longitude = currentLocation?.longitude {
+            let coordinateRegion = Location.shared.makeRegion(latitude: latitude, longitude: longitude)
+            self.mapView.setRegion(coordinateRegion, animated: true)
+        }
     }
     
     // ✴️ Attributes:
