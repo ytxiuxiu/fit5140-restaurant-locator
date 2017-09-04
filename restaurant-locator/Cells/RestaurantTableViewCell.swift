@@ -27,6 +27,10 @@ class RestaurantTableViewCell: UITableViewCell {
     
     @IBOutlet weak var restaurantEditButton: UIImageView!
     
+    @IBOutlet weak var restaurantNotificationImageView: UIImageView!
+    
+    @IBOutlet weak var restaurantNotificationLabel: UILabel!
+    
     @IBOutlet weak var restaurantEditButtonWidthConstraint: NSLayoutConstraint!
     
     @IBOutlet weak var restaurantEditButtonRightConstraint: NSLayoutConstraint!

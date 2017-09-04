@@ -20,6 +20,8 @@ class RestaurantCalloutView: UIView {
 
     @IBOutlet weak var restaurantAddressLabel: UILabel!
     
+    @IBOutlet weak var restaurantNotificationImageView: UIImageView!
+    
     @IBOutlet weak var restaurantNotificationLabel: UILabel!
     
     @IBOutlet weak var backgroundContentButton: UIButton!
@@ -32,7 +34,6 @@ class RestaurantCalloutView: UIView {
     
     var restaurant: Restaurant?
     
-    var restaurantMapViewController: RestaurantMapViewController?
     
     // Restaurant detail button on the callout has been tapped
     @IBAction func onRestaurantDetailTapped(_ sender: Any) {

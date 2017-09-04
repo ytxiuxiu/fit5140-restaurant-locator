@@ -253,37 +253,35 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
      - Returns: Image
      */
     func generatePinImage(for restaurantAnnotation: RestaurantAnnotation) -> UIImage {
-        let restaurant = restaurantAnnotation.restaurant
-        let restaurantPinImage = restaurantPinImages[restaurant?.id ?? ""]
-        
-        if restaurantPinImage != nil {
-            return restaurantPinImage!
-        } else {
-            let pinSize = CGSize(width: 53, height: 59)
-            let backgroundSize = CGSize(width: 50, height: 56)
-            let imageSize = CGSize(width: 40, height: 40)
-            let cropedRestaurantImage = restaurant?.getImage().crop(to: imageSize)
-            let pinBackgroundImage = UIImage(named: "pin")
-            let notificationImage = UIImage(named: "notification")
+        if let restaurant = restaurantAnnotation.restaurant {
+            let restaurantPinImage = restaurantPinImages[restaurant.id]
             
-            UIGraphicsBeginImageContext(pinSize)
-            
-            cropedRestaurantImage?.draw(in: CGRect(origin: CGPoint(x: 8, y: 8), size: imageSize))
-            pinBackgroundImage?.draw(in: CGRect(origin: CGPoint(x: 3, y: 3), size: backgroundSize))
-            
-            if restaurant?.notificationRadius != -1 {
+            if restaurantPinImage != nil {
+                return restaurantPinImage!
+            } else {
+                let pinSize = CGSize(width: 53, height: 59)
+                let backgroundSize = CGSize(width: 50, height: 56)
+                let imageSize = CGSize(width: 40, height: 40)
+                let cropedRestaurantImage = restaurant.getImage().crop(to: imageSize)
+                let pinBackgroundImage = UIImage(named: "pin")
+                
+                UIGraphicsBeginImageContext(pinSize)
+                
+                cropedRestaurantImage.draw(in: CGRect(origin: CGPoint(x: 8, y: 8), size: imageSize))
+                pinBackgroundImage?.draw(in: CGRect(origin: CGPoint(x: 3, y: 3), size: backgroundSize))
+                
+                let notificationImage = restaurant.notificationRadius != -1 ? UIImage(named: "notification") : UIImage(named: "no-notification")
                 notificationImage?.draw(in: CGRect(origin: CGPoint.zero, size: CGSize(width: 16, height: 16)))
+                
+                restaurantAnnotation.image = UIGraphicsGetImageFromCurrentImageContext()
+                
+                // cache pin image
+                restaurantPinImages.updateValue(restaurantAnnotation.image!, forKey: restaurant.id)
+                
+                UIGraphicsEndImageContext()
             }
-            
-            restaurantAnnotation.image = UIGraphicsGetImageFromCurrentImageContext()
-            
-            // cache pin image
-            restaurantPinImages.updateValue(restaurantAnnotation.image!, forKey: (restaurant?.id ?? "")!)
-            
-            UIGraphicsEndImageContext()
-            
-            return restaurantPinImages[restaurant?.id ?? ""]!
         }
+        return restaurantPinImages[restaurantAnnotation.restaurant!.id]!
     }
     
     
@@ -348,7 +346,6 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
         annotationView?.image = generatePinImage(for: restaurantAnnotation)
         annotationView?.navigationController = self.navigationController
         annotationView?.restaurant = restaurantAnnotation.restaurant
-        annotationView?.restaurantMapViewController = self
         
         return annotationView
     }
@@ -458,8 +455,8 @@ class RestaurantMapViewController: UIViewController, MKMapViewDelegate, UIPicker
     }
     
     func editRestaurant(restaurant: Restaurant) {
-        for restaurantAnnotation in restaurantAnnotations {
-            if restaurantAnnotation.restaurant == restaurant {
+        for restaurantAnnotation in self.restaurantAnnotations {
+            if restaurantAnnotation.restaurant?.id == restaurant.id {
                 
                 // ✴️ Attribute
                 // StackOverflow: iOS refresh annotations on mapview

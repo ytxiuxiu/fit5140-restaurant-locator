@@ -168,6 +168,13 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
         cell.restaurantRatingView.rating = restaurant.rating
         cell.restaurantRatingView.settings.updateOnTouch = false    // disable editing
         cell.restaurantAddressLabel.text = restaurant.address
+        if restaurant.notificationRadius != -1 {
+            cell.restaurantNotificationImageView.image = UIImage(named: "notification-big")
+            cell.restaurantNotificationLabel.text = Location.radiusText[Int(restaurant.notificationRadius)]
+        } else {
+            cell.restaurantNotificationImageView.image = UIImage(named: "no-notification-big")
+            cell.restaurantNotificationLabel.text = "Never"
+        }
         cell.restaurantTableDelegate = self
         cell.restaurant = restaurant
         

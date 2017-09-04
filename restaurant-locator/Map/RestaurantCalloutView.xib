@@ -94,6 +94,7 @@
                 <outlet property="restaurantDetailButton" destination="Ag9-bv-a9R" id="1MR-FH-Dp5"/>
                 <outlet property="restaurantImageView" destination="8Mc-14-HSY" id="of4-v9-WND"/>
                 <outlet property="restaurantNameLabel" destination="MmZ-Lh-WNt" id="hkk-6A-bE9"/>
+                <outlet property="restaurantNotificationImageView" destination="FrL-su-ec6" id="WjK-Xq-DOI"/>
                 <outlet property="restaurantNotificationLabel" destination="7Fs-rs-bU0" id="svC-Yg-iiU"/>
             </connections>
             <point key="canvasLocation" x="34" y="91.5"/>

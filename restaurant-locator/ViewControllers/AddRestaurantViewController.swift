@@ -462,6 +462,29 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     func validationSuccessful() {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
+        if let categories = categoryTableDelegate?.getAllCategories() {
+            // Count how many restaurants have notification
+            var count = 0
+            for category in categories {
+                if let restaurants = category.restaurants {
+                    for restaurant in restaurants.allObjects as! [Restaurant] {
+                        guard count < 20 else {
+                            return
+                        }
+                        
+                        if restaurant.notificationRadius != -1 {
+                            count = count + 1
+                        }
+                    }
+                }
+            }
+            
+            if count >= 20 {
+                self.showError(message: "Sorry, you can only get notification for up to 20 restaurants.")
+                return
+            }
+        }
+        
         if !isEdit {
             if let latitude = self.currentPin?.coordinate.latitude, let longitude = self.currentPin?.coordinate.longitude {
                 let uuid = UUID().uuidString
@@ -514,7 +537,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
                 self.restaurantTableDelegate?.editRestaurant(restaurant: self.restaurant!)
                 self.restaurantDetailDelegate?.editRestaurant(restaurant: self.restaurant!)
                 self.restaurantAnnotationDelegate?.editRestaurant(restaurant: self.restaurant!)
-                appDelegate.restaurantMapDelegate?.addRestaurant(restaurant: restaurant!)
+                appDelegate.restaurantMapDelegate?.editRestaurant(restaurant: self.restaurant!)
 
             } else {
                 self.showError(message: "Please pick the current location of this restaurant. You see this message may be because you have not let this application access to your location.")

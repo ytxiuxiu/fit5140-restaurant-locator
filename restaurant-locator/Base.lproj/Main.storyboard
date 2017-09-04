@@ -254,8 +254,9 @@
                                             </userDefinedRuntimeAttributes>
                                         </view>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="? m" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="imE-tN-7SE">
-                                            <rect key="frame" x="158" y="84.666666666666671" width="248" height="16"/>
+                                            <rect key="frame" x="326" y="88" width="80" height="16"/>
                                             <constraints>
+                                                <constraint firstAttribute="width" constant="80" id="0rp-DU-Fy2"/>
                                                 <constraint firstAttribute="height" constant="16" id="Xay-Qg-KPb"/>
                                             </constraints>
                                             <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
@@ -279,20 +280,40 @@
                                                 <action selector="onRestaurantEditButtonTapped:" destination="2Au-XQ-wTj" eventType="touchUpInside" id="pbA-WO-VF9"/>
                                             </connections>
                                         </button>
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="notification-big" translatesAutoresizingMaskIntoConstraints="NO" id="hJa-Is-j2C">
+                                            <rect key="frame" x="158" y="87" width="16" height="17"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" secondItem="hJa-Is-j2C" secondAttribute="height" multiplier="15:16" id="dhb-lZ-FZ0"/>
+                                                <constraint firstAttribute="width" constant="16" id="pHn-0Q-1if"/>
+                                            </constraints>
+                                        </imageView>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="? m" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="juQ-7w-Nvn">
+                                            <rect key="frame" x="182" y="88" width="100" height="16"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="100" id="NNN-Pf-fIB"/>
+                                                <constraint firstAttribute="height" constant="16" id="ltg-aY-qju"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
+                                            <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
                                     </subviews>
                                     <constraints>
                                         <constraint firstItem="bMs-51-nD1" firstAttribute="top" secondItem="sMf-gW-fxO" secondAttribute="bottom" constant="2" id="23F-r2-SfN"/>
                                         <constraint firstItem="sMf-gW-fxO" firstAttribute="top" secondItem="mVo-RB-6Gn" secondAttribute="bottom" constant="2" id="4mj-9b-Mzn"/>
                                         <constraint firstItem="bMs-51-nD1" firstAttribute="trailing" secondItem="cOw-v7-vrA" secondAttribute="trailingMargin" id="6pO-Xp-UON"/>
+                                        <constraint firstItem="juQ-7w-Nvn" firstAttribute="bottom" secondItem="hJa-Is-j2C" secondAttribute="bottom" id="7U5-KG-Cqm"/>
+                                        <constraint firstItem="hJa-Is-j2C" firstAttribute="leading" secondItem="eNt-dg-wcv" secondAttribute="trailing" constant="16" id="9Za-aW-pMa"/>
                                         <constraint firstItem="eNt-dg-wcv" firstAttribute="top" secondItem="cOw-v7-vrA" secondAttribute="topMargin" id="HTY-QF-D5h"/>
                                         <constraint firstItem="mVo-RB-6Gn" firstAttribute="top" secondItem="cOw-v7-vrA" secondAttribute="topMargin" id="I1R-cw-PKq"/>
                                         <constraint firstItem="sMf-gW-fxO" firstAttribute="leading" secondItem="eNt-dg-wcv" secondAttribute="trailing" constant="16" id="IOT-93-sKo"/>
+                                        <constraint firstItem="imE-tN-7SE" firstAttribute="bottom" secondItem="hJa-Is-j2C" secondAttribute="bottom" id="KcC-6v-bsf"/>
                                         <constraint firstItem="mVo-RB-6Gn" firstAttribute="leading" secondItem="eNt-dg-wcv" secondAttribute="trailing" constant="16" id="KxJ-2j-HPn"/>
                                         <constraint firstItem="bMs-51-nD1" firstAttribute="leading" secondItem="eNt-dg-wcv" secondAttribute="trailing" constant="16" id="Uim-2t-QYx"/>
                                         <constraint firstItem="imE-tN-7SE" firstAttribute="trailing" secondItem="cOw-v7-vrA" secondAttribute="trailingMargin" id="XTk-Bg-Z0S"/>
-                                        <constraint firstAttribute="bottomMargin" secondItem="imE-tN-7SE" secondAttribute="bottom" constant="4" id="eOJ-ou-D9v"/>
+                                        <constraint firstItem="hJa-Is-j2C" firstAttribute="bottom" secondItem="eNt-dg-wcv" secondAttribute="bottom" id="Y5b-Nk-iKO"/>
+                                        <constraint firstItem="juQ-7w-Nvn" firstAttribute="leading" secondItem="hJa-Is-j2C" secondAttribute="trailing" constant="8" id="d12-tO-knD"/>
                                         <constraint firstItem="sMf-gW-fxO" firstAttribute="trailing" secondItem="cOw-v7-vrA" secondAttribute="trailingMargin" id="jOU-gi-GlU"/>
-                                        <constraint firstItem="imE-tN-7SE" firstAttribute="leading" secondItem="eNt-dg-wcv" secondAttribute="trailing" constant="16" id="kpB-go-Njg"/>
                                         <constraint firstItem="gE2-cl-JYb" firstAttribute="centerY" secondItem="cOw-v7-vrA" secondAttribute="centerY" id="n5q-Bh-htH"/>
                                         <constraint firstItem="gE2-cl-JYb" firstAttribute="leading" secondItem="cOw-v7-vrA" secondAttribute="leadingMargin" id="ngs-Re-Z44"/>
                                         <constraint firstItem="eNt-dg-wcv" firstAttribute="leading" secondItem="gE2-cl-JYb" secondAttribute="trailing" constant="8" id="ocj-9J-uBd"/>
@@ -306,6 +327,8 @@
                                     <outlet property="restaurantEditButtonRightConstraint" destination="ocj-9J-uBd" id="wY8-Ks-wB5"/>
                                     <outlet property="restaurantEditButtonWidthConstraint" destination="NpH-vQ-Iao" id="y0C-e1-Jhz"/>
                                     <outlet property="restaurantNameLabel" destination="mVo-RB-6Gn" id="yPh-dq-ITH"/>
+                                    <outlet property="restaurantNotificationImageView" destination="hJa-Is-j2C" id="BPi-Yn-xTV"/>
+                                    <outlet property="restaurantNotificationLabel" destination="juQ-7w-Nvn" id="dUL-tM-QyB"/>
                                     <outlet property="restaurantPhotoImageView" destination="eNt-dg-wcv" id="LEn-GD-tJv"/>
                                     <outlet property="restaurantRatingView" destination="sMf-gW-fxO" id="u9Z-cc-OoE"/>
                                     <segue destination="RhQ-Ko-2Kd" kind="show" identifier="showRestaurantDetailSegue" id="1AN-oh-jMv"/>
@@ -950,6 +973,7 @@
         <image name="list" width="30" height="30"/>
         <image name="map" width="30" height="30"/>
         <image name="navigation" width="64" height="64"/>
+        <image name="notification-big" width="32" height="32"/>
         <image name="photo-add" width="1500" height="500"/>
     </resources>
     <inferredMetricsTieBreakers>

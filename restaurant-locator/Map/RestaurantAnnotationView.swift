@@ -38,7 +38,6 @@ class RestaurantAnnotationView: MKAnnotationView, RestaurantAnnotationDelegate {
     
     var restaurant: Restaurant?
     
-    var restaurantMapViewController: RestaurantMapViewController?
 
     override init(annotation: MKAnnotation?, reuseIdentifier: String?) {
         super.init(annotation: annotation, reuseIdentifier: reuseIdentifier)
@@ -71,7 +70,6 @@ class RestaurantAnnotationView: MKAnnotationView, RestaurantAnnotationDelegate {
                 newCustomCalloutView.navigationController = self.navigationController
                 newCustomCalloutView.restaurantAnnotationDelegate = self
                 newCustomCalloutView.restaurant = self.restaurant
-                newCustomCalloutView.restaurantMapViewController = self.restaurantMapViewController
                 
                 newCustomCalloutView.layer.cornerRadius = 5
                 
@@ -128,14 +126,18 @@ class RestaurantAnnotationView: MKAnnotationView, RestaurantAnnotationDelegate {
     // MARK: - Restaurant Annotation Delegate
     
     func editRestaurant(restaurant: Restaurant) {
-        self.customCalloutView?.restaurantImageView.image = restaurant.getImage()
-        self.customCalloutView?.restaurantNameLabel.text = restaurant.name
-        self.customCalloutView?.restaurantAddressLabel.text = restaurant.address
-        
-        if restaurant.notificationRadius != -1 {
-            self.customCalloutView?.restaurantNotificationLabel.text = Location.radiusText[Int(restaurant.notificationRadius)]
-        } else {
-            self.customCalloutView?.restaurantNotificationLabel.text = "Never"
+        if let customCalloutView = self.customCalloutView {
+            customCalloutView.restaurantImageView.image = restaurant.getImage()
+            customCalloutView.restaurantNameLabel.text = restaurant.name
+            customCalloutView.restaurantAddressLabel.text = restaurant.address
+            
+            if restaurant.notificationRadius != -1 {
+                customCalloutView.restaurantNotificationImageView.image = UIImage(named: "notification-big")
+                customCalloutView.restaurantNotificationLabel.text = Location.radiusText[Int(restaurant.notificationRadius)]
+            } else {
+                customCalloutView.restaurantNotificationImageView.image = UIImage(named: "no-notification-big")
+                customCalloutView.restaurantNotificationLabel.text = "Never"
+            }
         }
     }
 

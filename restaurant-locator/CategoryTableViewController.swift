@@ -26,6 +26,13 @@ import UserNotifications
 protocol CategoryTableDelegate {
     
     /**
+     Get all category, it should return all categories
+    
+     - Returns: All categories
+     */
+    func getAllCategories() -> [Category]
+ 
+    /**
      Add category, it should add the category to the table
      
      - Parameters:
@@ -132,10 +139,16 @@ class CategoryTableViewController: UITableViewController, UIPopoverPresentationC
                 return
             }
             
+            var count = 0
             for category in self.categories {
                 for restaurant in category.restaurants?.allObjects as! [Restaurant] {
+                    guard count < 20 else { // Only monitor max 20 restaurants
+                        return
+                    }
+                    
                     if restaurant.notificationRadius != -1 {
                         Location.shared.addMonitor(restaurant: restaurant)
+                        count = count + 1
                     }
                 }
             }
@@ -326,6 +339,10 @@ class CategoryTableViewController: UITableViewController, UIPopoverPresentationC
 
     
     // MARK: - Category Table Delegate
+    
+    func getAllCategories() -> [Category] {
+        return self.categories
+    }
     
     func addCategory(category: Category) {
         categories.append(category)
