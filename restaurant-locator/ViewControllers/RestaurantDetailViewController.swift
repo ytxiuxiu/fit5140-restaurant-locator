@@ -29,7 +29,7 @@ protocol RestaurantDetailDelegate {
 /**
  Restaurant Detail
  */
-class RestaurantDetailViewController: UIViewController, RestaurantDetailDelegate {
+class RestaurantDetailViewController: UIViewController, RestaurantDetailDelegate, MKMapViewDelegate {
 
     @IBOutlet weak var restaurantImageView: UIImageView!
     
@@ -66,6 +66,7 @@ class RestaurantDetailViewController: UIViewController, RestaurantDetailDelegate
         updateRestaurantDetail(restaurant: restaurant!)
         
         self.restaurantMapView.showsUserLocation = true
+        self.restaurantMapView.delegate = self
         
         let editBarButton = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editBarButtonItemTapped(sender:)))
         navigationItem.rightBarButtonItem = editBarButton
@@ -91,6 +92,26 @@ class RestaurantDetailViewController: UIViewController, RestaurantDetailDelegate
     }
     
     
+    // MARK: - Pin
+    
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        if annotation is MKUserLocation {
+            return nil
+        }
+        
+        var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: "restaurantAnnotationView")
+        
+        if annotationView == nil {
+            annotationView = MKAnnotationView(annotation: annotation, reuseIdentifier: "restaurantAnnotationView")
+        } else {
+            annotationView?.annotation = annotation
+        }
+        annotationView?.image = UIImage(named: "pin-add")
+        
+        return annotationView
+    }
+    
+    
     // MARK: - Tools
     
     /**
@@ -105,7 +126,12 @@ class RestaurantDetailViewController: UIViewController, RestaurantDetailDelegate
         if self.restaurantAnnotation == nil {
             self.restaurantAnnotation = MKPointAnnotation()
             
-            self.restaurantMapView.addAnnotation(self.restaurantAnnotation!)
+            // ✴️ Attributes:
+            // StackOverflow: Swift Annotation Not Placed on MapView because viewForAnnotation not called
+            //      https://stackoverflow.com/questions/41948828/swift-annotation-not-placed-on-mapview-because-viewforannotation-not-called
+            DispatchQueue.main.async {
+                self.restaurantMapView.addAnnotation(self.restaurantAnnotation!)
+            }
         }
         
         self.restaurantAnnotation?.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)

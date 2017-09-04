@@ -93,7 +93,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
     /**
      Current radius selected
      */
-    var currentRaidus = 3
+    var currentRaidus = Location.radius.count   // Never by default (out of index)
     
     var radiusCircle: MKCircle?
     
@@ -233,7 +233,8 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
      Init notification picker
      */
     func initNotificationPicker() {
-        self.notificationPickerView.selectRow(3, inComponent: 0, animated: false)
+        // Never by default (out of index)
+        self.notificationPickerView.selectRow(Location.radius.count, inComponent: 0, animated: false)
     }
     
     /**
@@ -394,7 +395,12 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
         if self.currentPin == nil {
             self.currentPin = MKPointAnnotation()
             
-            self.restaurantMapView.addAnnotation(self.currentPin!)
+            // ✴️ Attributes:
+            // StackOverflow: Swift Annotation Not Placed on MapView because viewForAnnotation not called
+            //      https://stackoverflow.com/questions/41948828/swift-annotation-not-placed-on-mapview-because-viewforannotation-not-called
+            DispatchQueue.main.async {
+                self.restaurantMapView.addAnnotation(self.currentPin!)
+            }
         }
         
         self.currentPin?.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
@@ -402,6 +408,49 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
         if alsoMoveTheMap {
             let region = Location.shared.makeRegion(latitude: latitude, longitude: longitude)
             self.restaurantMapView.setRegion(region, animated: true)
+        }
+    }
+    
+    
+    // MARK: - Dragging pin
+    
+    // ✴️ Attributes:
+    // StackOverflow: How to drag an annotation with MKMapView being dragged? (iOS)
+    //      https://stackoverflow.com/questions/33188663/how-to-drag-an-annotation-with-mkmapview-being-dragged-ios
+    
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        if annotation is MKUserLocation {
+            return nil
+        }
+        
+        var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: "restaurantAnnotationView")
+        
+        if annotationView == nil {
+            annotationView = MKAnnotationView(annotation: annotation, reuseIdentifier: "restaurantAnnotationView")
+        } else {
+            annotationView?.annotation = annotation
+        }
+        annotationView?.image = UIImage(named: "pin-add")
+        annotationView?.isDraggable = true
+        
+        return annotationView
+    }
+    
+    func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, didChange newState: MKAnnotationViewDragState, fromOldState oldState: MKAnnotationViewDragState) {
+        if newState == .ending {
+            if let latitude = view.annotation?.coordinate.latitude, let longitude = view.annotation?.coordinate.longitude {
+            
+                Location.getAddress(latitude: latitude, longitude: longitude) { (address, error) in
+                    guard address != nil else {
+                        if error != nil {
+                            print("Could not get address: \(error!)")
+                        }
+                        return
+                    }
+                    
+                    self.restaurantAddressTextField.text = address
+                }
+            }
         }
     }
     
