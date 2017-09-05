@@ -53,7 +53,7 @@ public class Category: NSManagedObject {
         fetch.sortDescriptors = [NSSortDescriptor(key: "sort", ascending: true)]
         
         do {
-            return try Data.shared.managedObjectContext.fetch(fetch) as! [Category]
+            return try Data.shared.managedObjectContext.fetch(fetch) as NSArray as! [Category]
         } catch {
             fatalError("Failed to fetch categories: \(error)")
         }

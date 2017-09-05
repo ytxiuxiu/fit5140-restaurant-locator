@@ -57,7 +57,7 @@ public class Restaurant: NSManagedObject {
         let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Restaurant")
         
         do {
-            return try Data.shared.managedObjectContext.fetch(fetch) as! [Restaurant]
+            return try Data.shared.managedObjectContext.fetch(fetch) as NSArray as! [Restaurant]
         } catch {
             fatalError("Failed to fetch restaurants: \(error)")
         }

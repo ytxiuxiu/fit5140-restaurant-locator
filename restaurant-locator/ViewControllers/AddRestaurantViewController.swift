@@ -516,7 +516,7 @@ class AddRestaurantViewController: UIViewController, UIPickerViewDelegate, UIPic
             var count = 0
             for category in categories {
                 if let restaurants = category.restaurants {
-                    for restaurant in restaurants.allObjects as! [Restaurant] {
+                    for restaurant in restaurants.allObjects as NSArray as! [Restaurant] {
                         guard count < 20 else {
                             return
                         }

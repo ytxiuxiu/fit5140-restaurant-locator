@@ -141,14 +141,16 @@ class CategoryTableViewController: UITableViewController, UIPopoverPresentationC
             
             var count = 0
             for category in self.categories {
-                for restaurant in category.restaurants?.allObjects as! [Restaurant] {
-                    guard count < 20 else { // Only monitor max 20 restaurants
-                        return
-                    }
-                    
-                    if restaurant.notificationRadius != -1 {
-                        Location.shared.addMonitor(restaurant: restaurant)
-                        count = count + 1
+                if let restaurants = category.restaurants?.allObjects {
+                    for restaurant in restaurants as NSArray as! [Restaurant] {
+                        guard count < 20 else { // Only monitor max 20 restaurants
+                            return
+                        }
+                        
+                        if restaurant.notificationRadius != -1 {
+                            Location.shared.addMonitor(restaurant: restaurant)
+                            count = count + 1
+                        }
                     }
                 }
             }

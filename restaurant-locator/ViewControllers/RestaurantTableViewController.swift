@@ -78,7 +78,9 @@ class RestaurantTableViewController: UITableViewController, UIPopoverPresentatio
 
         navigationItem.rightBarButtonItems?.append(editButtonItem)
         
-        restaurants = category?.restaurants?.allObjects as! [Restaurant]
+        if let restaurants = category?.restaurants?.allObjects {
+             self.restaurants = restaurants as NSArray as! [Restaurant]
+        }
         
         // Init
         initSort()
