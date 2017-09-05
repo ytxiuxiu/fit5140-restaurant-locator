@@ -31,7 +31,6 @@ import SearchTextField
 import MapKit
 import CoreLocation
 import Cosmos
-import Alamofire
 import SwiftValidator
 
 
