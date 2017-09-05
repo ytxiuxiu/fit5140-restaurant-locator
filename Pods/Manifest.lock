@@ -1,17 +1,13 @@
 PODS:
-  - Alamofire (4.5.0)
   - Cosmos (11.0.3)
   - SearchTextField (1.1.6)
   - SwiftValidator (4.0.0)
-  - SwiftyJSON (3.1.4)
   - Whisper (5.0.0)
 
 DEPENDENCIES:
-  - Alamofire (~> 4.4)
   - Cosmos (~> 11.0)
   - SearchTextField
   - SwiftValidator (from `https://github.com/jpotts18/SwiftValidator.git`, branch `master`)
-  - SwiftyJSON
   - Whisper
 
 EXTERNAL SOURCES:
@@ -25,13 +21,11 @@ CHECKOUT OPTIONS:
     :git: https://github.com/jpotts18/SwiftValidator.git
 
 SPEC CHECKSUMS:
-  Alamofire: f28cdffd29de33a7bfa022cbd63ae95a27fae140
   Cosmos: eb506859929f4add2d2aec822a27efb2f718a95d
   SearchTextField: 913343415f7cb0bfa29db09e00ce4b54274b611b
   SwiftValidator: 25ded5ca1f10c05adf57f6ac82a72d28ac8d91af
-  SwiftyJSON: c2842d878f95482ffceec5709abc3d05680c0220
   Whisper: 051f25e704bf8992641ffd28b20d5682ddc5f5d3
 
-PODFILE CHECKSUM: e0c40dfe5a8054a168107f64c517ff448a106248
+PODFILE CHECKSUM: 338b286cf707d98576e2c5aa24f8c609cc9ff0f9
 
 COCOAPODS: 1.3.0

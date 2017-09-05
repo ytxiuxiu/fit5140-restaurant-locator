@@ -4,11 +4,6 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>Alamofire.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
 		<key>Cosmos.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -29,11 +24,6 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>SwiftyJSON.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
 		<key>Whisper.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -42,7 +32,12 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>0FDBBD0D3EF7F2BCD3C5DC932071315B</key>
+		<key>0A364B459AC5CAFFDCC9D7AADF664EE0</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>1167A30C856E576364286A5EC2B77E8E</key>
 		<dict>
 			<key>primary</key>
 			<true/>
@@ -52,27 +47,12 @@
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>5AD13224EDB5676F6FDEA2075DA7BFEE</key>
+		<key>83FB47408B9D39F689D5B11442313601</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>62652F004979E15B21FD1627692D8195</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>62B81B78AA69449CB350157B415E5190</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>862E9161ACF3F11201EC6939E6F5D26B</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>88E9EC28B8B46C3631E6B242B50F4442</key>
+		<key>874BCE5B15357940526771727012AA6A</key>
 		<dict>
 			<key>primary</key>
 			<true/>
