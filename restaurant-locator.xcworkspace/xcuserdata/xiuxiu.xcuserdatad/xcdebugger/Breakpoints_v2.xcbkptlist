@@ -493,54 +493,6 @@
             timestampString = "525697965.335474"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "87"
-            endingLineNumber = "87"
-            landmarkName = "locationManager(_:didEnterRegion:)"
-            landmarkType = "7">
-            <Locations>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "restaurant_locator.Location.locationManager (__ObjC.CLLocationManager, didEnterRegion : __ObjC.CLRegion) -&gt; ()"
-                  moduleName = "restaurant-locator"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/xiuxiu/workspace/fit5140/restaurant-locator/restaurant-locator/Location.swift"
-                  timestampString = "525678958.740723"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "78"
-                  endingLineNumber = "78"
-                  offsetFromSymbolStart = "283">
-               </Location>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "restaurant_locator.Location.(locationManager (__ObjC.CLLocationManager, didEnterRegion : __ObjC.CLRegion) -&gt; ()).(implicit closure #1)"
-                  moduleName = "restaurant-locator"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/xiuxiu/workspace/fit5140/restaurant-locator/restaurant-locator/Location.swift"
-                  timestampString = "525678958.74285"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "78"
-                  endingLineNumber = "78"
-                  offsetFromSymbolStart = "12">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "restaurant-locator/Location.swift"
-            timestampString = "525697965.335474"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
             startingLineNumber = "106"
             endingLineNumber = "106"
             landmarkName = "locationManager(_:didEnterRegion:)"

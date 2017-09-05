@@ -84,8 +84,6 @@ class Location: NSObject, CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
         let restaurant = monitoringRestaurants[region.identifier]
         
-        print("entered restaurant region \(restaurant?.name ?? "no name restaurant")")
-        
         let content = UNMutableNotificationContent()
         
         content.title = "You are near \(restaurant?.name ?? "a restaurant")"
@@ -217,8 +215,6 @@ class Location: NSObject, CLLocationManagerDelegate {
         region.notifyOnExit = false
         
         locationManager.startMonitoring(for: region)
-        
-        print("start to monitor restaurant \(restaurant.name)")
     }
     
     /**
